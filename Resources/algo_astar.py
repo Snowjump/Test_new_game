@@ -1,7 +1,10 @@
 ## Miracle battles
+## algo_astar
 
 from Resources import game_stats
 from Resources import game_obj
+from Content import exploration_catalog
+
 import math
 
 # inspired by https://medium.com/@nicholas.w.swift/easy-a-star-pathfinding-7e6689c7f7b2
@@ -22,7 +25,7 @@ class Node:
         return self.position == other.position
 
 
-def astar(travel_agent, start, end, destination):
+def astar(travel_agent, start, end, destination, friendly_cities, hostile_cities, known_map):
     """Returns a list of tuples as a path from the given start to the given end in the given maze"""
 
     # Create start and end node
@@ -70,8 +73,8 @@ def astar(travel_agent, start, end, destination):
             while current is not None:
                 path.append(current.position)
                 current = current.parent
-            print("Final path is " + str(path))
-            return path[::-1]  # Return reversed path
+            # print("Final path is " + str(path))
+            return path[::-1]  #, current_node.g  # Return reversed path
 
         # Generate children
         children = []
@@ -96,14 +99,29 @@ def astar(travel_agent, start, end, destination):
             # Make sure walkable terrain
             TileNum = (node_position[1] - 1) * game_stats.cur_level_width + node_position[0] - 1
             # print("Testing tile [" + str(node_position[0]) + "; " + str(node_position[1]) + "] - " + str(TileNum))
-            if not game_obj.game_map[TileNum].travel:  # No obstacles
-                continue
+            if node_position in known_map:
+                if not game_obj.game_map[TileNum].travel:  # No obstacles
+                    continue
+
+                if game_obj.game_map[TileNum].city_id is not None:
+                    # Forbidden territory
+                    if game_obj.game_map[TileNum].city_id not in friendly_cities \
+                            and game_obj.game_map[TileNum].city_id not in hostile_cities:
+                        continue
+
             if node_position == end:  # Doesn't matter for the last tile
                 pass
-            elif game_obj.game_map[TileNum].army_id is not None:  # Army can't pass through other armies
-                continue
-            elif game_obj.game_map[TileNum].lot == "City":  # Army can't pass through settlement
-                continue
+            elif node_position in known_map:
+                if game_obj.game_map[TileNum].army_id is not None:  # Army can't pass through other armies
+                    continue
+                elif game_obj.game_map[TileNum].lot is not None:
+                    if game_obj.game_map[TileNum].lot == "City":  # Army can't pass through settlement
+                        continue
+                    # For now army can’t pass through facilities and exploration objects
+                    # may reconsider later
+                    elif game_obj.game_map[TileNum].lot.obj_typ == "Facility" or \
+                            game_obj.game_map[TileNum].lot.obj_typ in exploration_catalog.exploration_objects_groups_cat:
+                        continue
 
             # Create new node
             new_node = Node(current_node, node_position)

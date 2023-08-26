@@ -1,4 +1,5 @@
 ## Miracle battles!
+## Create level
 
 
 import pygame.draw, pygame.font
@@ -24,8 +25,7 @@ font20 = pygame.font.SysFont('timesnewroman', 20)
 
 
 def create_level_screen(screen):
-
-    screen.fill(NewGameColor) # background
+    screen.fill(NewGameColor)  # background
 
     # Title
 
@@ -35,148 +35,219 @@ def create_level_screen(screen):
     # Map properties
 
     # Level width
+    x_pos = 50
+    y_pos = 85
 
     text_NewGame2 = font20.render("Level width", True, TitleText)
-    screen.blit(text_NewGame2, [260, 85])
+    screen.blit(text_NewGame2, [x_pos + 10, y_pos])
+
+    y_pos += 23
 
     text_NewGame3 = font20.render(str(game_stats.new_level_width), True, TitleText)
-    screen.blit(text_NewGame3, [260, 108])
+    screen.blit(text_NewGame3, [x_pos + 10, y_pos])
+
+    y_pos += 23
 
     # Width field
 
-    pygame.draw.polygon(screen, FieldColor, [[250, 131], [320, 131], [320, 163], [250, 163]])
-    if game_stats.active_width_field == False:
-        pygame.draw.polygon(screen, BorderNewGameColor, [[250, 131], [320, 131], [320, 163], [250, 163]],3)
+    pygame.draw.polygon(screen, FieldColor, [[x_pos, y_pos], [x_pos + 70, y_pos],
+                                             [x_pos + 70, y_pos + 32], [x_pos, y_pos + 32]])
+    if not game_stats.active_width_field:
+        pygame.draw.polygon(screen, BorderNewGameColor, [[x_pos, y_pos], [x_pos + 70, y_pos],
+                                                         [x_pos + 70, y_pos + 32], [x_pos, y_pos + 32]], 3)
     else:
-        pygame.draw.polygon(screen, HighlightBorder, [[250, 131], [320, 131], [320, 163], [250, 163]],3)
+        pygame.draw.polygon(screen, HighlightBorder, [[x_pos, y_pos], [x_pos + 70, y_pos],
+                                                      [x_pos + 70, y_pos + 32], [x_pos, y_pos + 32]], 3)
 
-    if game_stats.active_width_field == True:
-        if len(game_stats.input_text) > 0:
-            if game_stats.input_text != game_stats.level_width:
-                game_stats.level_width = str(game_stats.input_text)
+    if game_stats.active_width_field:
+        if len(game_stats.create_level_input_text) > 0:
+            if game_stats.create_level_input_text != game_stats.level_width:
+                game_stats.level_width = str(game_stats.create_level_input_text)
     text_NewGame4 = font20.render(str(game_stats.level_width), True, TitleText)
-    screen.blit(text_NewGame4, [260, 133])
+    screen.blit(text_NewGame4, [x_pos + 10, y_pos + 5])
 
     # Approve field 1
 
-    pygame.draw.polygon(screen, ApproveFieldColor, [[330, 131], [362, 131], [362, 163], [330, 163]])
-    pygame.draw.polygon(screen, ApproveElementsColor, [[330, 131], [362, 131], [362, 163], [330, 163]],3)
-    pygame.draw.lines(screen, ApproveElementsColor, False, [(334, 147), (342, 159), (357, 135)], 3)
+    pygame.draw.polygon(screen, ApproveFieldColor, [[x_pos + 80, y_pos], [x_pos + 112, y_pos],
+                                                    [x_pos + 112, y_pos + 32], [x_pos + 80, y_pos + 32]])
+    pygame.draw.polygon(screen, ApproveElementsColor, [[x_pos + 80, y_pos], [x_pos + 112, y_pos],
+                                                       [x_pos + 112, y_pos + 32], [x_pos + 80, y_pos + 32]], 3)
+    pygame.draw.lines(screen, ApproveElementsColor, False, [(x_pos + 84, y_pos + 16),
+                                                            (x_pos + 92, y_pos + 28),
+                                                            (x_pos + 107, y_pos + 4)], 3)
 
     # Cancel field 1
 
-    pygame.draw.polygon(screen, CancelFieldColor, [[370, 131], [402, 131], [402, 163], [370, 163]])
-    pygame.draw.polygon(screen, CancelElementsColor, [[370, 131], [402, 131], [402, 163], [370, 163]],3)
-    pygame.draw.line(screen, CancelElementsColor, [373, 135], [399, 159], 3)
-    pygame.draw.line(screen, CancelElementsColor, [373, 159], [399, 135], 3)
+    pygame.draw.polygon(screen, CancelFieldColor, [[x_pos + 120, y_pos], [x_pos + 152, y_pos],
+                                                   [x_pos + 152, y_pos + 32], [x_pos + 120, y_pos + 32]])
+    pygame.draw.polygon(screen, CancelElementsColor, [[x_pos + 120, y_pos], [x_pos + 152, y_pos],
+                                                      [x_pos + 152, y_pos + 32], [x_pos + 120, y_pos + 32]], 3)
+    pygame.draw.line(screen, CancelElementsColor, [x_pos + 123, y_pos + 4], [x_pos + 149, y_pos + 28], 3)
+    pygame.draw.line(screen, CancelElementsColor, [x_pos + 123, y_pos + 28], [x_pos + 149, y_pos + 4], 3)
+
+    y_pos += 55
 
     # Level height
 
     text_NewGame5 = font20.render("Level height", True, TitleText)
-    screen.blit(text_NewGame5, [260, 186])
+    screen.blit(text_NewGame5, [x_pos + 10, y_pos])
+
+    y_pos += 23
 
     text_NewGame6 = font20.render(str(game_stats.new_level_height), True, TitleText)
-    screen.blit(text_NewGame6, [260, 209])
+    screen.blit(text_NewGame6, [x_pos + 10, y_pos])
+
+    y_pos += 23
 
     # Height field
 
-    pygame.draw.polygon(screen, FieldColor, [[250, 232], [320, 232], [320, 264], [250, 264]])
-    if game_stats.active_height_field == False:
-        pygame.draw.polygon(screen, BorderNewGameColor, [[250, 232], [320, 232], [320, 264], [250, 264]],3)
+    pygame.draw.polygon(screen, FieldColor, [[x_pos, y_pos], [x_pos + 70, y_pos],
+                                             [x_pos + 70, y_pos + 32], [x_pos, y_pos + 32]])
+    if not game_stats.active_height_field:
+        pygame.draw.polygon(screen, BorderNewGameColor, [[x_pos, y_pos], [x_pos + 70, y_pos],
+                                                         [x_pos + 70, y_pos + 32], [x_pos, y_pos + 32]], 3)
     else:
-        pygame.draw.polygon(screen, HighlightBorder, [[250, 232], [320, 232], [320, 264], [250, 264]],3)
+        pygame.draw.polygon(screen, HighlightBorder, [[x_pos, y_pos], [x_pos + 70, y_pos],
+                                                      [x_pos + 70, y_pos + 32], [x_pos, y_pos + 32]], 3)
 
-    if game_stats.active_height_field == True:
-        if len(game_stats.input_text) > 0:
-            if game_stats.input_text != game_stats.level_height:
-                game_stats.level_height = str(game_stats.input_text)
+    if game_stats.active_height_field:
+        if len(game_stats.create_level_input_text) > 0:
+            if game_stats.create_level_input_text != game_stats.level_height:
+                game_stats.level_height = str(game_stats.create_level_input_text)
     text_NewGame7 = font20.render(str(game_stats.level_height), True, TitleText)
-    screen.blit(text_NewGame7, [260, 234])
+    screen.blit(text_NewGame7, [x_pos + 10, y_pos + 5])
 
     # Approve field 2
 
-    pygame.draw.polygon(screen, ApproveFieldColor, [[330, 232], [362, 232], [362, 264], [330, 264]])
-    pygame.draw.polygon(screen, ApproveElementsColor, [[330, 232], [362, 232], [362, 264], [330, 264]],3)
-    pygame.draw.lines(screen, ApproveElementsColor, False, [(334, 248), (342, 260), (357, 236)], 3)
+    pygame.draw.polygon(screen, ApproveFieldColor, [[x_pos + 80, y_pos], [x_pos + 112, y_pos],
+                                                    [x_pos + 112, y_pos + 32], [x_pos + 80, y_pos + 32]])
+    pygame.draw.polygon(screen, ApproveElementsColor, [[x_pos + 80, y_pos], [x_pos + 112, y_pos],
+                                                       [x_pos + 112, y_pos + 32], [x_pos + 80, y_pos + 32]], 3)
+    pygame.draw.lines(screen, ApproveElementsColor, False, [(x_pos + 84, y_pos + 16),
+                                                            (x_pos + 92, y_pos + 28),
+                                                            (x_pos + 107, y_pos + 4)], 3)
 
     # Cancel field 2
 
-    pygame.draw.polygon(screen, CancelFieldColor, [[370, 232], [402, 232], [402, 264], [370, 264]])
-    pygame.draw.polygon(screen, CancelElementsColor, [[370, 232], [402, 232], [402, 264], [370, 264]],3)
-    pygame.draw.line(screen, CancelElementsColor, [373, 236], [399, 260], 3)
-    pygame.draw.line(screen, CancelElementsColor, [373, 260], [399, 236], 3)
+    pygame.draw.polygon(screen, CancelFieldColor, [[x_pos + 120, y_pos], [x_pos + 152, y_pos],
+                                                   [x_pos + 152, y_pos + 32], [x_pos + 120, y_pos + 32]])
+    pygame.draw.polygon(screen, CancelElementsColor, [[x_pos + 120, y_pos], [x_pos + 152, y_pos],
+                                                      [x_pos + 152, y_pos + 32], [x_pos + 120, y_pos + 32]], 3)
+    pygame.draw.line(screen, CancelElementsColor, [x_pos + 123, y_pos + 4], [x_pos + 149, y_pos + 28], 3)
+    pygame.draw.line(screen, CancelElementsColor, [x_pos + 123, y_pos + 28], [x_pos + 149, y_pos + 4], 3)
+
+    y_pos += 55
 
     # Level name
 
     text_NewGame8 = font20.render("Level name", True, TitleText)
-    screen.blit(text_NewGame8, [260, 287])
+    screen.blit(text_NewGame8, [x_pos + 10, y_pos])
+
+    y_pos += 23
 
     text_NewGame9 = font20.render(str(game_stats.new_level_name), True, TitleText)
-    screen.blit(text_NewGame9, [260, 310])
+    screen.blit(text_NewGame9, [x_pos + 10, y_pos])
+
+    y_pos += 23
 
     # Name field
 
-    pygame.draw.polygon(screen, FieldColor, [[250, 333], [470, 333], [470, 365], [250, 365]])
-    if game_stats.active_name_field == False:
-        pygame.draw.polygon(screen, BorderNewGameColor, [[250, 333], [470, 333], [470, 365], [250, 365]],3)
+    pygame.draw.polygon(screen, FieldColor, [[x_pos, y_pos], [x_pos + 220, y_pos],
+                                             [x_pos + 220, y_pos + 32], [x_pos, y_pos + 32]])
+    if not game_stats.active_name_field:
+        pygame.draw.polygon(screen, BorderNewGameColor, [[x_pos, y_pos], [x_pos + 220, y_pos],
+                                                         [x_pos + 220, y_pos + 32], [x_pos, y_pos + 32]], 3)
     else:
-        pygame.draw.polygon(screen, HighlightBorder, [[250, 333], [470, 333], [470, 365], [250, 365]],3)
+        pygame.draw.polygon(screen, HighlightBorder, [[x_pos, y_pos], [x_pos + 220, y_pos],
+                                                      [x_pos + 220, y_pos + 32], [x_pos, y_pos + 32]], 3)
 
-    if game_stats.active_name_field == True:
-        if len(game_stats.input_text) > 0:
-            if game_stats.input_text != game_stats.level_name:
-                game_stats.level_name = str(game_stats.input_text)
+    if game_stats.active_name_field:
+        if len(game_stats.create_level_input_text) > 0:
+            if game_stats.create_level_input_text != game_stats.level_name:
+                game_stats.level_name = str(game_stats.create_level_input_text)
     text_NewGame10 = font20.render(str(game_stats.level_name), True, TitleText)
-    screen.blit(text_NewGame10, [260, 335])
+    screen.blit(text_NewGame10, [x_pos + 10, y_pos + 5])
 
     # Approve field 3
 
-    pygame.draw.polygon(screen, ApproveFieldColor, [[480, 333], [512, 333], [512, 365], [480, 365]])
-    pygame.draw.polygon(screen, ApproveElementsColor, [[480, 333], [512, 333], [512, 365], [480, 365]],3)
-    pygame.draw.lines(screen, ApproveElementsColor, False, [(484, 349), (492, 361), (507, 337)], 3)
+    pygame.draw.polygon(screen, ApproveFieldColor, [[x_pos + 230, y_pos], [x_pos + 262, y_pos],
+                                                    [x_pos + 262, y_pos + 32], [x_pos + 230, y_pos + 32]])
+    pygame.draw.polygon(screen, ApproveElementsColor, [[x_pos + 230, y_pos], [x_pos + 262, y_pos],
+                                                       [x_pos + 262, y_pos + 32], [x_pos + 230, y_pos + 32]], 3)
+    pygame.draw.lines(screen, ApproveElementsColor, False, [(x_pos + 234, y_pos + 16),
+                                                            (x_pos + 242, y_pos + 28),
+                                                            (x_pos + 257, y_pos + 4)], 3)
 
     # Cancel field 3
 
-    pygame.draw.polygon(screen, CancelFieldColor, [[520, 333], [552, 333], [552, 365], [520, 365]])
-    pygame.draw.polygon(screen, CancelElementsColor, [[520, 333], [552, 333], [552, 365], [520, 365]],3)
-    pygame.draw.line(screen, CancelElementsColor, [523, 337], [549, 361], 3)
-    pygame.draw.line(screen, CancelElementsColor, [523, 361], [549, 337], 3)
+    pygame.draw.polygon(screen, CancelFieldColor, [[x_pos + 270, y_pos], [x_pos + 302, y_pos],
+                                                   [x_pos + 302, y_pos + 32], [x_pos + 270, y_pos + 32]])
+    pygame.draw.polygon(screen, CancelElementsColor, [[x_pos + 270, y_pos], [x_pos + 302, y_pos],
+                                                      [x_pos + 302, y_pos + 32], [x_pos + 270, y_pos + 32]], 3)
+    pygame.draw.line(screen, CancelElementsColor, [x_pos + 273, y_pos + 4], [x_pos + 299, y_pos + 28], 3)
+    pygame.draw.line(screen, CancelElementsColor, [x_pos + 273, y_pos + 28], [x_pos + 299, y_pos + 4], 3)
 
     # Starting month
+    x_pos = 360
+    y_pos = 85
 
     text_NewGame11 = font20.render("Starting month", True, TitleText)
-    screen.blit(text_NewGame11, [580, 85])
+    screen.blit(text_NewGame11, [x_pos + 10, y_pos])
+
+    y_pos += 23
 
     text_NewGame12 = font20.render(str(game_stats.LE_month), True, TitleText)
-    screen.blit(text_NewGame12, [580, 108])
+    screen.blit(text_NewGame12, [x_pos + 10, y_pos])
 
     # Month field
+    y_pos += 23
 
-    pygame.draw.polygon(screen, FieldColor, [[570, 131], [640, 131], [640, 163], [570, 163]])
-    if game_stats.active_starting_month_field == False:
-        pygame.draw.polygon(screen, BorderNewGameColor, [[570, 131], [640, 131], [640, 163], [570, 163]], 3)
+    pygame.draw.polygon(screen, FieldColor, [[x_pos, y_pos], [x_pos + 70, y_pos],
+                                             [x_pos + 70, y_pos + 32], [x_pos, y_pos + 32]])
+    if not game_stats.active_starting_month_field:
+        pygame.draw.polygon(screen, BorderNewGameColor, [[x_pos, y_pos], [x_pos + 70, y_pos],
+                                                         [x_pos + 70, y_pos + 32], [x_pos, y_pos + 32]], 3)
     else:
-        pygame.draw.polygon(screen, HighlightBorder, [[570, 131], [640, 131], [640, 163], [570, 163]], 3)
+        pygame.draw.polygon(screen, HighlightBorder, [[x_pos, y_pos], [x_pos + 70, y_pos],
+                                                      [x_pos + 70, y_pos + 32], [x_pos, y_pos + 32]], 3)
 
-    if game_stats.active_starting_month_field == True:
-        if len(game_stats.input_text) > 0:
-            if game_stats.input_text != game_stats.type_LE_month:
-                game_stats.type_LE_month = str(game_stats.input_text)
+    if game_stats.active_starting_month_field:
+        if len(game_stats.create_level_input_text) > 0:
+            if game_stats.create_level_input_text != game_stats.type_LE_month:
+                game_stats.type_LE_month = str(game_stats.create_level_input_text)
     text_NewGame13 = font20.render(str(game_stats.type_LE_month), True, TitleText)
-    screen.blit(text_NewGame13, [580, 133])
+    screen.blit(text_NewGame13, [x_pos + 10, y_pos + 5])
 
     # Approve field 4
 
-    pygame.draw.polygon(screen, ApproveFieldColor, [[650, 131], [682, 131], [682, 163], [650, 163]])
-    pygame.draw.polygon(screen, ApproveElementsColor, [[650, 131], [682, 131], [682, 163], [650, 163]], 3)
-    pygame.draw.lines(screen, ApproveElementsColor, False, [(654, 147), (662, 159), (677, 135)], 3)
+    pygame.draw.polygon(screen, ApproveFieldColor, [[x_pos + 80, y_pos], [x_pos + 112, y_pos],
+                                                    [x_pos + 112, y_pos + 32], [x_pos + 80, y_pos + 32]])
+    pygame.draw.polygon(screen, ApproveElementsColor, [[x_pos + 80, y_pos], [x_pos + 112, y_pos],
+                                                       [x_pos + 112, y_pos + 32], [x_pos + 80, y_pos + 32]], 3)
+    pygame.draw.lines(screen, ApproveElementsColor, False, [(x_pos + 84, y_pos + 16),
+                                                            (x_pos + 92, y_pos + 28),
+                                                            (x_pos + 107, y_pos + 4)], 3)
 
     # Cancel field 4
 
-    pygame.draw.polygon(screen, CancelFieldColor, [[690, 131], [722, 131], [722, 163], [690, 163]])
-    pygame.draw.polygon(screen, CancelElementsColor, [[690, 131], [722, 131], [722, 163], [690, 163]], 3)
-    pygame.draw.line(screen, CancelElementsColor, [693, 135], [719, 159], 3)
-    pygame.draw.line(screen, CancelElementsColor, [693, 159], [719, 135], 3)
+    pygame.draw.polygon(screen, CancelFieldColor, [[x_pos + 120, y_pos], [x_pos + 152, y_pos],
+                                                   [x_pos + 152, y_pos + 32], [x_pos + 120, y_pos + 32]])
+    pygame.draw.polygon(screen, CancelElementsColor, [[x_pos + 120, y_pos], [x_pos + 152, y_pos],
+                                                      [x_pos + 152, y_pos + 32], [x_pos + 120, y_pos + 32]], 3)
+    pygame.draw.line(screen, CancelElementsColor, [x_pos + 123, y_pos + 4], [x_pos + 149, y_pos + 28], 3)
+    pygame.draw.line(screen, CancelElementsColor, [x_pos + 123, y_pos + 28], [x_pos + 149, y_pos + 4], 3)
+
+    y_pos += 55
+
+    # Level type
+    text_NewGame11 = font20.render("Level type", True, TitleText)
+    screen.blit(text_NewGame11, [x_pos + 10, y_pos])
+
+    y_pos += 23
+
+    # Would be more in the future
+    text_NewGame12 = font20.render(game_stats.LE_level_type, True, TitleText)
+    screen.blit(text_NewGame12, [x_pos + 10, y_pos])
 
     ## Buttons
 
@@ -185,11 +256,11 @@ def create_level_screen(screen):
     text_NewGame2 = font26.render("Return to Main Menu", True, TitleText)
     screen.blit(text_NewGame2, [290, 515])
 
-    pygame.draw.polygon(screen, BorderNewGameColor, [[250, 513], [550, 513], [550, 545], [250, 545]],3)
+    pygame.draw.polygon(screen, BorderNewGameColor, [[250, 513], [550, 513], [550, 545], [250, 545]], 3)
 
     # Start editor
 
     text_NewGame11 = font26.render("Start editor", True, TitleText)
     screen.blit(text_NewGame11, [335, 460])
 
-    pygame.draw.polygon(screen, BorderNewGameColor, [[250, 458], [550, 458], [550, 490], [250, 490]],3)
+    pygame.draw.polygon(screen, BorderNewGameColor, [[250, 458], [550, 458], [550, 490], [250, 490]], 3)

@@ -32,12 +32,18 @@ def return_settings_main_menu_but():
     game_stats.current_screen = "Entrance Menu"
     game_stats.screen_to_draw = "main_menu_screen"
 
+    click_sound = pygame.mixer.Sound("Sound/Interface/Abstract1.ogg")
+    click_sound.play()
+
 
 def res_1280_800_but():
     game_stats.game_window_width = 1280
     game_stats.game_window_height = 800
     size = width, height = game_stats.game_window_width, game_stats.game_window_height
     screen = pygame.display.set_mode(size)
+
+    click_sound = pygame.mixer.Sound("Sound/Interface/Abstract1.ogg")
+    click_sound.play()
 
 
 def res_1280_700_but():
@@ -46,6 +52,9 @@ def res_1280_700_but():
     game_stats.game_window_height = 700
     size = width, height = game_stats.game_window_width, game_stats.game_window_height
     screen = pygame.display.set_mode(size)
+
+    click_sound = pygame.mixer.Sound("Sound/Interface/Abstract1.ogg")
+    click_sound.play()
 
 
 button_funs = {1 : return_settings_main_menu_but,

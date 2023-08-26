@@ -3,8 +3,6 @@ import math
 import copy
 import random
 
-from Resources import game_obj
-
 
 from Resources import game_obj
 from Resources import game_stats
@@ -14,6 +12,13 @@ from Resources import algo_b_astar
 
 def manage_ranged(b, acting_unit, own_army_id, enemy_army_id, own_melee, own_ranged, enemy_melee, enemy_ranged,
                   enemy_units):
+    enemy_hero = None
+    for army in game_obj.game_armies:
+        if army.army_id == enemy_army_id:
+            if army.hero is not None:
+                enemy_hero = army.hero
+            break
+
     # Important, firstly, need to be sure, that regiment is using ranged attack
     ranged_attacks_list = []
     num = 0
@@ -48,10 +53,11 @@ def manage_ranged(b, acting_unit, own_army_id, enemy_army_id, own_melee, own_ran
                             if army.army_id == enemy_army_id:
                                 if "melee" in army.units[b.battle_map[TileNum].unit_index].reg_tags:
                                     melee_enemy_nearby = True
+                                break
 
         if len(enemy_nearby) > 0:
             # Regiment has an enemy in nearby tile
-            # If melee enemy is nearby, than his regiment should defend itself
+            # If melee enemy is nearby, than this regiment should defend itself
             if melee_enemy_nearby:
                 print("Too dangerous to attack")
                 b.AI_ready = False
@@ -124,10 +130,12 @@ def manage_ranged(b, acting_unit, own_army_id, enemy_army_id, own_melee, own_ran
                     if e.counterattack == 0:
                         target_without_counterattack = True
                         if defence_strength is None:
-                            defence_strength = int(e.defence) + int(armor) + game_battle.defence_effect(e)
+                            defence_strength = int(e.armour) \
+                                               + game_battle.defence_effect(e, e.defence, enemy_hero)
                             e_index = int(num)
-                        elif int(e.defence) + int(armor) + game_battle.defence_effect(e) < defence_strength:
-                            defence_strength = int(e.defence) + int(armor) + game_battle.defence_effect(e)
+                        elif int(e.armour) + game_battle.defence_effect(e, e.defence, enemy_hero) < defence_strength:
+                            defence_strength = int(e.armour) \
+                                               + game_battle.defence_effect(e, e.defence, enemy_hero)
                             e_index = int(num)
                         else:
                             pass
@@ -175,28 +183,37 @@ def manage_ranged(b, acting_unit, own_army_id, enemy_army_id, own_melee, own_ran
                 b.AI_ready = False
                 game_battle.action_order(b, "Wait", None)
             else:
+                # Look for closest enemy
                 closest_enemy = find_closest_enemy(b, enemy_units, acting_unit)
 
                 if closest_enemy is not None:
+                    # Search for suitable position to shoot
                     shooting_position = find_closest_position_to_shoot(b, closest_enemy)
                     if shooting_position is None:
                         print("Unit can't reach position in move where it can shoot enemy")
+                        print("closest_enemy - " + str(closest_enemy))
                         node, a_path = algo_b_astar.b_astar(None, acting_unit.position, closest_enemy, None, b)
-                        a_path.pop(0)
-                        a_path.pop(-1)
-                        current = node
-                        while current is not None:
-                            # print("current.position - " + str(current.position))
-                            if current.position in b.movement_grid:
-                                b.path = [copy.deepcopy(current)]
-                                b.move_destination = [int(current.position[0]), int(current.position[1])]
-                                current = None
-                            else:
-                                # print("current.parent.position - " + str(current.parent.position))
-                                current = current.parent
+                        if a_path is not None:
+                            # Trying to come closer toward enemy
+                            a_path.pop(0)
+                            a_path.pop(-1)
+                            current = node
+                            while current is not None:
+                                # print("current.position - " + str(current.position))
+                                if current.position in b.movement_grid:
+                                    b.path = [copy.deepcopy(current)]
+                                    b.move_destination = [int(current.position[0]), int(current.position[1])]
+                                    current = None
+                                else:
+                                    # print("current.parent.position - " + str(current.parent.position))
+                                    current = current.parent
 
-                        b.AI_ready = False
-                        game_battle.action_order(b, "Move", None)
+                            b.AI_ready = False
+                            game_battle.action_order(b, "Move", None)
+                        else:
+                            # Regiment is blocked off from reaching enemies, should wait instead
+                            b.AI_ready = False
+                            game_battle.action_order(b, "Wait", None)
                     else:
                         print("Moving to shooting position")
                         b.move_destination = [int(shooting_position[0]), int(shooting_position[1])]
@@ -211,6 +228,39 @@ def manage_ranged(b, acting_unit, own_army_id, enemy_army_id, own_melee, own_ran
 
         # b.AI_ready = False
         # game_battle.action_order(b, "Wait", None)
+
+
+def direction_of_hit(chosen_enemy, old_position):
+
+    if chosen_enemy[0] - old_position[0] == 1:
+        if chosen_enemy[1] - old_position[1] == 1:
+            # NW from target
+            pos = [20, 20]
+        elif chosen_enemy[1] - old_position[1] == 0:
+            # W from target
+            pos = [20, 50]
+        elif chosen_enemy[1] - old_position[1] == -1:
+            # SW from target
+            pos = [20, 80]
+    elif chosen_enemy[0] - old_position[0] == 0:
+        if chosen_enemy[1] - old_position[1] == 1:
+            # N from target
+            pos = [50, 20]
+        elif chosen_enemy[1] - old_position[1] == -1:
+            # S from target
+            pos = [50, 80]
+    elif chosen_enemy[0] - old_position[0] == -1:
+        if chosen_enemy[1] - old_position[1] == 1:
+            # NE from target
+            pos = [80, 20]
+        elif chosen_enemy[1] - old_position[1] == 0:
+            # E from target
+            pos = [80, 50]
+        elif chosen_enemy[1] - old_position[1] == -1:
+            # SE from target
+            pos = [80, 80]
+
+    return pos
 
 
 def find_shootings_targets(b, acting_unit, enemy_units):

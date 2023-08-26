@@ -5,6 +5,8 @@ import math
 
 
 def construct_path(selected_army, route):
+    print("Route: " + str(route))
+    # all_armies: True or False
     for army in game_obj.game_armies:
         if army.army_id == selected_army:
             # Check movement points
@@ -78,4 +80,11 @@ def construct_path(selected_army, route):
 
                 order += 1
 
+            # print("army.path_arrows: " + str(army.path_arrows))
+            break
+
             # print("Arrows are ready")
+
+
+def construct_path_for_all_armies():
+    pass

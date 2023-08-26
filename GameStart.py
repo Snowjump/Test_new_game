@@ -1,4 +1,5 @@
-# Miracle battles!
+## Miracle battles!
+## GameStart
 
 import sys
 import pygame
@@ -15,13 +16,15 @@ from Surfaces.sf_create_level import *
 from Surfaces.sf_entrance_menu import *
 from Surfaces.sf_game_board import *
 from Surfaces.sf_level_editor import *
-from Surfaces.sf_new_game import *
+from Surfaces.sf_skirmish_menu import *
 from Surfaces.sf_settings import *
 from Surfaces.sf_battle import *
+from Surfaces.sf_credits import *
 
 
 fpsClock = pygame.time.Clock()
 time_counted = 0
+# font16 = pygame.font.SysFont('timesnewroman', 16)
 
 # display constants
 size = width, height = game_stats.game_window_width, game_stats.game_window_height
@@ -39,6 +42,10 @@ key_pressed = False
 
 
 def init_window():
+    # Sound module, must be executed before pygame.init()
+    # Source: https://proproprogs.ru/modules/dobavlyaem-zvuk-v-igrovoy-process-moduli-mixer-i-music
+    pygame.mixer.pre_init(44100, -16, 1, 512)
+
     pygame.init()
     ##    game_stats.start_time = pygame.time.get_ticks()
 
@@ -88,6 +95,13 @@ def main_action():
         # frames per second
         fpsClock.tick(60)
 
+        # # FPS
+        # fps = fpsClock.get_fps()
+        # text_panel = font16.render(str(fps), True, [0xFF, 0xFF, 0x99])
+        # screen.blit(text_panel, [10, 44])
+        if game_stats.fps_status:
+            game_stats.fps = math.ceil(fpsClock.get_fps() * 100) / 100
+
 
 # all events happen below
 def control_input():
@@ -100,16 +114,23 @@ def control_input():
 
         # Typing
         if event.type == KEYDOWN:
-            # print(event.key)
-            game_stats.input_text += event.unicode
-            print(game_stats.input_text)
+            print("event.key: " + str(event.key) + "; key_pressed: " + str(key_pressed))
+            # game_stats.input_text += event.unicode
+            # print(game_stats.input_text)
+            print("unicode: " + event.unicode + "; record_text: " + str(game_stats.record_text))
+            if game_stats.record_text:
+                game_stats.input_text += event.unicode
 
-            if key_pressed == False:
-                key_pressed = True
+            # if not key_pressed or event.key in [304]:
+            if not key_pressed:
+                print("key_handler")
+                if event.key not in [304]:
+                    key_pressed = True
                 key_handler(event.key)
+            # print(game_stats.input_text)  # For checking
 
         if event.type == KEYUP:
-            if key_pressed == True:
+            if key_pressed:
                 # print("key is up " + str(event.key))
                 key_pressed = False
 
@@ -171,12 +192,13 @@ def control_input():
 def mouse_handler1(position):  # for first mouse button
     # print("Mouse 1: current_screen is " + str(game_stats.current_screen))
     button_action_list = {"Entrance Menu": entrance_menu_surface_m1,
-                          "New Game": new_game_surface_m1,
+                          "Skirmish": skirmish_menu_surface_m1,
                           "Game Board": game_board_surface_m1,
                           "Create Level": create_level_surface_m1,
                           "Level Editor": level_editor_surface_m1,
                           "Settings": settings_surface_m1,
-                          "Battle": battle_surface_m1}
+                          "Battle": battle_surface_m1,
+                          "Credits": credits_surface_m1}
 
     button_action_list[game_stats.current_screen](position)
 
@@ -184,12 +206,13 @@ def mouse_handler1(position):  # for first mouse button
 def mouse_handler3(position):  # for third (right) mouse button
     # print("Mouse 3: current_screen is " + str(game_stats.current_screen))
     button_action_list = {"Entrance Menu": entrance_menu_surface_m3,
-                          "New Game": new_game_surface_m3,
+                          "Skirmish": skirmish_menu_surface_m3,
                           "Game Board": game_board_surface_m3,
                           "Create Level": create_level_surface_m3,
                           "Level Editor": level_editor_surface_m3,
                           "Settings": settings_surface_m3,
-                          "Battle": battle_surface_m3}
+                          "Battle": battle_surface_m3,
+                          "Credits": credits_surface_m3}
 
     button_action_list[game_stats.current_screen](position)
 
@@ -198,12 +221,13 @@ def key_handler(key_action):  # for keyboard
     # print("Keyboard: current_screen is " + str(game_stats.current_screen))
     # print("Key action is " + str(key_action))
     key_action_list = {"Entrance Menu": entrance_menu_keys,
-                       "New Game": new_game_keys,
+                       "Skirmish": skirmish_menu_keys,
                        "Game Board": game_board_keys,
                        "Create Level": create_level_keys,
                        "Level Editor": level_editor_keys,
                        "Settings": settings_keys,
-                       "Battle": battle_keys}
+                       "Battle": battle_keys,
+                       "Credits": credits_keys}
 
     key_action_list[game_stats.current_screen](key_action)
 

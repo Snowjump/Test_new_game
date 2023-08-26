@@ -31,5 +31,5 @@ def new_game():
         y = int(math.ceil(tile_number / game_stats.new_level_width))
         game_stats.level_map.append(game_classes.Tile((x, y), "Plain",
                                                       terrain_catalog.terrain_calendar["Plain"][game_stats.LE_month]))
-        print("x, y - " + str(x) + " " + str(y))
+        # print("x, y - " + str(x) + " " + str(y))
         tile_number += 1

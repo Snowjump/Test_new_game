@@ -3,9 +3,22 @@
 LE_neutrals_units_list = ["Simurg's anarchists",
                           "Bandit archers",
                           "Highway robbers",
-                          "Robber knights"]
+                          "Robber knights",
+                          "Grey dragon",
+                          "Grey drakes"]
 
-LE_knight_lords_units_list = ["Peasants"]
+LE_knight_lords_units_list = ["Peasant mob",
+                              "Peasant bowmen",
+                              "Crossbowmen",
+                              "Spear footmen",
+                              "Sword footmen",
+                              "Squires",
+                              "Knights",
+                              "Priests of Salvation",
+                              "Battle monks",
+                              "Griffons",
+                              "Pegasus knights",
+                              "Field ballistas"]
 
 LE_nature_keepers_units_list = ["Elven archers"]
 

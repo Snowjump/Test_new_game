@@ -1,15 +1,23 @@
 ## Miracle battles!
+## level_save
 
 import shelve
 from pathlib import Path
 
 from Resources import game_stats
 
+
 # Start saving new level
 def save_new_level():
-    shelfFile = shelve.open(str(Path('levels')) + '/' + game_stats.new_level_name)
+    if game_stats.LE_level_type == "Skirmish":
+        check_playable_realms()
+
+    folder = str(game_stats.LE_level_type)
+    shelfFile = shelve.open(str(Path('levels/' + folder)) + '/' + game_stats.new_level_name)
 
     shelfFile["new_level_named"] = game_stats.new_level_name
+
+    shelfFile["new_level_type"] = game_stats.LE_level_type
 
     shelfFile["new_level_year"] = game_stats.LE_year
 
@@ -27,7 +35,12 @@ def save_new_level():
 
     shelfFile["new_level_LE_army_id_counter"] = game_stats.LE_army_id_counter
 
+    shelfFile["new_level_LE_hero_id_counter"] = game_stats.LE_hero_id_counter
+
+    shelfFile["new_level_LE_population_id_counter"] = game_stats.LE_population_id_counter
+
     shelfFile.close()
+
 
 # Save current game
 def save_game():
@@ -42,3 +55,17 @@ def save_game():
     shelfFile["new_level_id_counter"] = game_stats.person_id_counter
 
     shelfFile.close()
+
+
+def check_playable_realms():
+    # In case there is no playable realms for human player in skirmish scenario
+    # then all realms should be made to be playable
+    no_playable_realms = True
+    for realm in game_stats.editor_powers:
+        if realm.playable:
+            no_playable_realms = False
+            break
+
+    if no_playable_realms:
+        for realm in game_stats.editor_powers:
+            realm.playable = True

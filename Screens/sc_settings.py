@@ -1,5 +1,5 @@
 ## Miracle battles!
-
+## sc_settings
 
 import pygame.draw, pygame.font
 pygame.init()
@@ -19,18 +19,16 @@ BorderMainMenuColor = [0xFF, 0xCC, 0x99]
 font26 = pygame.font.SysFont('timesnewroman', 26)
 font20 = pygame.font.SysFont('timesnewroman', 20)
 
-def settings_screen(screen):
 
-    screen.fill(NewGameColor) # background
+def settings_screen(screen):
+    screen.fill(NewGameColor)  # background
 
     ## Decorative lines
-
     pygame.draw.line(screen, LineMainMenuColor1, [145, 170], [470, 170], 5)
 
     ## Settings
 
     # Resolution
-
     text_settings2 = font26.render("Resolution", True, TitleText)
     screen.blit(text_settings2, [180, 180])
 
@@ -47,7 +45,6 @@ def settings_screen(screen):
     ## Buttons
 
     # Return to Main Menu
-
     text_settings1 = font26.render("Return to Main Menu", True, TitleText)
     screen.blit(text_settings1, [200, 102])
 
