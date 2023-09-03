@@ -1253,7 +1253,7 @@ def close_autobattle_results():
                                             attacker_realm, defender_realm,
                                             game_stats.battle_type,
                                             game_stats.attacker_no_troops_left, game_stats.defender_no_troops_left,
-                                            game_stats.battle_result)
+                                            game_stats.battle_result, None)
 
     print("Set default values in game_stats")
 

@@ -5,7 +5,9 @@ knight_names = ["Sir Stibor",
                 "Sir Jean",
                 "Sir Giles",
                 "Sir Valdi",
-                "Sir Theobold"]
+                "Sir Theobold",
+                "Kalben the Greenskin knight",
+                "Silard the Orc relictor"]
 
 
 priest_of_salvation_names = ["Monk Gatret",

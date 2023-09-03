@@ -329,7 +329,13 @@ def assemble_adventure_destinations(realm, role, army, settlement, friendly_citi
     # print("len(settlement.control_zone) : " + str(len(settlement.control_zone)))
     # print("len(realm.known_map) : " + str(len(realm.known_map)))
     # print("realm.known_map : " + str(realm.known_map))
+    own_army_sum_rank = 0
+    for unit in army.units:
+        own_army_sum_rank += unit.rank
+    print("Own army: len(army.units) - " + str(len(army.units)) + "; own_army_sum_rank - " + str(own_army_sum_rank))
     for TileNum in settlement.control_zone:
+        # Adventuring on your own territory
+
         # print(str(tile))
         # print(str(realm.known_map))
         # print(str(game_obj.game_map[TileNum].posxy))
@@ -341,59 +347,89 @@ def assemble_adventure_destinations(realm, role, army, settlement, friendly_citi
 
         # else:
             # print(str(list(game_obj.game_map[TileNum].posxy)))
-        elif game_obj.game_map[TileNum].lot is not None and TileNum != army.location:
-            if game_obj.game_map[TileNum].lot != "City":
-                map_obj = game_obj.game_map[TileNum].lot
-                # print(map_obj.obj_name)
-                if map_obj.obj_typ == "Bonus":
-                    # Exploration objects
-                    if map_obj.obj_name in exploration_objects_group_1:
-                        if army.hero.hero_id not in map_obj.properties.hero_list \
-                                and not map_obj.properties.need_replenishment:
-                            passed_verification = True
-                            if map_obj.obj_name in AI_exploration_cond.event_conditions:
-                                passed_verification = AI_exploration_cond.event_conditions[map_obj.obj_name](army)
-                            if passed_verification:
+        elif TileNum != army.location:
+            # Exclude army's own position
+            if game_obj.game_map[TileNum].lot is not None:
+                if game_obj.game_map[TileNum].lot != "City":
+                    map_obj = game_obj.game_map[TileNum].lot
+                    # print(map_obj.obj_name)
+                    if map_obj.obj_typ == "Bonus":
+                        # Exploration objects
+                        if map_obj.obj_name in exploration_objects_group_1:
+                            if army.hero.hero_id not in map_obj.properties.hero_list \
+                                    and not map_obj.properties.need_replenishment:
+                                passed_verification = True
+                                if map_obj.obj_name in AI_exploration_cond.event_conditions:
+                                    passed_verification = AI_exploration_cond.event_conditions[map_obj.obj_name](army)
+                                if passed_verification:
+                                    distance = math.sqrt(((army.posxy[0] - game_obj.game_map[TileNum].posxy[0]) ** 2) +
+                                                         ((army.posxy[1] - game_obj.game_map[TileNum].posxy[1]) ** 2))
+                                    distance = math.floor(distance * 100) / 100
+                                    tile_list.append(["Bonus", list(game_obj.game_map[TileNum].posxy), distance])
+                        elif map_obj.obj_name in exploration_objects_group_2:
+                            if not map_obj.properties.need_replenishment:
                                 distance = math.sqrt(((army.posxy[0] - game_obj.game_map[TileNum].posxy[0]) ** 2) + (
                                         (army.posxy[1] - game_obj.game_map[TileNum].posxy[1]) ** 2))
                                 distance = math.floor(distance * 100) / 100
                                 tile_list.append(["Bonus", list(game_obj.game_map[TileNum].posxy), distance])
-                    elif map_obj.obj_name in exploration_objects_group_2:
-                        if not map_obj.properties.need_replenishment:
-                            distance = math.sqrt(((army.posxy[0] - game_obj.game_map[TileNum].posxy[0]) ** 2) + (
-                                    (army.posxy[1] - game_obj.game_map[TileNum].posxy[1]) ** 2))
-                            distance = math.floor(distance * 100) / 100
-                            tile_list.append(["Bonus", list(game_obj.game_map[TileNum].posxy), distance])
 
-                elif map_obj.obj_typ == "Lair":
-                    # Lair objects with opportunity to fight for a prize
-                    if map_obj.properties.army_id is not None:
-                        print("obj.properties.army_id - " + str(map_obj.properties.army_id))
-                        for target in game_obj.game_armies:
-                            if target.army_id == map_obj.properties.army_id:
-                                target_sum_rank = 0
-                                for unit in target.units:
-                                    target_sum_rank += unit.rank
-                                print("len(target.units) - " + str(len(target.units)) + "; target_sum_rank - " +
-                                      str(target_sum_rank))
-                                own_army_sum_rank = 0
-                                for unit in army.units:
-                                    own_army_sum_rank += unit.rank
-                                print("len(army.units) - " + str(len(army.units)) + "; own_army_sum_rank - " +
-                                      str(own_army_sum_rank))
-                                rank_ratio = int(own_army_sum_rank / target_sum_rank * 100)
-                                random_risk_level = random.randint(0, 40)
-                                # Standard border is 120
-                                print("rank_ratio - " + str(rank_ratio) + "; random_risk_level - " +
-                                      str(random_risk_level) + "; result - " + str(120 - random_risk_level))
-                                if rank_ratio >= 120 - random_risk_level:
-                                    print("Attack")
-                                    distance = math.sqrt(
-                                        ((army.posxy[0] - game_obj.game_map[TileNum].posxy[0]) ** 2) + (
-                                                (army.posxy[1] - game_obj.game_map[TileNum].posxy[1]) ** 2))
-                                    distance = math.floor(distance * 100) / 100
-                                    tile_list.append(["Lair", list(game_obj.game_map[TileNum].posxy), distance])
-                                break
+                    elif map_obj.obj_typ == "Lair":
+                        # Lair objects with opportunity to fight for a prize
+                        if map_obj.properties.army_id is not None:
+                            print("obj.properties.army_id - " + str(map_obj.properties.army_id))
+                            for target in game_obj.game_armies:
+                                if target.army_id == map_obj.properties.army_id:
+                                    target_sum_rank = 0
+                                    for unit in target.units:
+                                        target_sum_rank += unit.rank
+                                    print("len(target.units) - " + str(len(target.units)) + "; target_sum_rank - " +
+                                          str(target_sum_rank))
+
+                                    rank_ratio = int(own_army_sum_rank / target_sum_rank * 100)
+                                    random_risk_level = random.randint(0, 40)
+                                    # Standard border is 120
+                                    print("rank_ratio - " + str(rank_ratio) + "; random_risk_level - " +
+                                          str(random_risk_level) + "; result - " + str(120 - random_risk_level))
+                                    if rank_ratio >= 120 - random_risk_level:
+                                        print("Attack")
+                                        distance = math.sqrt(
+                                            ((army.posxy[0] - game_obj.game_map[TileNum].posxy[0]) ** 2) + (
+                                                    (army.posxy[1] - game_obj.game_map[TileNum].posxy[1]) ** 2))
+                                        distance = math.floor(distance * 100) / 100
+                                        tile_list.append(["Lair", list(game_obj.game_map[TileNum].posxy), distance])
+                                    break
+
+            else:
+                # Tile without a lot
+                if game_obj.game_map[TileNum].army_id is not None:
+                    # But there is an army
+                    print("Tile.army_id - " + str(game_obj.game_map[TileNum].army_id))
+                    for target in game_obj.game_armies:
+                        if target.army_id == game_obj.game_map[TileNum].army_id:
+                            if target.action == "Stand":
+                                # Targeting standing armies
+                                if target.owner == "Neutral":
+                                    # Targeting neutral armies
+                                    target_sum_rank = 0
+                                    for unit in target.units:
+                                        target_sum_rank += unit.rank
+                                    print("len(target.units) - " + str(len(target.units)) + "; target_sum_rank - " +
+                                          str(target_sum_rank))
+
+                                    rank_ratio = int(own_army_sum_rank / target_sum_rank * 100)
+                                    random_risk_level = random.randint(0, 40)
+                                    # Standard border is 120
+                                    print("rank_ratio - " + str(rank_ratio) + "; random_risk_level - " +
+                                          str(random_risk_level) + "; result - " + str(120 - random_risk_level))
+                                    if rank_ratio >= 100 - random_risk_level:
+                                        print("Attack")
+                                        distance = math.sqrt(
+                                            ((army.posxy[0] - game_obj.game_map[TileNum].posxy[0]) ** 2) + (
+                                                    (army.posxy[1] - game_obj.game_map[TileNum].posxy[1]) ** 2))
+                                        distance = math.floor(distance * 100) / 100
+                                        tile_list.append(["Enemy army", list(game_obj.game_map[TileNum].posxy),
+                                                          distance])
+                                    break
 
     # print("len(tile_list) : " + str(len(tile_list)))
     # print("tile_list: " + str(tile_list))
@@ -518,7 +554,7 @@ def return_to_base(realm, friendly_cities, hostile_cities):
         elif role.army_role == "Travel to settlement":
             # if role.status == "Start":
             #     all_finished = False
-            print("army.action - " + str(army.action))
+            print("Travel to settlement: army.action - " + str(army.action))
             if army.action != "Stand":
                 all_finished = False
             elif army.action == "Stand":
@@ -529,6 +565,15 @@ def return_to_base(realm, friendly_cities, hostile_cities):
                         role.army_role = "Nothing to do"
                         role.status = "Finished"
                         print("Army has returned to settlement")
+
+                # If army hasn't reached settlement yet but doesn't have movement points to travel
+                # It must change status to Finished
+                # This prevent army from making fake animation of moving over map
+                if give_command_to_move:
+                    if role.status == "Finished":
+                        give_command_to_move = False
+                        print("No movement points left")
+
                 if give_command_to_move:
                     army.action = "Ready to move"
                     all_finished = False

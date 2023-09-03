@@ -8,6 +8,7 @@ from Resources import game_stats
 from Resources import game_obj
 from Resources import update_gf_game_board
 from Resources import prepare_level
+from Resources import game_start
 
 
 # This function needed to load level, when player is starting new game or proceed to next level
@@ -39,14 +40,16 @@ def begin_new_level(folder, level_to_load):
 
     shelfFile.close()
 
+    game_start.nullify_level_editor_variables()
+
     pov_pos = [0, 0]
-    print("Level name is " + game_stats.current_level_name)
-    print(str(game_stats.game_month) + " month " + str(game_stats.game_year) + " year")
+    # print("Level name is " + game_stats.current_level_name)
+    # print(str(game_stats.game_month) + " month " + str(game_stats.game_year) + " year")
     # print("Playable faction is " + assign_parameters[game_stats.current_level_name])
     # game_stats.player_power = assign_parameters[game_stats.current_level_name]
-    print("Playable faction is " + game_stats.start_level_selected_realm.name)
+    # print("Playable faction is " + game_stats.start_level_selected_realm.name)
     game_stats.player_power = str(game_stats.start_level_selected_realm.name)
-    print("game_stats.player_power - " + str(game_stats.player_power))
+    # print("game_stats.player_power - " + str(game_stats.player_power))
     game_stats.perspective = str(game_stats.player_power)
     game_stats.turn_hourglass = False
 
@@ -63,7 +66,7 @@ def begin_new_level(folder, level_to_load):
             count_x = xy_tile.posxy[0]
         if xy_tile.posxy[1] > count_y:
             count_y = xy_tile.posxy[1]
-    print("count_x = " + str(count_x) + " and count_y = " + str(count_y))
+    # print("count_x = " + str(count_x) + " and count_y = " + str(count_y))
     game_stats.cur_level_width = int(count_x)
     game_stats.cur_level_height = int(count_y)
     game_stats.selected_object = ""
@@ -101,7 +104,7 @@ def gather_level_information(folder, level_to_load):
     game_stats.start_level_total_realms = int(len(realms))
     game_stats.start_level_playable_realms = 0
     for realm in realms:
-        print(realm.name + "; playable is " + str(realm.playable))
+        # print(realm.name + "; playable is " + str(realm.playable))
         if realm.playable:
             # print(realm.name)
             game_stats.start_level_playable_realms += 1

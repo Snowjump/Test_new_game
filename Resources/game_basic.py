@@ -31,6 +31,7 @@ from Resources import algo_building
 from Resources import update_gf_game_board
 from Resources import algo_path_arrows
 from Resources import siege_warfare
+from Resources import game_autobattle
 
 from Content.Quests import knight_lords_cond
 from Content.Quests import knight_lords_quest_result_scripts
@@ -488,6 +489,7 @@ def movement_action(army):
             if len(army.route) == 1:
                 for found_army in game_obj.game_armies:
                     if found_army.army_id == TileObj.army_id:
+                        print("")
                         if army.owner == found_army.owner:
                             print("Meeting ally army")
                             exchange_armies(army, found_army)
@@ -812,11 +814,22 @@ def change_position(army, own_realm):
 
             if len(army.route) == 0:
                 army.action = "Stand"
+
             else:
                 if not enough_movement_points(army):
+                    # Not enough movement points for army to make next move
                     army.action = "Stand"
+                    for role in own_realm.AI_cogs.army_roles:
+                        if role.army_id == army.army_id:
+                            role.status = "Finished"
+                            break
         else:
+            # Not enough movement points for army to move
             army.action = "Stand"
+            for role in own_realm.AI_cogs.army_roles:
+                if role.army_id == army.army_id:
+                    role.status = "Finished"
+                    break
 
     elif army.action == "Routing":
         next_point = list(army.route[0])
@@ -835,6 +848,13 @@ def change_position(army, own_realm):
         if len(army.route) == 0:
             army.action = "Stand"
             print("army.action = Stand")
+
+        # Won't be able to move anywhere after routing anyway
+        for role in own_realm.AI_cogs.army_roles:
+            if role.army_id == army.army_id:
+                if role.status != "Finished":
+                    role.status = "Finished"
+                break
 
 
 def spent_movement_points(army):
@@ -860,7 +880,8 @@ def enough_movement_points(army):
 
 
 def engage_army(attacker, defender, terrain, conditions, encounter_type):
-    print("Engaging " + str(attacker.army_id) + " vs " + str(defender.army_id))
+    print("")
+    print("Engaging army " + str(attacker.army_id) + " vs army " + str(defender.army_id))
 
     # print("Found defending army " + str(defender.army_id))
     defender.action = "Fighting"
@@ -902,6 +923,11 @@ def engage_army(attacker, defender, terrain, conditions, encounter_type):
             #         if army.owner == game_stats.player_power:
             #             print('game_stats.game_board_panel = "begin battle"')
             #             game_stats.game_board_panel = "begin battle"
+
+            else:
+                # AI battle
+                print("AI field battle")
+                game_autobattle.begin_battle(attacker, defender, "Battle", None)
 
     elif encounter_type == "Lair":
         # for unit in attacker.units:
@@ -1854,8 +1880,8 @@ def military_upkeep():
 
 
 def remove_army(id_list):
-    print("remove_army()")
-    print("1. id_list: " + str(id_list))
+    # print("remove_army()")
+    # print("1. id_list: " + str(id_list))
     while len(id_list) > 0:
         for army in game_obj.game_armies:
             if army.army_id == id_list[0]:
@@ -1873,7 +1899,7 @@ def remove_army(id_list):
                 del id_list[0]
                 break
 
-    print("2. id_list: " + str(id_list))
+    # print("2. id_list: " + str(id_list))
 
 
 def capture_settlement(settlement, attacker_realm, winner_alive, winner):

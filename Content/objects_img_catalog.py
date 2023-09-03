@@ -26,4 +26,4 @@ object_calendar = {"Oak": oak_seasons,
 
 
 object_variations = {"Oak": 1,
-                     "Birch": 2}
+                     "Birch": 3}

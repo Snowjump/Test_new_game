@@ -19,6 +19,7 @@ resource_names = ["Florins",
 
 
 def runaway_serfs_refuge_reward(the_army, the_realm):
+    # print("Runaway serfs refuge reward")
     reward_list = reward_catalog.reward_scripts["Runaway serfs refuge reward"](the_army)
     spread_reward(the_army, the_realm, list(reward_list[1]))
 

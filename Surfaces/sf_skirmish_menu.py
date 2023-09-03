@@ -36,10 +36,11 @@ def skirmish_menu_surface_m1(position):
             pressed_button = True
             y_axis = position[1]
             y_axis -= 82
-            print(str(y_axis))
+            # print(str(y_axis))
             y_axis = math.ceil(y_axis / 24)
-            print(str(y_axis))
-            if y_axis - 1 != game_stats.level_index:
+            # print(str(y_axis))
+            # print("len(game_stats.levels_list) - " + str(len(game_stats.levels_list)))
+            if y_axis - 1 != game_stats.level_index and y_axis <= len(game_stats.levels_list):
                 game_stats.level_index = int(y_axis - 1)
                 start_new_level.gather_level_information("Skirmish", game_stats.levels_list[game_stats.level_index])
 

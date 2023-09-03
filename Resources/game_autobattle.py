@@ -281,7 +281,15 @@ def begin_battle(attacker, defender, battle_type, battle_result_script):
         else:
             defender.hero.experience += int(exp_attackers)
 
-    if not attacker_realm.AI_player or not defender_realm.AI_player:
+    AI_battle = True
+    if attacker_realm is not None:
+        if not attacker_realm.AI_player:
+            AI_battle = False
+    elif defender_realm is not None:
+        if not defender_realm.AI_player:
+            AI_battle = False
+
+    if not AI_battle:
         if attacker.owner != "Neutral":
             print(attacker_realm.name + " AI_player - " + str(attacker_realm.AI_player))
         if defender.owner != "Neutral":
@@ -323,7 +331,7 @@ def begin_battle(attacker, defender, battle_type, battle_result_script):
         print("Input defender_troops_power_level_list: " + str(len(defender_troops_power_level_list)))
         after_battle_processing(attacker, defender, attacker_troops_power_level_list, defender_troops_power_level_list,
                                 attacker_realm, defender_realm, battle_type, attacker_no_troops_left,
-                                defender_no_troops_left, result)
+                                defender_no_troops_left, result, battle_result_script)
 
 
 def play_battle(attacker_troops_power_level_list, defender_troops_power_level_list, attacker_action_bonus,
@@ -578,9 +586,14 @@ def play_battle(attacker_troops_power_level_list, defender_troops_power_level_li
 
 def after_battle_processing(attacker, defender, attacker_troops_power_level_list, defender_troops_power_level_list,
                             attacker_realm, defender_realm, battle_type, attacker_no_troops_left,
-                            defender_no_troops_left, result):
+                            defender_no_troops_left, result, battle_result_script):
+    print("")
     print("attacker_no_troops_left - " + str(attacker_no_troops_left))
     print("defender_no_troops_left - " + str(defender_no_troops_left))
+    # if attacker_realm is not None:
+    #     print("Attacking realm - " + attacker_realm.name + "; AI_player - " + str(attacker_realm.AI_player))
+    # else:
+    #     print("Attacking is None")
     remove_army_id = []
 
     # Remove regiments
@@ -595,7 +608,7 @@ def after_battle_processing(attacker, defender, attacker_troops_power_level_list
 
     unit_list = sorted(unit_list, reverse=True)
 
-    print("attacker unit_list: " + str(unit_list))
+    # print("attacker unit_list: " + str(unit_list))
     for ind in unit_list:
         del attacker.units[ind]
 
@@ -612,7 +625,7 @@ def after_battle_processing(attacker, defender, attacker_troops_power_level_list
 
     unit_list = sorted(unit_list, reverse=True)
 
-    print("defender unit_list: " + str(unit_list))
+    # print("defender unit_list: " + str(unit_list))
     for ind in unit_list:
         del defender.units[ind]
 
@@ -622,8 +635,8 @@ def after_battle_processing(attacker, defender, attacker_troops_power_level_list
     attacker_posxy = list(attacker.posxy)
     defender_posxy = list(defender.posxy)
 
-    print("attacker.action - " + attacker.action)
-    print("defender.action - " + defender.action)
+    # print("attacker.action - " + attacker.action)
+    # print("defender.action - " + defender.action)
 
     attacker.action = "Stand"
     defender.action = "Stand"
@@ -660,7 +673,8 @@ def after_battle_processing(attacker, defender, attacker_troops_power_level_list
                     farthest_tile = list(tile)
                     biggest_distance = float(distance)
 
-            print("attacker: farthest_tile - " + str(farthest_tile) + " biggest_distance - " + str(biggest_distance))
+            print("Attacker routing: farthest_tile - " + str(farthest_tile) + " biggest_distance - " +
+                  str(biggest_distance))
 
             for node in routing_path:
                 if node.position == farthest_tile:
@@ -718,7 +732,8 @@ def after_battle_processing(attacker, defender, attacker_troops_power_level_list
                         farthest_tile = list(tile)
                         biggest_distance = float(distance)
 
-                print("defender: farthest_tile - " + str(farthest_tile) + " biggest_distance - " + str(biggest_distance))
+                print("Defender routing: farthest_tile - " + str(farthest_tile) + " biggest_distance - " +
+                      str(biggest_distance))
 
                 for node in routing_path:
                     if node.position == farthest_tile:
@@ -770,7 +785,7 @@ def after_battle_processing(attacker, defender, attacker_troops_power_level_list
 
     # Removing destroyed armies
     if len(remove_army_id) > 0:
-        print("after_battle_processing() - # Removing destroyed armies ")
+        # print("after_battle_processing() - # Removing destroyed armies ")
         # Removing army ID from location
         for id_item in remove_army_id:
             if id_item == attacker.army_id:
@@ -787,7 +802,9 @@ def after_battle_processing(attacker, defender, attacker_troops_power_level_list
     # Special battles (lairs)
     if result == "Attacker has won" and battle_type == "special":
         if attacker_realm.AI_player:
-            AI_battle_result_scripts.result_scripts[game_stats.battle_result_script](attacker, attacker_realm)
+            print("Attacking army - " + str(attacker.army_id) + " owned by " + str(attacker.owner))
+            print("battle_result_script - " + str(battle_result_script))
+            AI_battle_result_scripts.result_scripts[battle_result_script](attacker, attacker_realm)
             print("AI player " + attacker_realm.name + " has received its reward")
             game_stats.battle_result = ""
 

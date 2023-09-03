@@ -67,10 +67,15 @@ def skirmish_menu_screen(screen):
     # screen.blit(text_NewGame2, [80, 85])
     x = 80
     y = 85
+    underline_number = 0
     for level_title in game_stats.levels_list:
         text_NewGame2 = font20.render(level_title, True, TitleText)
         screen.blit(text_NewGame2, [x, y])
 
+        # Grey underlines
+        pygame.draw.lines(screen, NewGameColor, False, [(x, 85 + underline_number * 24 + 22),
+                                                       (x + 220, 85 + underline_number * 24 + 22)], 1)
+        underline_number += 1
         y += 24
 
     # White line
