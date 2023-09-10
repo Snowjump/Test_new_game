@@ -21,6 +21,8 @@ from Strategy_AI import AI_battle_result_scripts
 
 
 def begin_battle(attacker, defender, battle_type, battle_result_script):
+    print("")
+    print("game_autobattle - begin_battle")
     attacker_hero_bonus = 1.0
     attacker_action_bonus = 1.0
     attacker_action_level = 0
@@ -36,8 +38,10 @@ def begin_battle(attacker, defender, battle_type, battle_result_script):
     for realm in game_obj.game_powers:
         if realm.name == attacker.owner:
             attacker_realm = realm
+            print("attacker_realm - " + attacker_realm.name)
         elif realm.name == defender.owner:
             defender_realm = realm
+            print("defender_realm - " + defender_realm.name)
 
     print("Attacker list")
     # print(str(attacker.hero))
@@ -135,7 +139,7 @@ def begin_battle(attacker, defender, battle_type, battle_result_script):
 
         morale = float(unit.base_leadership) + float(bonus_leadership)
 
-        print("attacker_hero_bonus - " + str(attacker_hero_bonus) + "; power_bonus - " + str(power_bonus))
+        # print("attacker_hero_bonus - " + str(attacker_hero_bonus) + "; power_bonus - " + str(power_bonus))
         power_level = power_level * (attacker_hero_bonus + power_bonus)
         power_level = math.floor(power_level * 100) / 100
         attacker_troops_power_level_list.append(game_classes.Autobattle_Regiment_Card(num,
@@ -240,7 +244,7 @@ def begin_battle(attacker, defender, battle_type, battle_result_script):
 
         morale = float(unit.base_leadership) + float(bonus_leadership)
 
-        print("defender_hero_bonus - " + str(defender_hero_bonus) + "; power_bonus - " + str(power_bonus))
+        # print("defender_hero_bonus - " + str(defender_hero_bonus) + "; power_bonus - " + str(power_bonus))
         power_level = power_level * (defender_hero_bonus + power_bonus)
         power_level = math.floor(power_level * 100) / 100
         defender_troops_power_level_list.append(game_classes.Autobattle_Regiment_Card(num,
@@ -283,9 +287,11 @@ def begin_battle(attacker, defender, battle_type, battle_result_script):
 
     AI_battle = True
     if attacker_realm is not None:
+        print(attacker_realm.name + " attacker_realm.AI_player - " + str(attacker_realm.AI_player))
         if not attacker_realm.AI_player:
             AI_battle = False
-    elif defender_realm is not None:
+    if defender_realm is not None:
+        print(defender_realm.name + " defender_realm.AI_player - " + str(defender_realm.AI_player))
         if not defender_realm.AI_player:
             AI_battle = False
 
@@ -360,12 +366,12 @@ def play_battle(attacker_troops_power_level_list, defender_troops_power_level_li
         for card in attacker_troops_power_level_list:
             if card.status == "Fighting":
                 attacker_pl_sum += card.power_level
-                print("attacker_pl_sum - " + str(attacker_pl_sum) + "; card.power_level - " + str(card.power_level))
+                # print("attacker_pl_sum - " + str(attacker_pl_sum) + "; card.power_level - " + str(card.power_level))
 
         for card in defender_troops_power_level_list:
             if card.status == "Fighting":
                 defender_pl_sum += card.power_level
-                print("defender_pl_sum - " + str(defender_pl_sum) + "; card.power_level - " + str(card.power_level))
+                # print("defender_pl_sum - " + str(defender_pl_sum) + "; card.power_level - " + str(card.power_level))
 
         attacker_pl_sum = math.floor(attacker_pl_sum * 100) / 100
         defender_pl_sum = math.floor(defender_pl_sum * 100) / 100
@@ -467,8 +473,8 @@ def play_battle(attacker_troops_power_level_list, defender_troops_power_level_li
                 else:
                     card.power_level = math.floor(card.power_level * 100) / 100
 
-                print(card.name + ": current_pl - " + str(current_pl) + "; damage - " + str(damage) +
-                      "; card.power_level - " + str(card.power_level) + "; status - " + str(card.status))
+                # print(card.name + ": current_pl - " + str(current_pl) + "; damage - " + str(damage) +
+                #       "; card.power_level - " + str(card.power_level) + "; status - " + str(card.status))
 
                 # print(str(card.index) + " starting_power_level - " + str(card.starting_power_level) +
                 #       "; current_pl - " + str(current_pl))
@@ -480,13 +486,13 @@ def play_battle(attacker_troops_power_level_list, defender_troops_power_level_li
                 damage_fraction = math.floor(damage_fraction * 1000) / 1000
                 morale_hit = float(math.ceil(damage_fraction / game_stats.battle_base_morale_hit))
                 card.morale = float(int((card.morale - morale_hit) * 100)) / 100
-                print("damage - " + str(damage) + "; damage_part_1 - " + str(damage_part_1) + "; damage_part_2 - " +
-                      str(damage_part_2) + "; damage_fraction - " + str(damage_fraction) + "; battle_base_morale_hit - "
-                      + str(game_stats.battle_base_morale_hit) + "; morale_hit - " +
-                      str(morale_hit) + "; card.morale - " + str(card.morale))
+                # print("damage - " + str(damage) + "; damage_part_1 - " + str(damage_part_1) + "; damage_part_2 - " +
+                #       str(damage_part_2) + "; damage_fraction - " + str(damage_fraction) +
+                #       "; battle_base_morale_hit - " + str(game_stats.battle_base_morale_hit) + "; morale_hit - " +
+                #       str(morale_hit) + "; card.morale - " + str(card.morale))
                 if card.morale < 0.0:
                     card.status = "Routing"
-                    print(card.name + " " + str(card.index) + " is routing")
+                    # print(card.name + " " + str(card.index) + " is routing")
 
         for card in defender_troops_power_level_list:
             if card.status != "Routed" and card.power_level > 0:
@@ -504,8 +510,8 @@ def play_battle(attacker_troops_power_level_list, defender_troops_power_level_li
                 else:
                     card.power_level = math.floor(card.power_level * 100) / 100
 
-                print(card.name + ": current_pl - " + str(current_pl) + "; damage - " + str(damage) +
-                      "; card.power_level - " + str(card.power_level) + "; status - " + str(card.status))
+                # print(card.name + ": current_pl - " + str(current_pl) + "; damage - " + str(damage) +
+                #       "; card.power_level - " + str(card.power_level) + "; status - " + str(card.status))
 
                 damage_part_1 = (damage / 2) / current_pl
                 damage_part_1 = math.floor(damage_part_1 * 1000) / 1000
@@ -517,7 +523,7 @@ def play_battle(attacker_troops_power_level_list, defender_troops_power_level_li
                 card.morale = float(int((card.morale - morale_hit) * 100)) / 100
                 if card.morale < 0.0:
                     card.status = "Routing"
-                    print(card.name + " " + str(card.index) + " is routing")
+                    # print(card.name + " " + str(card.index) + " is routing")
 
         attacker_no_troops_left = True
         defender_no_troops_left = True
@@ -814,11 +820,10 @@ def after_battle_processing(attacker, defender, attacker_troops_power_level_list
     # Quest battles
     if result == "Attacker has won" and defender.event is not None:
         if attacker_realm.AI_player:
-            pass
-            # TODO: later
+            quest_autobattle_result(attacker, attacker_realm, defender)
 
         else:
-            quest_autobattle_result(attacker, defender)
+            quest_autobattle_result(attacker, attacker_realm, defender)
 
     if settlement_captured:
         winner_alive = True
@@ -844,10 +849,10 @@ def special_autobattle_result(winner_army):
     battle_result_scripts.result_scripts[game_stats.battle_result_script](winner_army)
 
 
-def quest_autobattle_result(winner, loser):
+def quest_autobattle_result(winner, attacker_realm, loser):
     print("quest_autobattle_result: Event name - " + loser.event.name)
     if loser.event.name in knight_lords_quest_result_scripts.result_scripts:
-        knight_lords_quest_result_scripts.result_scripts[loser.event.name](winner, loser.event)
+        knight_lords_quest_result_scripts.result_scripts[loser.event.name](winner, attacker_realm, loser.event)
 
 
 def defence_structures_power_level_bonus(defender_pl_sum, defender_troops_power_level_list, settlement):

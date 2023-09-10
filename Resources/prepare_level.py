@@ -1,4 +1,5 @@
 ## Miracle battles
+## prepare_level
 
 import copy
 import math
@@ -90,6 +91,25 @@ def prepare_known_map(player_power):
 
         # if power.name == "Seventeenth":
         #     print("prepare_known_map - Seventeenth - contacts: " + str(power.contacts))
+
+
+def set_pov_pos(player_power, level_type):
+    if level_type == "Skirmish":
+        settlement_positions = []
+        for settlement in game_obj.game_cities:
+            if settlement.owner == player_power:
+                settlement_positions.append(list(settlement.posxy))
+
+        for army in game_obj.game_armies:
+            if army.owner == player_power:
+                if army.posxy not in settlement_positions:
+                    settlement_positions.append(list(army.posxy))
+
+        final_position = random.choice(settlement_positions)
+        game_stats.pov_pos[0] = int(final_position[0] - 13)
+        game_stats.pov_pos[1] = int(final_position[1] - 7)
+    else:
+        game_stats.pov_pos = [0, 0]
 
 
 def prepare_leader_traits(player_power):

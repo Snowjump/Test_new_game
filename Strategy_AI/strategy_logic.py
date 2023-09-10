@@ -15,9 +15,15 @@ from Resources import game_basic
 from Strategy_AI import diplomacy_logic
 from Strategy_AI import economy_logic
 from Strategy_AI import AI_exploration_cond
+from Strategy_AI import quest_logic
 
 
 def manage_realm():
+    ## Quest log
+    for realm in game_obj.game_powers:
+        if realm.AI_player:
+            quest_logic.manage_messages(realm)
+
     ## Diplomacy
     ## Diplomatic messages
     for realm in game_obj.game_powers:
@@ -121,7 +127,7 @@ def manage_armies(realm):
 
     if realm.AI_cogs.cognition_stage == "Manage armies":
         # Local adventure
-        adventure_role_AI(realm, friendly_cities, hostile_cities)
+        adventure_role_AI(realm, friendly_cities, hostile_cities, at_war_list)
 
         # Return to base
         return_to_base(realm, friendly_cities, hostile_cities)
@@ -252,7 +258,7 @@ def command_armies(realm):
                     break
 
 
-def adventure_role_AI(realm, friendly_cities, hostile_cities):
+def adventure_role_AI(realm, friendly_cities, hostile_cities, at_war_list):
     print("")
     all_finished = True
     for role in realm.AI_cogs.army_roles:
@@ -276,6 +282,10 @@ def adventure_role_AI(realm, friendly_cities, hostile_cities):
                             # Shouldn't go to adventure
                             print("Army is shattered")
                             pass
+                        elif army.action == "Fighting":
+                            # Shouldn't go to adventure due to fighting
+                            print("Army " + str(army.army_id) + " is busy fighting")
+                            pass
                         elif role.army_role == "Adventure":
                             print("army.route: " + str(army.route))
                             print("army.army_id = " + str(army.army_id) + "; army.action = " + str(army.action))
@@ -284,9 +294,26 @@ def adventure_role_AI(realm, friendly_cities, hostile_cities):
                                 go_to_adventure = True
 
                             else:
+                                check_standing = True
+
                                 if not game_basic.enough_movement_points(army):
                                     role.status = "Finished"
-                                else:
+                                    check_standing = False
+
+                                if len(army.route) > 1:
+                                    next_point = list(army.route[0])
+                                    TileNum = (next_point[1] - 1) * game_stats.cur_level_width + next_point[0] - 1
+                                    TileObj = game_obj.game_map[TileNum]
+                                    if TileObj.army_id is not None:
+                                        army.action = "Stand"
+                                        army.route = []
+                                        army.path_arrows = []
+                                        go_to_adventure = True
+                                        role.army_role = "Idle"
+                                        check_standing = False
+                                        print("1) Path to adventure is blocked by army " + str(TileObj.army_id))
+
+                                if check_standing:
                                     if army.action == "Stand":
                                         army.action = "Ready to move"
                         else:
@@ -302,7 +329,7 @@ def adventure_role_AI(realm, friendly_cities, hostile_cities):
                                     if settlement.owner == realm.name:
                                         # role.army_role = "Adventure"
                                         assemble_adventure_destinations(realm, role, army, settlement,
-                                                                        friendly_cities, hostile_cities)
+                                                                        friendly_cities, hostile_cities, at_war_list)
                                         issued_order = True
                                         break
 
@@ -313,7 +340,7 @@ def adventure_role_AI(realm, friendly_cities, hostile_cities):
                                         print(settlement.name + "; city_id - " + str(settlement.city_id))
                                         print("base_of_operation - " + str(role.base_of_operation))
                                         assemble_adventure_destinations(realm, role, army, settlement,
-                                                                        friendly_cities, hostile_cities)
+                                                                        friendly_cities, hostile_cities, at_war_list)
                                         break
                         break
 
@@ -323,7 +350,7 @@ def adventure_role_AI(realm, friendly_cities, hostile_cities):
         realm.AI_cogs.cognition_stage = "Finished turn"
 
 
-def assemble_adventure_destinations(realm, role, army, settlement, friendly_cities, hostile_cities):
+def assemble_adventure_destinations(realm, role, army, settlement, friendly_cities, hostile_cities, at_war_list):
     tile_list = []
     print("")
     # print("len(settlement.control_zone) : " + str(len(settlement.control_zone)))
@@ -391,7 +418,7 @@ def assemble_adventure_destinations(realm, role, army, settlement, friendly_citi
                                     print("rank_ratio - " + str(rank_ratio) + "; random_risk_level - " +
                                           str(random_risk_level) + "; result - " + str(120 - random_risk_level))
                                     if rank_ratio >= 120 - random_risk_level:
-                                        print("Attack")
+                                        print("Ready to attack lair")
                                         distance = math.sqrt(
                                             ((army.posxy[0] - game_obj.game_map[TileNum].posxy[0]) ** 2) + (
                                                     (army.posxy[1] - game_obj.game_map[TileNum].posxy[1]) ** 2))
@@ -421,8 +448,39 @@ def assemble_adventure_destinations(realm, role, army, settlement, friendly_citi
                                     # Standard border is 120
                                     print("rank_ratio - " + str(rank_ratio) + "; random_risk_level - " +
                                           str(random_risk_level) + "; result - " + str(120 - random_risk_level))
-                                    if rank_ratio >= 100 - random_risk_level:
-                                        print("Attack")
+                                    if rank_ratio >= 120 - random_risk_level:
+                                        print("Ready to attack neutral army")
+                                        distance = math.sqrt(
+                                            ((army.posxy[0] - game_obj.game_map[TileNum].posxy[0]) ** 2) + (
+                                                    (army.posxy[1] - game_obj.game_map[TileNum].posxy[1]) ** 2))
+                                        distance = math.floor(distance * 100) / 100
+                                        tile_list.append(["Enemy army", list(game_obj.game_map[TileNum].posxy),
+                                                          distance])
+                                    break
+
+                                elif target.owner in at_war_list:
+                                    # Targeting armies from realms who are at war with this realm
+                                    target_sum_rank = 0
+                                    for unit in target.units:
+                                        target_sum_rank += unit.rank
+                                    print("len(target.units) - " + str(len(target.units)) + "; target_sum_rank - " +
+                                          str(target_sum_rank))
+
+                                    rank_ratio = int(own_army_sum_rank / target_sum_rank * 100)
+                                    random_risk_level = random.randint(0, 40)
+                                    # Standard border is 120
+                                    power_border = 120
+                                    # But for human player factions increase to 145, since humans are better at battling
+                                    for realm in game_obj.game_powers:
+                                        if realm.name == target.owner:
+                                            if not realm.AI_player:
+                                                power_border = 145
+                                            break
+                                    print("rank_ratio - " + str(rank_ratio) + "; random_risk_level - " +
+                                          str(random_risk_level) + "; result - " +
+                                          str(power_border - random_risk_level))
+                                    if rank_ratio >= power_border - random_risk_level:
+                                        print("Ready to attack " + str(target.owner) + " army")
                                         distance = math.sqrt(
                                             ((army.posxy[0] - game_obj.game_map[TileNum].posxy[0]) ** 2) + (
                                                     (army.posxy[1] - game_obj.game_map[TileNum].posxy[1]) ** 2))
@@ -494,6 +552,7 @@ def return_to_base(realm, friendly_cities, hostile_cities):
         for the_army in game_obj.game_armies:
             if the_army.army_id == role.army_id:
                 army = the_army
+                break
 
         if role.army_role in ["Adventure"] and role.status != "Finished":
             all_finished = False
@@ -557,14 +616,44 @@ def return_to_base(realm, friendly_cities, hostile_cities):
             print("Travel to settlement: army.action - " + str(army.action))
             if army.action != "Stand":
                 all_finished = False
+                # Verification that next tile on a path is not blocked
+                if len(army.route) > 0:
+                    next_point = list(army.route[0])
+                    TileNum = (next_point[1] - 1) * game_stats.cur_level_width + next_point[0] - 1
+                    TileObj = game_obj.game_map[TileNum]
+                    if TileObj.army_id is not None:
+                        army.action = "Stand"
+                        army.route = []
+                        army.path_arrows = []
+                        print("1) Path to settlement is blocked by army " + str(TileObj.army_id))
             elif army.action == "Stand":
                 give_command_to_move = True
+
                 if game_obj.game_map[army.location].lot is not None:
                     if game_obj.game_map[army.location].lot == "City":
                         give_command_to_move = False
                         role.army_role = "Nothing to do"
                         role.status = "Finished"
                         print("Army has returned to settlement")
+
+                if len(army.route) == 0:
+                    # Most likely army's path has been blocked by someone
+                    give_command_to_move = False
+                    role.army_role = "Idle"
+                    all_finished = False
+
+                else:
+                    next_point = list(army.route[0])
+                    TileNum = (next_point[1] - 1) * game_stats.cur_level_width + next_point[0] - 1
+                    TileObj = game_obj.game_map[TileNum]
+                    if TileObj.army_id is not None:
+                        army.action = "Stand"
+                        army.route = []
+                        army.path_arrows = []
+                        give_command_to_move = False
+                        role.army_role = "Idle"
+                        all_finished = False
+                        print("2) Path to settlement is blocked by army " + str(TileObj.army_id))
 
                 # If army hasn't reached settlement yet but doesn't have movement points to travel
                 # It must change status to Finished

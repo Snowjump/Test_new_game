@@ -202,6 +202,7 @@ def game_board_surface_m1(position):
     global yVar
     game_stats.button_pressed = False
     ##    print("Success")
+    print("")
 
     button_numb = 0
     for square in button_zone:
@@ -282,68 +283,26 @@ def game_board_surface_m1(position):
                 if 0 < x_axis % 153 < 143 and 0 < y_axis % 108 < 100:
                     if 73 < y_axis % 108:
                         if x_axis % 153 < 35:
-                            print(str(x_axis) + ", " + str(y_axis))
+                            print("Building - build a new structure: " + str(x_axis) + ", " + str(y_axis))
                             x_axis = math.ceil(x_axis / 153)
                             y_axis = math.ceil(y_axis / 108)
-                            print(str(x_axis) + ", " + str(y_axis))
-
-                            # Order to build a new structure
-                            power_name = None
-                            the_settlement = None
-                            cost = None
-                            the_plot = None
-                            for city in game_obj.game_cities:
-                                if city.city_id == game_stats.selected_settlement:
-                                    power_name = city.owner
-                                    the_settlement = city
-                                    for plot in city.buildings:
-                                        if plot.upgrade is not None:
-                                            if plot.screen_position == [x_axis, y_axis + game_stats.building_row_index]:
-                                                the_plot = plot
-                                                cost = plot.upgrade.construction_cost
-                                                break
-                                    break
-
-                            if cost is not None:
-                                treasury = None
-                                for realm in game_obj.game_powers:
-                                    if realm.name == power_name:
-                                        treasury = realm.coffers
-                                        break
-                                print(str(power_name) + ", treasury " + str(treasury) + ", cost " + str(cost))
-                                if algo_building.check_available_resources(treasury, cost) \
-                                        and the_plot.upgrade.fulfilled_conditions:
-                                    algo_building.consume_constructions_materials(treasury, cost, the_settlement)
-                                    algo_building.start_construction(the_plot)
+                            print("Building - build a new structure: " + str(x_axis) + ", " + str(y_axis))
+                            build_new_structure(x_axis, y_axis)
 
                         else:
-                            print(str(x_axis) + ", " + str(y_axis))
+                            print("Building - upgrade information: " + str(x_axis) + ", " + str(y_axis))
                             x_axis = math.ceil(x_axis / 153)
                             y_axis = math.ceil(y_axis / 108)
-                            print(str(x_axis) + ", " + str(y_axis))
+                            print("Building - upgrade information: " + str(x_axis) + ", " + str(y_axis))
 
-                            the_plot = None
-                            for city in game_obj.game_cities:
-                                if city.city_id == game_stats.selected_settlement:
-                                    for plot in city.buildings:
-                                        if plot.upgrade is not None:
-                                            if plot.screen_position == [x_axis, y_axis + game_stats.building_row_index]:
-                                                the_plot = plot
-                                                print("Position - " + str(plot.screen_position))
-
-                            if the_plot is not None:
-                                game_stats.right_window = "Building upgrade information"
-                                game_stats.rw_object = the_plot.upgrade
-                                # Update visuals
-                                update_gf_game_board.add_settlement_building_sprites(the_plot.upgrade.name,
-                                                                                     the_plot.upgrade.img)
+                            show_building_upgrade_information(x_axis, y_axis)
 
                     else:
                         # Building information
-                        print(str(x_axis) + ", " + str(y_axis))
+                        print("Building - information: " + str(x_axis) + ", " + str(y_axis))
                         x_axis = math.ceil(x_axis / 153)
                         y_axis = math.ceil(y_axis / 108)
-                        print(str(x_axis) + ", " + str(y_axis))
+                        print("Building - information: " + str(x_axis) + ", " + str(y_axis))
 
                         the_plot = None
                         for city in game_obj.game_cities:
@@ -353,6 +312,8 @@ def game_board_surface_m1(position):
                                         if plot.screen_position == [x_axis, y_axis + game_stats.building_row_index]:
                                             the_plot = plot
                                             print("Position - " + str(plot.screen_position))
+                                            break
+                                break
 
                         if the_plot is not None:
                             print('game_stats.right_window = "Building information"')
@@ -914,6 +875,13 @@ def game_board_surface_m3(position):
             game_stats.button_pressed = True
             break
 
+    # Panels' zone
+    if game_stats.game_board_panel != "":
+        if game_stats.game_board_panel == "settlement panel" and game_stats.settlement_area == "Building":
+            square = [1, 112, 639, 540]
+            if square[0] < position[0] < square[2] and square[1] < position[1] < square[3]:
+                game_stats.button_pressed = True
+
     # Lower panel
     if game_stats.details_panel_mode != "":
         yVar = game_stats.game_window_height - 800
@@ -1215,7 +1183,9 @@ def autobattle_but():
     battle_result_script = None
     if attacker.action == "Besieging":
         game_stats.battle_type = "Siege"
-    print("game_stats.battle_type - " + str(game_stats.battle_type))
+    # print("game_stats.battle_type - " + str(game_stats.battle_type))
+    # print("game_stats.attacker_army_id - " + str(game_stats.attacker_army_id))
+    # print("game_stats.defender_army_id - " + str(game_stats.defender_army_id))
 
     game_autobattle.begin_battle(attacker, defender, game_stats.battle_type, battle_result_script)
 
@@ -1581,6 +1551,9 @@ def close_settlement_panel_but():
     update_gf_game_board.remove_settlement_misc_sprites(img_list)
     game_stats.gf_building_dict = {}
 
+    click_sound = pygame.mixer.Sound("Sound/Interface/Abstract2.ogg")
+    click_sound.play()
+
 
 def next_turn_but():
     for realm in game_obj.game_powers:
@@ -1802,6 +1775,9 @@ def plot_row_up():
     if game_stats.building_row_index > 0:
         game_stats.building_row_index -= 1
 
+    click_sound = pygame.mixer.Sound("Sound/Interface/bookFlip3.ogg")
+    click_sound.play()
+
 
 def plot_row_down():
     settlement = None
@@ -1816,10 +1792,70 @@ def plot_row_down():
             list_of_rows.append(int(plot.screen_position[1]))
 
     max_row = max(list_of_rows)
-    print("list_of_rows - " + str(list_of_rows))
+    # print("list_of_rows - " + str(list_of_rows))
 
     if game_stats.building_row_index < max_row - 4:
         game_stats.building_row_index += 1
+
+    click_sound = pygame.mixer.Sound("Sound/Interface/bookFlip3.ogg")
+    click_sound.play()
+
+
+def build_new_structure(x_axis, y_axis):
+    # Order to build a new structure
+    power_name = None
+    the_settlement = None
+    cost = None
+    the_plot = None
+    for city in game_obj.game_cities:
+        if city.city_id == game_stats.selected_settlement:
+            power_name = city.owner
+            the_settlement = city
+            for plot in city.buildings:
+                if plot.upgrade is not None:
+                    if plot.screen_position == [x_axis, y_axis + game_stats.building_row_index]:
+                        the_plot = plot
+                        cost = plot.upgrade.construction_cost
+                        break
+            break
+
+    if cost is not None:
+        treasury = None
+        for realm in game_obj.game_powers:
+            if realm.name == power_name:
+                treasury = realm.coffers
+                break
+        print(str(power_name) + ", treasury " + str(treasury) + ", cost " + str(cost))
+        if algo_building.check_available_resources(treasury, cost) \
+                and the_plot.upgrade.fulfilled_conditions:
+            algo_building.consume_constructions_materials(treasury, cost, the_settlement)
+            algo_building.start_construction(the_plot)
+
+            click_sound = pygame.mixer.Sound("Sound/Interface/mining.wav")
+            click_sound.play()
+
+
+def show_building_upgrade_information(x_axis, y_axis):
+    the_plot = None
+    for city in game_obj.game_cities:
+        if city.city_id == game_stats.selected_settlement:
+            for plot in city.buildings:
+                if plot.upgrade is not None:
+                    if plot.screen_position == [x_axis, y_axis + game_stats.building_row_index]:
+                        the_plot = plot
+                        print("Position - " + str(plot.screen_position))
+                        break
+            break
+
+    if the_plot is not None:
+        game_stats.right_window = "Building upgrade information"
+        game_stats.rw_object = the_plot.upgrade
+        # Update visuals
+        update_gf_game_board.add_settlement_building_sprites(the_plot.upgrade.name,
+                                                             the_plot.upgrade.img)
+
+        click_sound = pygame.mixer.Sound("Sound/Interface/bookFlip1.ogg")
+        click_sound.play()
 
 
 def settlement_regiment_information():
@@ -2428,6 +2464,9 @@ def close_realm_panel_but():
     game_stats.game_board_panel = ""
     game_stats.realm_inspection = None
 
+    click_sound = pygame.mixer.Sound("Sound/Interface/Abstract2.ogg")
+    click_sound.play()
+
 
 def close_quest_log_panel_but():
     game_stats.game_board_panel = ""
@@ -2438,6 +2477,9 @@ def close_quest_log_panel_but():
     game_stats.selected_diplomatic_notifications = None
     game_stats.diplomatic_message_index = None
     game_stats.diplomatic_message_panel = None
+
+    click_sound = pygame.mixer.Sound("Sound/Interface/Abstract2.ogg")
+    click_sound.play()
 
 
 def open_quest_messages_area():
@@ -2523,6 +2565,9 @@ def close_diplomacy_panel_but():
     game_stats.peace_offer_text = []
     game_stats.explored_contacts = []
     game_stats.summary_text = []
+
+    click_sound = pygame.mixer.Sound("Sound/Interface/Abstract2.ogg")
+    click_sound.play()
 
 
 def previous_contact_but():

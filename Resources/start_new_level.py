@@ -38,6 +38,8 @@ def begin_new_level(folder, level_to_load):
 
     game_stats.population_id_counter = shelfFile["new_level_LE_population_id_counter"]
 
+    level_type = shelfFile["new_level_type"]
+
     shelfFile.close()
 
     game_start.nullify_level_editor_variables()
@@ -73,6 +75,7 @@ def begin_new_level(folder, level_to_load):
 
     game_stats.map_positions = list(prepare_level.map_all_tiles())
     prepare_level.prepare_known_map(game_stats.player_power)
+    prepare_level.set_pov_pos(game_stats.player_power, level_type)
     prepare_level.prepare_AI_class_AI_cogs()
     prepare_level.prepare_regiments()
     prepare_level.prepare_leader_traits(game_stats.player_power)

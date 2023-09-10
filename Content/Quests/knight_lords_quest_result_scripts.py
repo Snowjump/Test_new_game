@@ -15,7 +15,7 @@ def quest_message_close():
     game_stats.event_panel_det = None
 
 
-def poachers_in_royal_forest_result(army, quest_event):
+def poachers_in_royal_forest_result(army, army_realm, quest_event):
     for settlement in game_obj.game_cities:
         if settlement.city_id == game_obj.game_map[quest_event.settlement_location].city_id:
             for faction in settlement.factions:
@@ -39,14 +39,15 @@ def poachers_in_royal_forest_result(army, quest_event):
             break
 
     if army.owner == quest_event.realm_name:
-        game_stats.game_board_panel = "poachers in royal forest result panel"
-        game_stats.event_panel_det = game_classes.Object_Surface({1: quest_message_close},
-                                                                 [[611, 406, 670, 426]],
-                                                                 [481, 101, 800, 430],
-                                                                 None)
+        if not army_realm.AI_player:
+            game_stats.game_board_panel = "poachers in royal forest result panel"
+            game_stats.event_panel_det = game_classes.Object_Surface({1: quest_message_close},
+                                                                     [[611, 406, 670, 426]],
+                                                                     [481, 101, 800, 430],
+                                                                     None)
 
 
-def slay_the_grey_dragon_result(army, quest_event):
+def slay_the_grey_dragon_result(army, army_realm, quest_event):
     effect = campaign_effect_classes.Settlement_Effect("Slayer of the Grey dragon",
                                                        "Settlement",
                                                        "Loyalty",
@@ -86,14 +87,15 @@ def slay_the_grey_dragon_result(army, quest_event):
             break
 
     if army.owner == quest_event.realm_name:
-        game_stats.game_board_panel = "slay the grey dragon result panel"
-        game_stats.event_panel_det = game_classes.Object_Surface({1: quest_message_close},
-                                                                 [[611, 406, 670, 426]],
-                                                                 [481, 101, 800, 430],
-                                                                 None)
+        if not army_realm.AI_player:
+            game_stats.game_board_panel = "slay the grey dragon result panel"
+            game_stats.event_panel_det = game_classes.Object_Surface({1: quest_message_close},
+                                                                     [[611, 406, 670, 426]],
+                                                                     [481, 101, 800, 430],
+                                                                     None)
 
 
-def failed_to_provide_stone_to_vassal(army, quest_event):
+def failed_to_provide_stone_to_vassal(army, army_realm, quest_event):
     effect = campaign_effect_classes.Settlement_Effect("Failed to provide stone",
                                                        "Settlement",
                                                        "Loyalty",

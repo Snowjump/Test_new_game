@@ -321,7 +321,7 @@ def track_the_dragon():
     for settlement in game_obj.game_cities:
         if settlement.city_id == game_obj.game_map[quest.settlement_location].city_id:
             the_settlement = settlement
-            print(the_settlement.name)
+            # print(the_settlement.name)
             break
 
     # Create neutral army

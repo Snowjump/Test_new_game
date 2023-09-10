@@ -1,6 +1,7 @@
 ## Miracle battles
 ## exploration_scripts
 
+import pygame
 import random
 
 from Resources import game_stats
@@ -239,6 +240,9 @@ def burial_mound_event(obj, army):
                                                                  [[611, 376, 670, 396]],
                                                                  [481, 101, 800, 400],
                                                                  None)
+
+    click_sound = pygame.mixer.Sound("Sound/Exploration/Just_Transitions_Creepy-259.wav")
+    click_sound.play()
 
 
 def anglers_cabin_event(obj, army):

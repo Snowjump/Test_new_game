@@ -1,5 +1,5 @@
 ## Miracle battles
-
+# sf_battle
 
 import math
 import pygame
@@ -17,6 +17,7 @@ from Resources import battle_abilities_hero
 from Resources import battle_abilities_regiment
 from Resources import update_gf_game_board
 from Resources import update_gf_battle
+from Resources import game_pathfinding
 
 from Content import ability_catalog
 from Content import ability_desc_cat_hero
@@ -80,6 +81,13 @@ def battle_keys(key_action):
                 defend_but()
             elif key_action == 114:  # R
                 prepare_change_attack_method()
+
+            elif key_action == 120:  # key - X
+                print("game_stats.fps_status - " + str(game_stats.fps_status))
+                if game_stats.fps_status:
+                    game_stats.fps_status = False
+                else:
+                    game_stats.fps_status = True
 
 
 def battle_surface_m1(position):
@@ -1621,9 +1629,15 @@ def end_battle_but():
             battle_result_scripts.result_scripts[b.result_script](winner_army)
 
     elif loser.event is not None:
+        attacker_realm = None
+        for realm in game_obj.game_powers:
+            if realm.name == winner.owner:
+                attacker_realm = realm
+                break
+
         print("end_battle_but: Event name - " + loser.event.name)
         if loser.event.name in knight_lords_quest_result_scripts.result_scripts:
-            knight_lords_quest_result_scripts.result_scripts[loser.event.name](winner, loser.event)
+            knight_lords_quest_result_scripts.result_scripts[loser.event.name](winner, attacker_realm, loser.event)
 
     game_obj.game_battles.remove(b)
 

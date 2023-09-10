@@ -450,6 +450,8 @@ def movement_action(army):
             if tile in own_realm.known_map:
                 if xTileObj.army_id is not None:
                     cancel_movement = True
+                    print("Army " + str(army.army_id) + " canceled movement, path is blocked by army " +
+                          str(xTileObj.army_id))
                 elif xTileObj.lot is not None:
                     if xTileObj.lot == "City":
                         cancel_movement = True
@@ -805,7 +807,7 @@ def change_position(army, own_realm):
             game_obj.game_map[TileNum].army_id = army.army_id
             army.location = int(TileNum)
             army.posxy = list(next_point)
-            print("Army: new position - " + str(army.posxy) + "; " + str(army.location))
+            print("Army " + str(army.army_id) + ": new position - " + str(army.posxy) + "; " + str(army.location))
 
             del army.route[0]
             del army.path_arrows[0]
@@ -904,6 +906,9 @@ def engage_army(attacker, defender, terrain, conditions, encounter_type):
                 game_stats.battle_type = "Battle"
                 game_stats.battle_terrain = str(terrain)
                 game_stats.battle_conditions = str(conditions)
+
+                # print("game_stats.attacker_army_id - " + str(game_stats.attacker_army_id))
+                # print("game_stats.defender_army_id - " + str(game_stats.defender_army_id))
 
                 # print('game_stats.game_board_panel = "begin battle panel"')
                 game_stats.game_board_panel = "begin battle panel"
@@ -1059,6 +1064,29 @@ def perform_actions():
             movement_action(army)
         elif army.action in ["Routing"]:
             routing_action(army)
+
+    # Next set of checks exist to prevent armies from performing unnecessary animations
+    for army in game_obj.game_armies:
+        if len(army.route) > 1 and army.owner != "Neutral":
+            own_realm = None
+            for realm in game_obj.game_powers:
+                if realm.name == army.owner:
+                    own_realm = realm
+                    break
+
+            print("The rest of the route: " + str(army.route))
+            for role in own_realm.AI_cogs.army_roles:
+                if role.army_id == army.army_id:
+                    next_point = list(army.route[0])
+                    TileNum = (next_point[1] - 1) * game_stats.cur_level_width + next_point[0] - 1
+                    TileObj = game_obj.game_map[TileNum]
+                    if TileObj.army_id is not None:
+                        army.action = "Stand"
+                        army.route = []
+                        army.path_arrows = []
+                        role.army_role = "Idle"
+                        print("change_position: Path to adventure is blocked by army " + str(TileObj.army_id))
+                    break
 
 
 def exchange_armies(approaching_army, standing_army):
@@ -1635,6 +1663,7 @@ def create_new_quest_message(settlement):
 
     if settlement.owner != "Neutral":
         quest_message_name = quests_conditions_choice[settlement.alignment](settlement)
+        print(settlement.name + ": new quest message - " + str(quest_message_name))
 
         for realm in game_obj.game_powers:
             if realm.name == settlement.owner:

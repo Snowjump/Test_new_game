@@ -2163,8 +2163,9 @@ def battle_screen(screen):
     elif b.battle_window == "Siege equipment menu":
         siege_equipment_menu_window(screen, b)
 
-    text_panel = font20.render(str(game_stats.fps), True, TitleText)
-    screen.blit(text_panel, [10, 4])
+    if game_stats.fps_status:
+        text_panel = font20.render(str(game_stats.fps), True, TitleText)
+        screen.blit(text_panel, [10, 4])
 
 
 def change_cursor(screen, b, unit):

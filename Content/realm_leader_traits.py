@@ -134,9 +134,17 @@ neutral_nicknames = ["the Black",
 
 
 lifestyle_traits_list = ["Hunter",
-                         "Sword champion"]
+                         "Sword champion",
+                         "Scholar",
+                         "Mystic"]
 
 lifestyle_traits_nicknames = {"Hunter" : ["the Hunter",
                                           "the Fawler"],
                               "Sword champion" : ["the Swordsman",
-                                                  "the Champion"]}
+                                                  "the Champion"],
+                              "Scholar": ["the Scholar",
+                                          "the Illuminated"],
+                              "Mystic": ["the Mystic",
+                                         "the Seer",
+                                         "the Shrouded"]
+                              }
