@@ -31,6 +31,7 @@ def manage_hero(b, acting_hero, own_units, enemy_units, own_army_id, enemy_army_
     if index_list:
         pos_xy = own_units[random.choice(index_list)].position
         TileNum = (pos_xy[1] - 1) * game_stats.battle_width + pos_xy[0] - 1
+        b.selected_tile = [int(pos_xy[0]), int(pos_xy[1])]
         # Use ability
         b.AI_ready = False
         for action in ability_catalog.ability_cat[b.selected_ability].action:

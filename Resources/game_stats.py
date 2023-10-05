@@ -1,4 +1,11 @@
+## game_stats
 ## Miracle battles!
+
+# Software versioning
+version_major = 0
+version_minor = 1
+version_micro = 0
+
 
 fps = 0.0
 fps_status = True
@@ -8,6 +15,7 @@ current_screen = "Entrance Menu"
 
 # Temporary
 # sprite objects
+gf_menus_art = {}
 gf_misc_img_dict = {}
 gf_terrain_dict = {}
 gf_road_dict = {}
@@ -278,6 +286,8 @@ battle_terrain = ""
 battle_conditions = ""
 blockaded_settlement_name = ""
 assault_allowed = True
+besieged_by_human = True  # More activated interface options if True
+siege_assault = True  # When AI proceeded from blockade to assault
 battle_result_script = None  # None is standard for regular battles, but battles in lairs could give a reward after
 # Ending of the battle
 battle_result = ""  # 4 variations: "Attacker has won", "Defender has won", "Draw", ""

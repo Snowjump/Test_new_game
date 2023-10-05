@@ -1,4 +1,5 @@
 ## Miracle battles!
+## sf_create_level
 
 import sys, pygame
 
@@ -206,6 +207,7 @@ def start_editor_but():
     click_sound.play()
 
     # Update visuals
+    game_stats.gf_menus_art = {}
     update_gf_level_editor.update_sprites()
 
 

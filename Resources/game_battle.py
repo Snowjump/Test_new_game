@@ -10,7 +10,7 @@ from Resources import game_classes
 from Resources import effect_classes
 from Resources import game_obj
 from Resources import game_stats
-from Resources import algo_movement_range
+from Resources import algo_b_movement_range
 from Resources import algo_b_astar
 from Battle_AI import battle_logic
 from Resources import battle_skills
@@ -192,7 +192,7 @@ def advance_queue(b):  # b - stands for Battle
                 MP = calculate_speed(unit, acting_hero)
                 start = b.queue[0].position
 
-                b.path, b.movement_grid = algo_movement_range.pseudo_astar(None, start, MP, b, mode)
+                b.path, b.movement_grid = algo_b_movement_range.pseudo_astar(None, start, MP, b, mode)
 
                 # Check if unit should route due to low morale
                 if unit.morale <= 0.0:
@@ -602,7 +602,7 @@ def execute_order(b):
             start = b.queue[0].position
             MP = unit.attacks[b.attack_type_index].range_limit
 
-            b.path, b.movement_grid = algo_movement_range.pseudo_astar(None, start, MP, b, "Flight")
+            b.path, b.movement_grid = algo_b_movement_range.pseudo_astar(None, start, MP, b, "Flight")
             action_order(b, "Move", "Fly back")
 
     elif b.primary == "Break the gates":

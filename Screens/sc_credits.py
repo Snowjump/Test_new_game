@@ -56,7 +56,31 @@ def credits_screen(screen):
 
     text_MainMenu2 = font20.render("https://nathangibson.myportfolio.com", True, TitleText)
     screen.blit(text_MainMenu2, [x_pos, y_pos])
+    y_pos += 48
+
+    text_MainMenu2 = font20.render("Sound library – Pupaya", True, TitleText)
+    screen.blit(text_MainMenu2, [x_pos, y_pos])
     y_pos += 24
+
+    text_MainMenu2 = font20.render("https://pupaya.itch.io/fantasy-audio-bundle", True, TitleText)
+    screen.blit(text_MainMenu2, [x_pos, y_pos])
+    y_pos += 48
+
+    text_MainMenu2 = font20.render("Sound library – GameSounds.xyz", True, TitleText)
+    screen.blit(text_MainMenu2, [x_pos, y_pos])
+    y_pos += 24
+
+    text_MainMenu2 = font20.render("https://gamesounds.xyz/", True, TitleText)
+    screen.blit(text_MainMenu2, [x_pos, y_pos])
+    y_pos += 48
+
+    text_MainMenu2 = font20.render("Sound library – Sonniss", True, TitleText)
+    screen.blit(text_MainMenu2, [x_pos, y_pos])
+    y_pos += 24
+
+    text_MainMenu2 = font20.render("https://sonniss.com/", True, TitleText)
+    screen.blit(text_MainMenu2, [x_pos, y_pos])
+    y_pos += 48
 
 
 def draw_button(screen, text_line, text_color, border_color, text_indent, x_pos, y_pos, length, height):

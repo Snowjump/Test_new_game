@@ -3,6 +3,7 @@
 
 
 import pygame.draw, pygame.font
+
 from Resources import game_stats
 
 pygame.init()
@@ -264,3 +265,9 @@ def create_level_screen(screen):
     screen.blit(text_NewGame11, [335, 460])
 
     pygame.draw.polygon(screen, BorderNewGameColor, [[250, 458], [550, 458], [550, 490], [250, 490]], 3)
+
+    # Art picture
+    picture_img = game_stats.gf_menus_art["Arts/storm_in_the_ocean"]
+    picture_img = pygame.transform.scale(picture_img,
+                                         (306, 546))
+    screen.blit(picture_img, (901, 61))

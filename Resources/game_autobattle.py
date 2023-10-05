@@ -8,7 +8,7 @@ from Resources import game_classes
 from Resources import game_stats
 from Resources import game_basic
 from Resources import game_obj
-from Resources import algo_routing_range
+from Resources import algo_movement_range
 from Resources import game_pathfinding
 
 from Content import exploration_catalog
@@ -18,6 +18,7 @@ from Content import battle_result_scripts
 from Content.Quests import knight_lords_quest_result_scripts
 
 from Strategy_AI import AI_battle_result_scripts
+from Strategy_AI import strategy_logic
 
 
 def begin_battle(attacker, defender, battle_type, battle_result_script):
@@ -617,6 +618,7 @@ def after_battle_processing(attacker, defender, attacker_troops_power_level_list
     # print("attacker unit_list: " + str(unit_list))
     for ind in unit_list:
         del attacker.units[ind]
+    game_basic.establish_leader(attacker.army_id, "Game")
 
     if len(attacker.units) == 0:
         remove_army_id.append(int(attacker.army_id))
@@ -634,6 +636,7 @@ def after_battle_processing(attacker, defender, attacker_troops_power_level_list
     # print("defender unit_list: " + str(unit_list))
     for ind in unit_list:
         del defender.units[ind]
+    game_basic.establish_leader(defender.army_id, "Game")
 
     if len(defender.units) == 0:
         remove_army_id.append(int(defender.army_id))
@@ -663,8 +666,8 @@ def after_battle_processing(attacker, defender, attacker_troops_power_level_list
         else:
             known_map = game_stats.map_positions
 
-        routing_path, routing_grid = algo_routing_range.routeing_astar(None, attacker_posxy, 600.0, friendly_cities,
-                                                                       hostile_cities, known_map)
+        routing_path, routing_grid = algo_movement_range.range_astar(None, attacker_posxy, 600.0, friendly_cities,
+                                                                     hostile_cities, known_map, True, [])
 
         if len(routing_grid) > 0:
             farthest_tile = None
@@ -722,8 +725,8 @@ def after_battle_processing(attacker, defender, attacker_troops_power_level_list
             else:
                 known_map = game_stats.map_positions
 
-            routing_path, routing_grid = algo_routing_range.routeing_astar(None, defender_posxy, 600.0, friendly_cities,
-                                                                           hostile_cities, known_map)
+            routing_path, routing_grid = algo_movement_range.range_astar(None, defender_posxy, 600.0, friendly_cities,
+                                                                         hostile_cities, known_map, True, [])
 
             if len(routing_grid) > 0:
                 farthest_tile = None
@@ -775,19 +778,40 @@ def after_battle_processing(attacker, defender, attacker_troops_power_level_list
                             game_obj.game_map[defender.location].lot.properties.army_id = None
 
     settlement = None
+    if game_obj.game_map[defender.location].city_id:
+        for city in game_obj.game_cities:
+            if city.city_id == game_obj.game_map[defender.location].city_id:
+                settlement = city
+                break
+
+    if settlement:
+        if settlement.siege:
+            settlement.siege = None
+
     settlement_captured = False
-    if battle_type == "Siege":
+    if battle_type in ["Siege", "Sortie"]:
         if result == "Attacker has won":
             # If attacking army wins siege battle, then defending army gets destroyed
             if defender.army_id not in remove_army_id:  # Could have been added before
                 remove_army_id.append(int(defender.army_id))
-
-            for city in game_obj.game_cities:
-                if city.city_id == game_obj.game_map[defender.location].city_id:
-                    settlement = city
-                    break
-
             settlement_captured = True
+
+    # Battle victories score
+    if result != "Draw":
+        for war in game_obj.game_wars:
+            if war.initiator in [attacker.owner, defender.owner]:
+                if war.respondent in [attacker.owner, defender.owner]:
+                    if result == "Attacker has won":
+                        if war.initiator == attacker.owner:
+                            war.initiator_battle_victories += 1
+                        else:
+                            war.respondent_battle_victories += 1
+                    else:
+                        if war.initiator == attacker.owner:
+                            war.respondent_battle_victories += 1
+                        else:
+                            war.initiator_battle_victories += 1
+                    break
 
     # Removing destroyed armies
     if len(remove_army_id) > 0:
@@ -804,6 +828,14 @@ def after_battle_processing(attacker, defender, attacker_troops_power_level_list
 
         # Delete army
         game_basic.remove_army(remove_army_id)
+
+    if attacker:
+        if attacker.owner != "Neutral":
+            strategy_logic.complete_war_order(attacker, attacker_realm)
+
+    if defender:
+        if defender.owner != "Neutral":
+            strategy_logic.complete_war_order(defender, defender_realm)
 
     # Special battles (lairs)
     if result == "Attacker has won" and battle_type == "special":

@@ -129,19 +129,19 @@ def manage_ranged(b, acting_unit, own_army_id, enemy_army_id, own_melee, own_ran
                 if e.position in enemy_nearby:
                     if e.counterattack == 0:
                         target_without_counterattack = True
+                        print("Enemy without counterattack: new_position - " + str(e) + "; num - " + str(num))
                         if defence_strength is None:
-                            defence_strength = int(e.armour) \
-                                               + game_battle.defence_effect(e, e.defence, enemy_hero)
+                            defence_strength = int(e.armour) + game_battle.defence_effect(e, e.defence, enemy_hero)
                             e_index = int(num)
                         elif int(e.armour) + game_battle.defence_effect(e, e.defence, enemy_hero) < defence_strength:
-                            defence_strength = int(e.armour) \
-                                               + game_battle.defence_effect(e, e.defence, enemy_hero)
+                            defence_strength = int(e.armour) + game_battle.defence_effect(e, e.defence, enemy_hero)
                             e_index = int(num)
                         else:
                             pass
                 num += 1
 
             if target_without_counterattack:
+                print("enemy_nearby :" + str(enemy_nearby))
                 print("Opportunity to hit an enemy without counterattack")
 
                 # And switch to melee attack

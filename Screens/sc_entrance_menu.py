@@ -2,6 +2,9 @@
 ## sc_entrance_menu
 
 import pygame.draw, pygame.font
+
+from Resources import game_stats
+
 pygame.init()
 
 MainMenuColor = [0x9F, 0x97, 0x97]
@@ -15,10 +18,16 @@ BorderMainMenuColor = [0xFF, 0xCC, 0x99]
 # Fonts
 font26 = pygame.font.SysFont('timesnewroman', 26)
 font20 = pygame.font.SysFont('timesnewroman', 20)
+font_arial_10 = pygame.font.SysFont('arial', 10)
 
 
 def main_menu_screen(screen):
     screen.fill(MainMenuColor)  # background
+
+    # Software version annotation
+    text_MainMenu1 = font_arial_10.render(str(game_stats.version_major) + "." + str(game_stats.version_minor)
+                                          + "." + str(game_stats.version_micro), True, TitleText)
+    screen.blit(text_MainMenu1, [3, 3])
 
     # Decorative lines
     pygame.draw.line(screen, LineMainMenuColor1, [30, 120], [240, 120], 10)
@@ -66,3 +75,9 @@ def main_menu_screen(screen):
     screen.blit(text_MainMenu3, [395, 415])
 
     pygame.draw.polygon(screen, BorderMainMenuColor, [[270, 413], [570, 413], [570, 445], [270, 445]], 3)
+
+    # Art picture
+    picture_img = game_stats.gf_menus_art["Arts/sinister_figure_in_the_woods"]
+    picture_img = pygame.transform.scale(picture_img,
+                                         (306, 546))
+    screen.blit(picture_img, (901, 61))

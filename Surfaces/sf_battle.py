@@ -11,7 +11,7 @@ from Resources import game_stats
 from Resources import game_battle
 from Resources import game_classes
 from Resources import game_basic
-from Resources import algo_routing_range
+from Resources import algo_movement_range
 from Resources import algo_path_arrows
 from Resources import battle_abilities_hero
 from Resources import battle_abilities_regiment
@@ -28,6 +28,8 @@ from Content import reward_catalog
 from Content import siege_warfare_catalog
 
 from Content.Quests import knight_lords_quest_result_scripts
+
+from Strategy_AI import strategy_logic
 
 yVar = game_stats.game_window_height - 800
 
@@ -1440,15 +1442,23 @@ def end_battle_but():
                 winner = army
                 winner_alive = True
 
-            if b.battle_type == "Siege" and settlement is None:
+            if army.army_id == b.defender_id:
                 if game_obj.game_map[army.location].lot is not None:
                     if game_obj.game_map[army.location].lot == "City":
                         for city in game_obj.game_cities:
                             if city.city_id == game_obj.game_map[army.location].city_id:
-                                if city.siege is not None:
-                                    settlement = city
-                                    print(settlement.name + " - siege settlement")
+                                settlement = city
+                                print(settlement.name + " - siege settlement")
                                 break
+            # if b.battle_type == "Siege" and settlement is None:
+            #     if game_obj.game_map[army.location].lot is not None:
+            #         if game_obj.game_map[army.location].lot == "City":
+            #             for city in game_obj.game_cities:
+            #                 if city.city_id == game_obj.game_map[army.location].city_id:
+            #                     if city.siege is not None:
+            #                         settlement = city
+            #                         print(settlement.name + " - siege settlement")
+            #                     break
 
             if len(army.units) == 0 or (army.owner == b.defeated_side and army.owner == "Neutral"):
                 if army.owner == "Neutral":
@@ -1500,44 +1510,25 @@ def end_battle_but():
                     if army.hero is not None:
                         army.hero.experience += int(b.earned_experience)
 
+            if army.army_id not in remove_army_id:
+                if army.owner != "Neutral":
+                    for realm in game_obj.game_powers:
+                        if realm.name == army.owner:
+                            strategy_logic.complete_war_order(army, realm)
+                            break
+
     # Removing destroyed armies
     game_basic.remove_army(remove_army_id)
-    # while len(remove_army_id) > 0:
-    #     for army in game_obj.game_armies:
-    #         if army.army_id == remove_army_id[0]:
-    #             for realm in game_obj.game_powers:
-    #                 if realm.AI_player:
-    #                     if realm.name == army.owner:
-    #                         for role in realm.AI_cogs.army_roles:
-    #                             if role.army_id == army.army_id:
-    #                                 realm.AI_cogs.army_roles.remove(role)
-    #                                 break
-    #                         break
-    #             game_obj.game_armies.remove(army)
-    #             del remove_army_id[0]
-    #             break
 
     # Capture settlement
-    if settlement_captured:
-        game_basic.capture_settlement(settlement, b.attacker_realm, winner_alive, winner)
-        # print("settlement_captured")
-        # settlement.siege = None
-        # if settlement.owner == "Neutral":
-        #     settlement.owner = str(winner.owner)
-        # elif settlement.owner == b.attacker_realm:
-        #     settlement.military_occupation = None
-        # else:
-        #     for realm in game_obj.game_powers:
-        #         if realm.name == b.attacker_realm:
-        #             settlement.military_occupation = [str(realm.f_color), str(realm.s_color), str(realm.name)]
-        #             break
-        #
-        # if winner_alive:
-        #     # Move victorious army into captured settlement
-        #     game_obj.game_map[winner.location].army_id = None
-        #     game_obj.game_map[settlement.location].army_id = int(winner.army_id)
-        #     winner.location = int(settlement.location)
-        #     winner.posxy = list(settlement.posxy)
+    if b.battle_type == "Siege":
+        if settlement_captured:
+            game_basic.capture_settlement(settlement, b.attacker_realm, winner_alive, winner)
+
+    # In case there is a besieged settlement, its siege should be lifted
+    if settlement:
+        if settlement.siege:
+            settlement.siege = None
 
     # Check shattered status
     if loser.shattered == "Stable":
@@ -1565,8 +1556,8 @@ def end_battle_but():
         else:
             known_map = game_stats.map_positions
 
-        routing_path, routing_grid = algo_routing_range.routeing_astar(None, loser.posxy, 600.0, friendly_cities,
-                                                                       hostile_cities, known_map)
+        routing_path, routing_grid = algo_movement_range.range_astar(None, loser.posxy, 600.0, friendly_cities,
+                                                                     hostile_cities, known_map, True, [])
 
         if len(routing_grid) > 0:
             farthest_tile = None

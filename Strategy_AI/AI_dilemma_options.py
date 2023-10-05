@@ -60,7 +60,7 @@ def AI_forrest_law_upheld(realm, message):
                                     lodge.ready_units = 0
             break
 
-    remove_quest_message(realm, message.name)
+    remove_quest_message(realm, message)
 
 
 def AI_forrest_law_lenient(realm, message):
@@ -138,6 +138,136 @@ def AI_forrest_law_lenient(realm, message):
     for faction in the_settlement.factions:
         if faction.name == "Nobility estate":
             faction.loyalty -= 1
+
+    remove_quest_message(realm, message)
+
+
+def AI_rule_of_monastic_life_ignore(realm, message):
+    # Add effect
+    effect = campaign_effect_classes.Settlement_Effect("Frivolous monks",
+                                                       "Settlement",
+                                                       "Replenishment",
+                                                       [
+                                                           campaign_effect_classes.Recruitment_Effect(["Battle monks"],
+                                                                                                      "Replenishment and ready",
+                                                                                                      2,
+                                                                                                      "Addition")
+                                                       ],
+                                                       True)
+
+    for settlement in game_obj.game_cities:
+        if settlement.city_id == game_obj.game_map[message.settlement_location].city_id:
+            settlement.local_effects.append(effect)
+
+            # Adjust recruitment
+            for plot in settlement.buildings:
+                if plot.structure is not None:
+                    if len(plot.structure.recruitment) > 0:
+                        if plot.status == "Built":
+                            for lodge in plot.structure.recruitment:
+                                if "Battle monks" in recruitment_structures.unit_tags[lodge.unit_name]:
+                                    lodge.replenishment_rate += 2
+                                    break
+            break
+
+    remove_quest_message(realm, message)
+
+
+def AI_rule_of_monastic_life_aid_reform(realm, message):
+    # Add effect
+    effect1 = campaign_effect_classes.Settlement_Effect("Rule of Monastic Life",
+                                                        "Settlement",
+                                                        "Control",
+                                                        [
+                                                            campaign_effect_classes.Control_Effect("Knight Lords",
+                                                                                                   "Control",
+                                                                                                   1,
+                                                                                                   "Addition")
+                                                        ],
+                                                        True)
+    effect2 = campaign_effect_classes.Settlement_Effect("Disciplined monks",
+                                                        "Settlement",
+                                                        "Loyalty",
+                                                        [campaign_effect_classes.Faction_Effect("Clergy estate",
+                                                                                                "Loyalty",
+                                                                                                2,
+                                                                                                "Subtraction")
+                                                         ],
+                                                        8)
+
+    for settlement in game_obj.game_cities:
+        if settlement.city_id == game_obj.game_map[message.settlement_location].city_id:
+            settlement.local_effects.append(effect1)
+            settlement.local_effects.append(effect2)
+            # Adjust faction loyalty
+            for faction in settlement.factions:
+                if faction.name == "Clergy estate":
+                    faction.loyalty -= 2
+            break
+
+    remove_quest_message(realm, message)
+
+
+def AI_grant_land_holdings(realm, message):
+    # Add effect
+    effect1 = campaign_effect_classes.Settlement_Effect("Bribed local lord",
+                                                        "Settlement",
+                                                        "Loyalty",
+                                                        [
+                                                            campaign_effect_classes.Faction_Effect("Nobility estate",
+                                                                                                   "Loyalty",
+                                                                                                   2,
+                                                                                                   "Addition")
+                                                        ],
+                                                        8)
+    effect2 = campaign_effect_classes.Settlement_Effect("Transferred abbey's land holdings",
+                                                        "Settlement",
+                                                        "Loyalty",
+                                                        [campaign_effect_classes.Faction_Effect("Clergy estate",
+                                                                                                "Loyalty",
+                                                                                                1,
+                                                                                                "Subtraction")
+                                                         ],
+                                                        12)
+
+    for settlement in game_obj.game_cities:
+        if settlement.city_id == game_obj.game_map[message.settlement_location].city_id:
+            # Adjust faction loyalty
+            settlement.local_effects.append(effect1)
+            settlement.local_effects.append(effect2)
+            for faction in settlement.factions:
+                if faction.name == "Nobility estate":
+                    faction.loyalty += 2
+                elif faction.name == "Clergy estate":
+                    faction.loyalty -= 1
+            break
+
+    remove_quest_message(realm, message)
+
+
+def AI_pass_on_this_opportunity(realm, message):
+    remove_quest_message(realm, message)
+
+
+def AI_support_monastery_school(realm, message):
+    game_basic.realm_payment(realm.name, [["Florins", 5000]])
+    # Add effect
+    effect = campaign_effect_classes.Settlement_Effect("Monastery school",
+                                                       "Settlement",
+                                                       "New heroes",
+                                                       [
+                                                           campaign_effect_classes.New_Heroes_Effect(
+                                                               ["Priest of Salvation"],
+                                                               "Level",
+                                                               1,
+                                                               "Addition")
+                                                       ],
+                                                       True)
+
+    for settlement in game_obj.game_cities:
+        if settlement.city_id == game_obj.game_map[message.settlement_location].city_id:
+            # Apply effect
+            settlement.local_effects.append(effect)
 
     remove_quest_message(realm, message)
 
@@ -228,6 +358,25 @@ def AI_send_party_of_huntsmen(realm, message):
     print(message.name + ": In the realm " + str(realm.name) + " hunters were dispatched to chase the Grey Dragon")
 
 
+def AI_trade_with_dwarves(realm, message):
+    game_basic.realm_payment(realm.name, [["Florins", 2500]])
+    game_basic.realm_income(realm.name, [["Armament", 2500]])
+
+    remove_quest_message(realm, message)
+
+
+def AI_dwarves_spend_money(realm, message):
+    for settlement in game_obj.game_cities:
+        if settlement.city_id == game_obj.game_map[message.settlement_location].city_id:
+            for pops in settlement.residency:
+                if pops.name == "Merchants":
+                    game_basic.simple_add_resources(pops.reserve, [["Florins", 250]])
+                    break
+            break
+
+    remove_quest_message(realm, message)
+
+
 def AI_promise_to_supply_stone(realm, message):
     the_settlement = None
     for settlement in game_obj.game_cities:
@@ -236,7 +385,7 @@ def AI_promise_to_supply_stone(realm, message):
             print(the_settlement.name)
             break
 
-    # Add new quest to eliminate rogue army
+    # Add new quest to provide stone to vassal
     realm.quests_messages.append(game_classes.Quest_Message("Provide stone to vassal",
                                                             int(the_settlement.location),
                                                             str(the_settlement.name),
@@ -319,9 +468,33 @@ def AI_reject_request_for_stone_materials(realm, message):
     remove_quest_message(realm, message)
 
 
+## Options
 def forrest_law_options(realm):
     options_list = [AI_forrest_law_upheld, AI_forrest_law_lenient]
     weights_list = [5, 5]
+    return options_list, weights_list
+
+
+def rule_of_monastic_life_options(realm):
+    options_list = [AI_rule_of_monastic_life_ignore, AI_rule_of_monastic_life_aid_reform]
+    weights_list = [2, 8]
+    return options_list, weights_list
+
+
+def favor_abbeys_lands_options(realm):
+    options_list = [AI_grant_land_holdings, AI_pass_on_this_opportunity]
+    weights_list = [8, 2]
+    return options_list, weights_list
+
+
+def monastery_school_options(realm):
+    options_list = [AI_pass_on_this_opportunity]
+    weights_list = [2]
+
+    if game_basic.enough_resources_to_pay([["Florins", 5000]], realm.coffers):
+        options_list.append(AI_support_monastery_school)
+        weights_list.append(8)
+
     return options_list, weights_list
 
 
@@ -332,6 +505,17 @@ def grey_dragon_slayer_options(realm):
     if realm.leader.lifestyle_traits[0] == "Hunter" or realm.leader.lifestyle_traits[1] == "Hunter":
         options_list.append(AI_send_party_of_huntsmen)
         weights_list.append(9)
+
+    return options_list, weights_list
+
+
+def dwarven_caravan_options(realm):
+    options_list = [AI_dwarves_spend_money]
+    weights_list = [2]
+
+    if game_basic.enough_resources_to_pay([["Florins", 2500]], realm.coffers):
+        options_list.append(AI_trade_with_dwarves)
+        weights_list.append(8)
 
     return options_list, weights_list
 
@@ -354,5 +538,9 @@ def desolated_defences_options(realm):
 
 
 options_dict = {"Forest law" : forrest_law_options,
+                "Rule of Monastic Life" : rule_of_monastic_life_options,
+                "Favor abbey's lands" : favor_abbeys_lands_options,
+                "Monastery school" : monastery_school_options,
                 "Grey dragon slayer" : grey_dragon_slayer_options,
+                "Dwarven caravan" : dwarven_caravan_options,
                 "Desolated defences" : desolated_defences_options}

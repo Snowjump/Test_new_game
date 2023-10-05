@@ -513,9 +513,10 @@ class Post_Battle_Event:
 
 
 class Blockade:
-    def __init__(self, attacker_id, supplies, time_passed, trebuchets_max_quantity, siege_towers_max_quantity,
-                 battering_rams_max_quantity):
+    def __init__(self, attacker_id, attacker_realm, supplies, time_passed, trebuchets_max_quantity,
+                 siege_towers_max_quantity, battering_rams_max_quantity):
         self.attacker_id = attacker_id  # id of enemy army that besieged this settlement
+        self.attacker_realm = attacker_realm  # Realm name
         self.supplies = supplies  # Number of turns left without attrition damage to garrison
         self.time_passed = time_passed  # Number of turns passed since beginning of blockade
         self.trebuchets_ordered = 0

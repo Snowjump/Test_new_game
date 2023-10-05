@@ -83,7 +83,7 @@ def generate_map(attacker, defender):
     cover_map = [3, 1, 16, 12]
     if game_stats.defender_realm == game_stats.player_power:
         starting_pov = [6, 0]
-        cover_map = [1, 1, 14, 12]
+        cover_map = [1, 1, 13, 12]
 
     starting_attacking_positions = []
     starting_defending_positions = []

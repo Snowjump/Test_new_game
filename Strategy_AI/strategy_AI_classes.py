@@ -20,6 +20,8 @@ class army_roles:
         self.army_size = army_size
         # Most AI settlements should have a dedicated army that will operate nearby
         self.base_of_operation = 0  # City_id
+        self.target_army_id = 0  # 0 is False and means there is no target
+        self.target_city_id = 0  # 0 is False and means there is no target
 
 
 class AI_economy:

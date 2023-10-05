@@ -124,7 +124,7 @@ def rule_of_monastic_life_message(screen, quest):
                                                      [x_base + x_up, y_base + y_up], [x_base, y_base + y_up]], 2)
 
     text_panel1 = arial_font13.render("Ignore disorder", True, DarkText)
-    screen.blit(text_panel1, [x_base + 19, y_base + 3])
+    screen.blit(text_panel1, [x_base + 19, y_base + 4])
 
     # Temporary effect, should be changed later to something more meaningful
     text_panel1 = arial_font13.render("Battle monks recruitment +2 turns", True, DarkText)
@@ -142,19 +142,19 @@ def rule_of_monastic_life_message(screen, quest):
                                                      [x_base + x_up, y_base + y_up], [x_base, y_base + y_up]], 2)
 
     text_panel1 = arial_font13.render("Aid reformation", True, DarkText)
-    screen.blit(text_panel1, [x_base + 15, y_base + 3])
+    screen.blit(text_panel1, [x_base + 15, y_base + 4])
 
     text_panel1 = arial_font13.render("Knight Lords culture level +1", True, DarkText)
     screen.blit(text_panel1, [x_base + x_up + 9, y_base - 6])
 
-    text_panel1 = arial_font13.render("Clergy estate -1", True, DarkText)
+    text_panel1 = arial_font13.render("Clergy estate -2", True, DarkText)
     screen.blit(text_panel1, [x_base + x_up + 9, y_base + 14])
 
     icon_img = pygame.image.load('Img/Icons/bad_loyalty_icon.png')
-    screen.blit(icon_img, (x_base + x_up + 107, y_base + 13))
+    screen.blit(icon_img, (x_base + x_up + 106, y_base + 13))
 
     text_panel1 = arial_font13.render("for 8 turns", True, DarkText)
-    screen.blit(text_panel1, [x_base + x_up + 126, y_base + 14])
+    screen.blit(text_panel1, [x_base + x_up + 125, y_base + 14])
 
 
 def favor_abbeys_lands_message(screen, quest):

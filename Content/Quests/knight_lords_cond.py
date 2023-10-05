@@ -17,7 +17,7 @@ def rule_of_monastic_life_cond(quest_list, settlement):
     add_quest = False
     effect_name_list = ["Frivolous monks", "Disciplined monks"]
     if effect_block(effect_name_list, settlement):
-        # print("No block")
+        # print("No block for addition of rule_of_monastic_life_cond")
         for plot in settlement.buildings:
             if plot.structure is not None:
                 # print(plot.structure.name)
@@ -38,11 +38,12 @@ def monastery_school_cond(quest_list, settlement):
     add_quest = False
     effect_name_list = ["Monastery school"]
     if effect_block(effect_name_list, settlement):
-        for plot in settlement.buildings:
-            if plot.structure is not None:
-                if plot.status == "Built" and plot.structure.name == "Monastery":
-                    add_quest = True
-                    break
+        add_quest = True
+        # for plot in settlement.buildings:
+        #     if plot.structure is not None:
+        #         if plot.status == "Built" and plot.structure.name == "Monastery":
+        #             add_quest = True
+        #             break
 
     if add_quest:
         quest_list.append("Monastery school")
@@ -71,6 +72,7 @@ def desolated_defences_cond(quest_list, settlement):
 
 
 def effect_block(effect_name_list, settlement):
+    # If an effect from effect_nam_list is present in settlement, then this dilemma is not allowed there
     result = True
     for local_effect in settlement.local_effects:
         # print("local_effect - " + local_effect.name)
@@ -85,13 +87,13 @@ def effect_block(effect_name_list, settlement):
 def check_conditions(settlement):
     quest_list = []
 
-    # forest_law_quest_cond(quest_list, settlement)
-    # rule_of_monastic_life_cond(quest_list, settlement)
-    # grant_abbey_lands_cond(quest_list, settlement)
-    # monastery_school_cond(quest_list, settlement)
+    forest_law_quest_cond(quest_list, settlement)
+    rule_of_monastic_life_cond(quest_list, settlement)
+    grant_abbey_lands_cond(quest_list, settlement)
+    monastery_school_cond(quest_list, settlement)
     grey_dragon_slayer_cond(quest_list, settlement)
-    # dwarf_caravan_cond(quest_list, settlement)
-    # desolated_defences_cond(quest_list, settlement)
+    dwarf_caravan_cond(quest_list, settlement)
+    desolated_defences_cond(quest_list, settlement)
     print("quest_list:")
     for text_line in quest_list:
         print(text_line)

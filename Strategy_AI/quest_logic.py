@@ -4,6 +4,7 @@
 import random
 
 from Strategy_AI import AI_dilemma_options
+from Strategy_AI import AI_quest_options
 
 
 # class Dilemma_Option:
@@ -18,10 +19,17 @@ def manage_messages(realm):
         if message.message_type == "Dilemma":
             options_list, weights_list = AI_dilemma_options.options_dict[message.name](realm)
             if len(options_list) > 0:
-                print("len(options_list) = " + str(len(options_list)))
+                print("len(dilemma options_list) = " + str(len(options_list)))
             random.choices(options_list, weights=weights_list)[0](realm, message)
 
             # collect_options(realm, message)
+
+        elif message.message_type == "Quest":
+            if message.name in AI_quest_options.options_dict:
+                options_list, weights_list = AI_quest_options.options_dict[message.name](realm)
+                if len(options_list) > 0:
+                    print("len(quest options_list) = " + str(len(options_list)))
+                random.choices(options_list, weights=weights_list)[0](realm, message)
 
     # print("")
 

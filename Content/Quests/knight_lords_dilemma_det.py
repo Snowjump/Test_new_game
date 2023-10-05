@@ -200,7 +200,7 @@ def rule_of_monastic_life_aid_reform():
                                                         "Loyalty",
                                                         [campaign_effect_classes.Faction_Effect("Clergy estate",
                                                                                                 "Loyalty",
-                                                                                                1,
+                                                                                                2,
                                                                                                 "Subtraction")
                                                          ],
                                                         8)
@@ -214,7 +214,7 @@ def rule_of_monastic_life_aid_reform():
             # Adjust faction loyalty
             for faction in settlement.factions:
                 if faction.name == "Clergy estate":
-                    faction.loyalty -= 1
+                    faction.loyalty -= 2
             break
 
     remove_quest_message("Rule of Monastic Life")
@@ -469,7 +469,7 @@ def promise_to_supply_stone():
             print(the_settlement.name)
             break
 
-    # Add new quest to eliminate rogue army
+    # Add new quest to provide stone to vassal
     the_realm.quests_messages.append(game_classes.Quest_Message("Provide stone to vassal",
                                                                 int(the_settlement.location),
                                                                 str(the_settlement.name),

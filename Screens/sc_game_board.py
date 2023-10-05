@@ -57,6 +57,7 @@ pygame.init()
 WhiteColor = [255, 255, 255]
 
 MainMenuColor = [0x9F, 0x97, 0x97]
+MainMenuColorDark1 = [0x8D, 0x87, 0x87]
 NewGameColor = [0x8D, 0x86, 0x86]
 LineMainMenuColor1 = [0x60, 0x60, 0x60]
 Board1 = [0x8A, 0xAA, 0xE5]  # Light blue
@@ -203,7 +204,7 @@ def draw_tiles(screen):
                             game_stats.display_everything:
                         # New code
                         terrain_img = game_stats.gf_terrain_dict[TileObj.conditions]
-                        screen.blit(terrain_img, ((x - 1) * 48 , (y - 1) * 48))
+                        screen.blit(terrain_img, ((x - 1) * 48, (y - 1) * 48))
 
                         # Roads
                         if TileObj.road is not None:
@@ -264,7 +265,7 @@ def draw_tiles(screen):
                         #                      [(x - 1) * 48 + 1, (y - 1) * 48 + 48]],
                         #                     1)
 
-                        terrain_img = game_stats.gf_terrain_dict["Terrains/border_48_48_170"]
+                        terrain_img = game_stats.gf_terrain_dict["Terrains/border_48_48_200"]
                         screen.blit(terrain_img, ((x - 1) * 48, (y - 1) * 48))
 
                     # Draw undiscovered tiles as dark purple tiles
@@ -440,15 +441,15 @@ def draw_tiles(screen):
                                                 if unit.img_width > 44:
                                                     proportion = 44 / unit.img_width
                                                     army_img = pygame.transform.scale(army_img,
-                                                                           (44,
-                                                                            int(unit.img_height * proportion)))
+                                                                                      (44,
+                                                                                       int(unit.img_height * proportion)))
                                                     x_offset = 3
                                                     y_offset = (48 - (unit.img_height * proportion)) / 2
                                                 else:
                                                     proportion = 44 / unit.img_height
                                                     army_img = pygame.transform.scale(army_img,
-                                                                           (int(unit.img_width * proportion),
-                                                                            44))
+                                                                                      (int(unit.img_width * proportion),
+                                                                                       44))
                                                     x_offset = (48 - (unit.img_width * proportion)) / 2
                                                     y_offset = 3
                                             else:
@@ -589,7 +590,6 @@ def terrain_panel(screen, TileNum, xy_pos):
     yVar = game_stats.game_window_height - 800
     pygame.draw.polygon(screen, MainMenuColor,
                         [[200, 600 + yVar], [1080, 600 + yVar], [1080, 800 + yVar], [200, 800 + yVar]])
-
 
     # Natural feature
     if game_obj.game_map[TileNum - 1].natural_feature is not None:
@@ -757,10 +757,11 @@ def settlement_blockade_panel(screen):
     screen.blit(text_panel1, [575 - len(title_text), 73])
 
     # Close settlement siege window
-    pygame.draw.polygon(screen, CancelFieldColor, [[1135, 75], [1154, 75], [1154, 94], [1135, 94]])
-    pygame.draw.polygon(screen, CancelElementsColor, [[1135, 75], [1154, 75], [1154, 94], [1135, 94]], 2)
-    pygame.draw.line(screen, CancelElementsColor, [1138, 78], [1151, 91], 2)
-    pygame.draw.line(screen, CancelElementsColor, [1138, 91], [1151, 78], 2)
+    if game_stats.besieged_by_human or (not game_stats.besieged_by_human and not game_stats.siege_assault):
+        pygame.draw.polygon(screen, CancelFieldColor, [[1135, 75], [1154, 75], [1154, 94], [1135, 94]])
+        pygame.draw.polygon(screen, CancelElementsColor, [[1135, 75], [1154, 75], [1154, 94], [1135, 94]], 2)
+        pygame.draw.line(screen, CancelElementsColor, [1138, 78], [1151, 91], 2)
+        pygame.draw.line(screen, CancelElementsColor, [1138, 91], [1151, 78], 2)
 
     # Siege duration
     text_panel5 = font16.render("Siege duration:", True, DarkText)
@@ -782,47 +783,60 @@ def settlement_blockade_panel(screen):
     y_num = 0
 
     # Button - Start assault
+    text = "Start assault"
+    x = 0
+    if not game_stats.besieged_by_human and not game_stats.siege_assault:
+        text = "Start sortie"
+        x = 4
     pygame.draw.polygon(screen, FillButton, [[128, y_base + y_shift * y_num], [238, y_base + y_shift * y_num],
-                                             [238, y_base + y_shift * y_num + 22], [128, y_base + y_shift * y_num + 22]])
+                                             [238, y_base + y_shift * y_num + 22],
+                                             [128, y_base + y_shift * y_num + 22]])
     if game_stats.assault_allowed:  # Works both for Battle and autobattle
         color1 = HighlightOption
     else:
         color1 = CancelElementsColor
     pygame.draw.polygon(screen, color1, [[128, y_base + y_shift * y_num], [238, y_base + y_shift * y_num],
-                                                     [238, y_base + y_shift * y_num + 22], [128, y_base + y_shift * y_num + 22]], 3)
-    text_panel5 = font20.render("Start assault", True, DarkText)
-    screen.blit(text_panel5, [133, y_base + y_shift * y_num])
+                                         [238, y_base + y_shift * y_num + 22], [128, y_base + y_shift * y_num + 22]], 3)
+    text_panel5 = font20.render(text, True, DarkText)
+    screen.blit(text_panel5, [133 + x, y_base + y_shift * y_num])
     y_num += 1
 
     # Button - Autobattle
     pygame.draw.polygon(screen, FillButton, [[128, y_base + y_shift * y_num], [238, y_base + y_shift * y_num],
-                                             [238, y_base + y_shift * y_num + 22], [128, y_base + y_shift * y_num + 22]])
+                                             [238, y_base + y_shift * y_num + 22],
+                                             [128, y_base + y_shift * y_num + 22]])
     pygame.draw.polygon(screen, color1, [[128, y_base + y_shift * y_num], [238, y_base + y_shift * y_num],
-                                                     [238, y_base + y_shift * y_num + 22], [128, y_base + y_shift * y_num + 22]], 3)
+                                         [238, y_base + y_shift * y_num + 22], [128, y_base + y_shift * y_num + 22]], 3)
     text_panel5 = font20.render("Autobattle", True, DarkText)
     screen.blit(text_panel5, [139, y_base + y_shift * y_num])
     y_num += 1
 
     # Button - Encircle
-    pygame.draw.polygon(screen, FillButton, [[128, y_base + y_shift * y_num], [238, y_base + y_shift * y_num],
-                                             [238, y_base + y_shift * y_num + 22], [128, y_base + y_shift * y_num + 22]])
-    pygame.draw.polygon(screen, LineMainMenuColor1, [[128, y_base + y_shift * y_num], [238, y_base + y_shift * y_num],
-                                                     [238, y_base + y_shift * y_num + 22], [128, y_base + y_shift * y_num + 22]], 3)
-    text_panel5 = font20.render("Encircle", True, DarkText)
-    screen.blit(text_panel5, [151, y_base + y_shift * y_num])
-    y_num += 1
+    if game_stats.besieged_by_human:
+        pygame.draw.polygon(screen, FillButton, [[128, y_base + y_shift * y_num], [238, y_base + y_shift * y_num],
+                                                 [238, y_base + y_shift * y_num + 22],
+                                                 [128, y_base + y_shift * y_num + 22]])
+        pygame.draw.polygon(screen, LineMainMenuColor1,
+                            [[128, y_base + y_shift * y_num], [238, y_base + y_shift * y_num],
+                             [238, y_base + y_shift * y_num + 22], [128, y_base + y_shift * y_num + 22]], 3)
+        text_panel5 = font20.render("Encircle", True, DarkText)
+        screen.blit(text_panel5, [151, y_base + y_shift * y_num])
+        y_num += 1
 
     # Button - retreat
-    pygame.draw.polygon(screen, FillButton, [[128, y_base + y_shift * y_num], [238, y_base + y_shift * y_num],
-                                             [238, y_base + y_shift * y_num + 22], [128, y_base + y_shift * y_num + 22]])
-    pygame.draw.polygon(screen, LineMainMenuColor1, [[128, y_base + y_shift * y_num], [238, y_base + y_shift * y_num],
-                                                     [238, y_base + y_shift * y_num + 22], [128, y_base + y_shift * y_num + 22]], 3)
-    text_panel5 = font20.render("Retreat", True, DarkText)
-    screen.blit(text_panel5, [155, y_base + y_shift * y_num])
+    if game_stats.besieged_by_human:
+        pygame.draw.polygon(screen, FillButton, [[128, y_base + y_shift * y_num], [238, y_base + y_shift * y_num],
+                                                 [238, y_base + y_shift * y_num + 22],
+                                                 [128, y_base + y_shift * y_num + 22]])
+        pygame.draw.polygon(screen, LineMainMenuColor1,
+                            [[128, y_base + y_shift * y_num], [238, y_base + y_shift * y_num],
+                             [238, y_base + y_shift * y_num + 22], [128, y_base + y_shift * y_num + 22]], 3)
+        text_panel5 = font20.render("Retreat", True, DarkText)
+        screen.blit(text_panel5, [155, y_base + y_shift * y_num])
 
-    # Display defensive structures
-    text_panel5 = font20.render("Defences", True, DarkText)
-    screen.blit(text_panel5, [322, 95])
+        # Display defensive structures
+        text_panel5 = font20.render("Defences", True, DarkText)
+        screen.blit(text_panel5, [322, 95])
 
     # Defenders supplies
     # Background image
@@ -918,15 +932,19 @@ def settlement_blockade_panel(screen):
         text_panel = font20.render(str(the_settlement.siege.trebuchets_ordered), True, DarkText)
         screen.blit(text_panel, [725, y_base + y_shift * 0])
 
-    # + button
-    pygame.draw.circle(screen, FillButton, [734, y_base + y_shift * 0 + 30], circle_radius)
-    pygame.draw.circle(screen, LineMainMenuColor1, [734, y_base + y_shift * 0 + 30], circle_radius, 1)
-    pygame.draw.line(screen, LineMainMenuColor1, [729, y_base + y_shift * 0 + 29], [738, y_base + y_shift * 0 + 29], 2)
-    pygame.draw.line(screen, LineMainMenuColor1, [733, y_base + y_shift * 0 + 25], [733, y_base + y_shift * 0 + 34], 2)
-    # - button
-    pygame.draw.circle(screen, FillButton, [714, y_base + y_shift * 0 + 30], circle_radius)
-    pygame.draw.circle(screen, LineMainMenuColor1, [714, y_base + y_shift * 0 + 30], circle_radius, 1)
-    pygame.draw.line(screen, LineMainMenuColor1, [709, y_base + y_shift * 0 + 29], [718, y_base + y_shift * 0 + 29], 2)
+    if game_stats.besieged_by_human:
+        # + button
+        pygame.draw.circle(screen, FillButton, [734, y_base + y_shift * 0 + 30], circle_radius)
+        pygame.draw.circle(screen, LineMainMenuColor1, [734, y_base + y_shift * 0 + 30], circle_radius, 1)
+        pygame.draw.line(screen, LineMainMenuColor1, [729, y_base + y_shift * 0 + 29], [738, y_base + y_shift * 0 + 29],
+                         2)
+        pygame.draw.line(screen, LineMainMenuColor1, [733, y_base + y_shift * 0 + 25], [733, y_base + y_shift * 0 + 34],
+                         2)
+        # - button
+        pygame.draw.circle(screen, FillButton, [714, y_base + y_shift * 0 + 30], circle_radius)
+        pygame.draw.circle(screen, LineMainMenuColor1, [714, y_base + y_shift * 0 + 30], circle_radius, 1)
+        pygame.draw.line(screen, LineMainMenuColor1, [709, y_base + y_shift * 0 + 29], [718, y_base + y_shift * 0 + 29],
+                         2)
 
     # Amount
     text_line = str(the_settlement.siege.trebuchets_ready) + "/" + \
@@ -952,15 +970,19 @@ def settlement_blockade_panel(screen):
         text_panel = font20.render(str(the_settlement.siege.siege_towers_ordered), True, DarkText)
         screen.blit(text_panel, [725, y_base + y_shift * 1])
 
-    # + button
-    pygame.draw.circle(screen, FillButton, [734, y_base + y_shift * 1 + 30], circle_radius)
-    pygame.draw.circle(screen, LineMainMenuColor1, [734, y_base + y_shift * 1 + 30], circle_radius, 1)
-    pygame.draw.line(screen, LineMainMenuColor1, [729, y_base + y_shift * 1 + 29], [738, y_base + y_shift * 1 + 29], 2)
-    pygame.draw.line(screen, LineMainMenuColor1, [733, y_base + y_shift * 1 + 25], [733, y_base + y_shift * 1 + 34], 2)
-    # - button
-    pygame.draw.circle(screen, FillButton, [714, y_base + y_shift * 1 + 30], circle_radius)
-    pygame.draw.circle(screen, LineMainMenuColor1, [714, y_base + y_shift * 1 + 30], circle_radius, 1)
-    pygame.draw.line(screen, LineMainMenuColor1, [709, y_base + y_shift * 1 + 29], [718, y_base + y_shift * 1 + 29], 2)
+    if game_stats.besieged_by_human:
+        # + button
+        pygame.draw.circle(screen, FillButton, [734, y_base + y_shift * 1 + 30], circle_radius)
+        pygame.draw.circle(screen, LineMainMenuColor1, [734, y_base + y_shift * 1 + 30], circle_radius, 1)
+        pygame.draw.line(screen, LineMainMenuColor1, [729, y_base + y_shift * 1 + 29], [738, y_base + y_shift * 1 + 29],
+                         2)
+        pygame.draw.line(screen, LineMainMenuColor1, [733, y_base + y_shift * 1 + 25], [733, y_base + y_shift * 1 + 34],
+                         2)
+        # - button
+        pygame.draw.circle(screen, FillButton, [714, y_base + y_shift * 1 + 30], circle_radius)
+        pygame.draw.circle(screen, LineMainMenuColor1, [714, y_base + y_shift * 1 + 30], circle_radius, 1)
+        pygame.draw.line(screen, LineMainMenuColor1, [709, y_base + y_shift * 1 + 29], [718, y_base + y_shift * 1 + 29],
+                         2)
 
     # Amount
     text_line = str(the_settlement.siege.siege_towers_ready) + "/" + \
@@ -986,15 +1008,19 @@ def settlement_blockade_panel(screen):
         text_panel = font20.render(str(the_settlement.siege.battering_rams_ordered), True, DarkText)
         screen.blit(text_panel, [725, y_base + y_shift * 2])
 
-    # + button
-    pygame.draw.circle(screen, FillButton, [734, y_base + y_shift * 2 + 30], circle_radius)
-    pygame.draw.circle(screen, LineMainMenuColor1, [734, y_base + y_shift * 2 + 30], circle_radius, 1)
-    pygame.draw.line(screen, LineMainMenuColor1, [729, y_base + y_shift * 2 + 29], [738, y_base + y_shift * 2 + 29], 2)
-    pygame.draw.line(screen, LineMainMenuColor1, [733, y_base + y_shift * 2 + 25], [733, y_base + y_shift * 2 + 34], 2)
-    # - button
-    pygame.draw.circle(screen, FillButton, [714, y_base + y_shift * 2 + 30], circle_radius)
-    pygame.draw.circle(screen, LineMainMenuColor1, [714, y_base + y_shift * 2 + 30], circle_radius, 1)
-    pygame.draw.line(screen, LineMainMenuColor1, [709, y_base + y_shift * 2 + 29], [718, y_base + y_shift * 2 + 29], 2)
+    if game_stats.besieged_by_human:
+        # + button
+        pygame.draw.circle(screen, FillButton, [734, y_base + y_shift * 2 + 30], circle_radius)
+        pygame.draw.circle(screen, LineMainMenuColor1, [734, y_base + y_shift * 2 + 30], circle_radius, 1)
+        pygame.draw.line(screen, LineMainMenuColor1, [729, y_base + y_shift * 2 + 29], [738, y_base + y_shift * 2 + 29],
+                         2)
+        pygame.draw.line(screen, LineMainMenuColor1, [733, y_base + y_shift * 2 + 25], [733, y_base + y_shift * 2 + 34],
+                         2)
+        # - button
+        pygame.draw.circle(screen, FillButton, [714, y_base + y_shift * 2 + 30], circle_radius)
+        pygame.draw.circle(screen, LineMainMenuColor1, [714, y_base + y_shift * 2 + 30], circle_radius, 1)
+        pygame.draw.line(screen, LineMainMenuColor1, [709, y_base + y_shift * 2 + 29], [718, y_base + y_shift * 2 + 29],
+                         2)
 
     # Amount
     text_line = str(the_settlement.siege.battering_rams_ready) + "/" + \
@@ -1408,7 +1434,6 @@ def settlement_info_panel(screen):
         if settlement.city_id == game_stats.selected_settlement:
             x2 = int(settlement.posxy[0])
             y2 = int(settlement.posxy[1])
-
 
             TileNum = (y2 - 1) * game_stats.cur_level_width + x2 - 1
             TileObj = game_obj.game_map[TileNum]
@@ -2133,7 +2158,7 @@ def game_board_screen(screen):
     screen.blit(hourglass_img, (1005, 5))
 
     # Calendar
-    pygame.draw.polygon(screen, MainMenuColor, [[910, 7], [1000, 7], [1000, 55], [910, 55]])
+    pygame.draw.polygon(screen, MainMenuColorDark1, [[910, 7], [1000, 7], [1000, 55], [910, 55]])
     text_NewGame2 = font20.render("Year", True, TitleText)
     screen.blit(text_NewGame2, [913, 8])
     text_NewGame2 = font20.render(str(game_stats.game_year), True, TitleText)
@@ -2154,7 +2179,7 @@ def game_board_screen(screen):
             break
 
     # Left ribbon menu
-    pygame.draw.polygon(screen, MainMenuColor, [[0, 0], [31, 0], [31, 119], [0, 119]])
+    pygame.draw.polygon(screen, MainMenuColorDark1, [[0, 0], [31, 0], [31, 119], [0, 119]])
 
     # Button - realm
     icon_img = game_stats.gf_misc_img_dict["Icons/crown"]
@@ -2173,7 +2198,7 @@ def game_board_screen(screen):
     screen.blit(icon_img, (4, 54))
 
     # Top ribbon
-    pygame.draw.polygon(screen, MainMenuColor, [[41, 0], [600, 0], [600, 20], [41, 20]])
+    pygame.draw.polygon(screen, MainMenuColorDark1, [[41, 0], [600, 0], [600, 20], [41, 20]])
 
     if len(treasury) > 0:
         x_shift = 80

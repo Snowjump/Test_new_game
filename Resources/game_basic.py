@@ -6,7 +6,6 @@ import random
 
 from Storage import create_unit
 
-from Content import building_drafts
 from Content import starting_skills
 from Content import exploration_catalog
 from Content import exploration_scripts
@@ -66,7 +65,7 @@ def establish_leader(focus, mode):
                     # Find unit with highest rank
                     leader = None
                     for item in ledger:
-                        if leader == None:
+                        if leader is None:
                             leader = list(item)
                         elif item[1] > leader[1]:
                             leader = list(item)
@@ -74,6 +73,8 @@ def establish_leader(focus, mode):
                     # Set army's leader unit
                     army.leader = int(leader[0])
                     print("Army ID - " + str(focus) + ", leader - " + str(leader))
+
+            break
 
 
 def open_tiles(condition, the_army, location, next_point, own_realm):
@@ -561,7 +562,7 @@ def movement_action(army):
                                         enemy_army = found_army
                                         break
                                 print("Blockade own settlement captured by enemy")
-                                blockade_settlement(army, enemy_army, settlement)
+                                blockade_settlement(army, enemy_army, settlement, own_realm)
 
                         else:
                             if TileObj.army_id is None:
@@ -642,7 +643,7 @@ def movement_action(army):
                                     enemy_army = found_army
                                     break
                             print("Blockade neutral settlement")
-                            blockade_settlement(army, enemy_army, settlement)
+                            blockade_settlement(army, enemy_army, settlement, own_realm)
 
                     elif settlement.owner in at_war_list:
                         if settlement.military_occupation:
@@ -721,7 +722,7 @@ def movement_action(army):
                                         enemy_army = found_army
                                         break
                                 print("Blockade enemy settlement")
-                                blockade_settlement(army, enemy_army, settlement)
+                                blockade_settlement(army, enemy_army, settlement, own_realm)
 
             elif TileObj.army_id is not None:
                 # Army standing on object
@@ -808,6 +809,7 @@ def change_position(army, own_realm):
             army.location = int(TileNum)
             army.posxy = list(next_point)
             print("Army " + str(army.army_id) + ": new position - " + str(army.posxy) + "; " + str(army.location))
+            # print("Army arrows path is " + str(army.path_arrows))
 
             del army.route[0]
             del army.path_arrows[0]
@@ -958,7 +960,7 @@ def engage_army(attacker, defender, terrain, conditions, encounter_type):
             update_gf_game_board.update_regiment_sprites()
 
 
-def blockade_settlement(attacker, defender, settlement):
+def blockade_settlement(attacker, defender, settlement, attacker_realm):
     if enough_movement_points(attacker):
         spent_movement_points(attacker)
 
@@ -1009,21 +1011,160 @@ def blockade_settlement(attacker, defender, settlement):
                 battering_rams_max_quantity += capacity_list[1]
 
         settlement.siege = game_classes.Blockade(int(attacker.army_id),
+                                                 str(attacker.owner),
                                                  3,
                                                  0,
                                                  trebuchets_max_quantity,
                                                  siege_towers_max_quantity,
                                                  battering_rams_max_quantity)
 
-        game_stats.blockaded_settlement_name = str(settlement.name)
-        game_stats.selected_settlement = settlement.city_id
+        human_attacker = True
+        for realm in game_obj.game_powers:
+            if realm.name == attacker.owner:
+                if realm.AI_player:
+                    human_attacker = False
+                break
 
-        game_stats.game_board_panel = "settlement blockade panel"
+        if human_attacker:
+            game_stats.blockaded_settlement_name = str(settlement.name)
+            game_stats.selected_settlement = settlement.city_id
+            game_stats.besieged_by_human = True
 
-        # Update visuals
-        update_gf_game_board.update_misc_sprites()
-        update_gf_game_board.update_regiment_sprites()
-        update_gf_game_board.open_settlement_building_sprites()
+            game_stats.game_board_panel = "settlement blockade panel"
+
+            # Update visuals
+            update_gf_game_board.update_misc_sprites()
+            update_gf_game_board.update_regiment_sprites()
+            update_gf_game_board.open_settlement_building_sprites()
+
+        else:
+            AI_blockade_settlement(settlement, attacker, defender, attacker_realm)
+
+
+def AI_blockade_settlement(settlement, attacker, defender, attacker_realm):
+    print("AI_blockade_settlement()")
+    print("the_siege.siege_towers_max_quantity " + str(settlement.siege.siege_towers_max_quantity))
+    print("the_siege.trebuchets_max_quantity " + str(settlement.siege.trebuchets_max_quantity))
+    print("the_siege.battering_rams_max_quantity " + str(settlement.siege.battering_rams_max_quantity))
+    assault_allowed = True
+    for defensive_structure in settlement.defences:
+        if defensive_structure.provide_wall:
+            assault_allowed = False
+            for def_object in defensive_structure.def_objects:
+                if def_object.state in ["Broken", "Opened"]:
+                    assault_allowed = True
+                    break
+
+    # Check available siege equipment
+    if not assault_allowed:
+        if settlement.siege.siege_towers_ready + settlement.siege.battering_rams_ready > 0:
+            assault_allowed = True
+
+    continue_blockade = True
+
+    if assault_allowed:
+        own_army_sum_rank = 0
+        for unit in attacker.units:
+            own_army_sum_rank += unit.rank
+        print("Siege - own army: len(army.units) - " + str(len(attacker.units)) + "; own_army_sum_rank - "
+              + str(own_army_sum_rank))
+
+        # Standard border is 120
+        power_border = 120
+        # But for human player factions increase to 135, since humans are better at battling
+        for realm in game_obj.game_powers:
+            if realm.name == defender.owner:
+                if not realm.AI_player:
+                    power_border = 135
+                break
+
+        if strategy_logic.rank_ratio_calculation(own_army_sum_rank, defender, power_border, True):
+            print("Assault")
+            continue_blockade = False
+
+            game_stats.blockaded_settlement_name = str(settlement.name)
+            game_stats.selected_settlement = settlement.city_id
+            game_stats.besieged_by_human = False
+            game_stats.siege_assault = True
+
+            game_stats.selected_object = ""
+            game_stats.game_board_panel = "settlement blockade panel"
+            game_stats.details_panel_mode = ""
+            game_stats.right_window = ""
+            game_stats.settlement_area = ""
+
+            # Update visuals
+            update_gf_game_board.update_misc_sprites()
+            update_gf_game_board.update_regiment_sprites()
+            update_gf_game_board.open_settlement_building_sprites()
+
+    if continue_blockade:
+        print("Setting blockade")
+        for role in attacker_realm.AI_cogs.army_roles:
+            if role.army_id == attacker.army_id:
+                role.status = "Finished"
+                break
+
+        the_siege = settlement.siege
+        gate_exist = False
+        walls_exist = False
+        for defensive_structure in settlement.defences:
+            if defensive_structure.provide_wall:
+                game_stats.assault_allowed = False
+                for def_object in defensive_structure.def_objects:
+                    if def_object.state in ["Broken", "Opened"]:
+                        game_stats.assault_allowed = True
+
+                    if def_object.section_type == "Gate":
+                        if def_object.state in ["Unbroken"]:
+                            gate_exist = True
+                    elif def_object.section_type == "Wall":
+                        if def_object.state in ["Unbroken"]:
+                            walls_exist = True
+
+        if gate_exist:
+            if the_siege.battering_rams_ordered + the_siege.battering_rams_ready < 1:
+                the_siege.battering_rams_ordered += 1
+                the_siege.siege_towers_max_quantity -= 1
+                the_siege.construction_orders.append(["Battering ram", 0])
+
+        if walls_exist:
+            while (the_siege.trebuchets_ordered + the_siege.trebuchets_ready <
+                   the_siege.trebuchets_max_quantity) and \
+                    (the_siege.siege_towers_ordered + the_siege.siege_towers_ready <
+                     the_siege.siege_towers_max_quantity):
+
+                if the_siege.trebuchets_ordered + the_siege.trebuchets_ready < the_siege.trebuchets_max_quantity:
+                    the_siege.trebuchets_ordered += 1
+                    the_siege.construction_orders.append(["Trebuchet", 0])
+
+                if the_siege.siege_towers_ordered + the_siege.siege_towers_ready < the_siege.siege_towers_max_quantity:
+                    the_siege.siege_towers_ordered += 1
+                    the_siege.battering_rams_max_quantity -= 1
+                    the_siege.construction_orders.append(["Siege tower", 0])
+
+        if game_stats.game_board_panel == "settlement panel" and settlement.city_id == game_stats.selected_settlement:
+            game_stats.assault_allowed = True
+            game_stats.blockaded_settlement_name = str(settlement.name)
+            game_stats.selected_settlement = settlement.city_id
+            game_stats.besieged_by_human = False
+            game_stats.siege_assault = False
+
+            game_stats.selected_object = ""
+            game_stats.game_board_panel = "settlement blockade panel"
+            game_stats.details_panel_mode = ""
+            game_stats.right_window = ""
+            game_stats.settlement_area = ""
+
+            # Update visuals
+            update_gf_game_board.update_misc_sprites()
+            update_gf_game_board.update_regiment_sprites()
+            update_gf_game_board.open_settlement_building_sprites()
+
+    print("")
+    print("the_siege.siege_towers_max_quantity " + str(settlement.siege.siege_towers_max_quantity))
+    print("the_siege.trebuchets_max_quantity " + str(settlement.siege.trebuchets_max_quantity))
+    print("the_siege.battering_rams_max_quantity " + str(settlement.siege.battering_rams_max_quantity))
 
 
 def find_siege(army):
@@ -1074,7 +1215,7 @@ def perform_actions():
                     own_realm = realm
                     break
 
-            print("The rest of the route: " + str(army.route))
+            # print("The rest of the route: " + str(army.route))
             for role in own_realm.AI_cogs.army_roles:
                 if role.army_id == army.army_id:
                     next_point = list(army.route[0])

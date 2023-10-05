@@ -19,6 +19,7 @@ from Resources import skill_classes
 from Resources import ability_classes
 from Resources import update_gf_game_board
 from Resources import update_gf_battle
+from Resources import update_gf_menus
 from Resources import algo_path_arrows
 from Resources import game_diplomacy
 from Resources import diplomacy_classes
@@ -823,9 +824,11 @@ def game_board_surface_m1(position):
                                             if settlement.siege.siege_towers_ready + \
                                                     settlement.siege.battering_rams_ready > 0:
                                                 game_stats.assault_allowed = True
+                                                game_stats.siege_assault = True
 
                                         game_stats.blockaded_settlement_name = str(settlement.name)
                                         game_stats.selected_settlement = settlement.city_id
+                                        game_stats.besieged_by_human = True
 
                                         game_stats.game_board_panel = "settlement blockade panel"
 
@@ -846,7 +849,7 @@ def game_board_surface_m1(position):
                             if army.owner == game_stats.player_power:
                                 if len(army.route) > 0 and [x2, y2] == army.route[-1]:
                                     if army.action == "Stand":
-                                        print('army.action = "Ready to move"')
+                                        print('army ' + str(army.army_id) + ' action = "Ready to move"')
                                         army.action = "Ready to move"
                                 else:
                                     if army.action == "Stand":
@@ -982,6 +985,8 @@ def exit_but():
     game_stats.edit_instrument = ""
     game_stats.selected_tile = []
     game_stats.level_editor_panel = ""
+
+    update_gf_menus.update_menus_art()
 
 
 def save_but():
@@ -1156,16 +1161,16 @@ def select_war_notification(position):
 def play_battle_but():
     battle_map_generation.create_battle_map()
 
-    # New visuals
-    game_stats.gf_settlement_dict = {}
-    game_stats.gf_facility_dict = {}
-    game_stats.gf_exploration_dict = {}
-    game_stats.gf_misc_img_dict = {}
-
-    # Update visuals for battle
-    update_gf_battle.battle_update_sprites()
-    update_gf_battle.update_misc_sprites()
-    game_stats.gf_battle_effects_dict = {}
+    # # New visuals
+    # game_stats.gf_settlement_dict = {}
+    # game_stats.gf_facility_dict = {}
+    # game_stats.gf_exploration_dict = {}
+    # game_stats.gf_misc_img_dict = {}
+    #
+    # # Update visuals for battle
+    # update_gf_battle.battle_update_sprites()
+    # update_gf_battle.update_misc_sprites()
+    # game_stats.gf_battle_effects_dict = {}
 
     click_sound = pygame.mixer.Sound("Sound/Interface/Minimalist2.ogg")
     click_sound.play()
@@ -1182,7 +1187,10 @@ def autobattle_but():
 
     battle_result_script = None
     if attacker.action == "Besieging":
-        game_stats.battle_type = "Siege"
+        if game_stats.siege_assault:
+            game_stats.battle_type = "Siege"
+        else:
+            game_stats.battle_type = "Sortie"
     # print("game_stats.battle_type - " + str(game_stats.battle_type))
     # print("game_stats.attacker_army_id - " + str(game_stats.attacker_army_id))
     # print("game_stats.defender_army_id - " + str(game_stats.defender_army_id))
@@ -1239,6 +1247,7 @@ def close_autobattle_results():
 
 
 def play_siege_but():
+    print("play_siege_but()")
     attacker = None
     defender = None
     for army in game_obj.game_armies:
@@ -1252,8 +1261,6 @@ def play_siege_but():
             TileObj = game_obj.game_map[TileNum]
             game_stats.battle_terrain = str(TileObj.terrain)
             game_stats.battle_conditions = str(TileObj.conditions)
-
-    can_assault = True
 
     # settlement = None
     # for city in game_obj.game_cities:
@@ -1272,253 +1279,301 @@ def play_siege_but():
         print(game_stats.current_screen)
         game_stats.screen_to_draw = "battle_screen"
 
-        siege_map_generation.generate_map(attacker, defender)
+        if game_stats.besieged_by_human:
+            siege_map_generation.generate_map(attacker, defender)
+
+        else:
+            if game_stats.siege_assault:
+                siege_map_generation.generate_map(attacker, defender)
+            else:
+                print("Start sortie - create_battle_map()")
+                battle_map_generation.create_battle_map()
 
     click_sound = pygame.mixer.Sound("Sound/Interface/Minimalist2.ogg")
     click_sound.play()
 
 
 def encircle_but():
-    game_stats.selected_object = ""
-    game_stats.selected_army = -1
-    game_stats.details_panel_mode = ""
-    game_stats.attacker_army_id = 0
-    game_stats.attacker_realm = ""
+    if game_stats.besieged_by_human or (not game_stats.besieged_by_human and not game_stats.siege_assault):
+        game_stats.selected_object = ""
+        game_stats.selected_army = -1
+        game_stats.details_panel_mode = ""
+        game_stats.attacker_army_id = 0
+        game_stats.attacker_realm = ""
 
-    if game_stats.defender_army_id != 0:
-        game_stats.defender_army_id = 0
-        game_stats.defender_realm = ""
+        if game_stats.defender_army_id != 0:
+            game_stats.defender_army_id = 0
+            game_stats.defender_realm = ""
 
-    game_stats.blockaded_settlement_name = ""
-    game_stats.selected_settlement = -1
-    game_stats.game_board_panel = ""
+        game_stats.blockaded_settlement_name = ""
+        game_stats.selected_settlement = -1
+        game_stats.game_board_panel = ""
 
-    # Update visuals
-    game_stats.gf_building_dict = {}
-    if "Icons/paper_2_square_50_x_40" in game_stats.gf_misc_img_dict:
-        del game_stats.gf_misc_img_dict["Icons/paper_2_square_50_x_40"]
+        # Update visuals
+        game_stats.gf_building_dict = {}
+        if "Icons/paper_2_square_50_x_40" in game_stats.gf_misc_img_dict:
+            del game_stats.gf_misc_img_dict["Icons/paper_2_square_50_x_40"]
 
-    click_sound = pygame.mixer.Sound("Sound/Interface/Minimalist2.ogg")
-    click_sound.play()
+        click_sound = pygame.mixer.Sound("Sound/Interface/Minimalist2.ogg")
+        click_sound.play()
 
 
 def retreat_but():
-    for army in game_obj.game_armies:
-        if army.army_id == game_stats.attacker_army_id:
-            army.action = "Stand"
-            break
-
-    if game_stats.defender_army_id != 0:
+    if game_stats.besieged_by_human:
         for army in game_obj.game_armies:
-            if army.army_id == game_stats.defender_army_id:
+            if army.army_id == game_stats.attacker_army_id:
                 army.action = "Stand"
                 break
 
-    for settlement in game_obj.game_cities:
-        if settlement.city_id == game_stats.selected_settlement:
-            settlement.siege = None
-            break
+        if game_stats.defender_army_id != 0:
+            for army in game_obj.game_armies:
+                if army.army_id == game_stats.defender_army_id:
+                    army.action = "Stand"
+                    break
 
-    game_stats.attacker_army_id = 0
-    game_stats.attacker_realm = ""
-    game_stats.defender_army_id = 0
-    game_stats.defender_realm = ""
+        for settlement in game_obj.game_cities:
+            if settlement.city_id == game_stats.selected_settlement:
+                settlement.siege = None
+                break
 
-    game_stats.blockaded_settlement_name = ""
-    game_stats.selected_settlement = -1
-    game_stats.game_board_panel = ""
+        game_stats.attacker_army_id = 0
+        game_stats.attacker_realm = ""
+        game_stats.defender_army_id = 0
+        game_stats.defender_realm = ""
 
-    # Update visuals
-    game_stats.gf_building_dict = {}
-    del game_stats.gf_misc_img_dict["Icons/paper_2_square_50_x_40"]
+        game_stats.blockaded_settlement_name = ""
+        game_stats.selected_settlement = -1
+        game_stats.game_board_panel = ""
 
-    click_sound = pygame.mixer.Sound("Sound/Interface/Minimalist2.ogg")
-    click_sound.play()
+        # Update visuals
+        game_stats.gf_building_dict = {}
+        del game_stats.gf_misc_img_dict["Icons/paper_2_square_50_x_40"]
+
+        click_sound = pygame.mixer.Sound("Sound/Interface/Minimalist2.ogg")
+        click_sound.play()
 
 
 def build_trebuchet():
-    print("build_trebuchet()")
-    the_siege = None
-    for city in game_obj.game_cities:
-        if city.city_id == game_stats.selected_settlement:
-            the_siege = city.siege
-            break
+    if game_stats.besieged_by_human:
+        print("build_trebuchet()")
+        the_siege = None
+        for city in game_obj.game_cities:
+            if city.city_id == game_stats.selected_settlement:
+                the_siege = city.siege
+                break
 
-    print("trebuchets_max_quantity - " + str(the_siege.trebuchets_max_quantity))
+        print("trebuchets_max_quantity - " + str(the_siege.trebuchets_max_quantity))
 
-    if the_siege.trebuchets_ordered + the_siege.trebuchets_ready < the_siege.trebuchets_max_quantity:
-        the_siege.trebuchets_ordered += 1
-        the_siege.construction_orders.append(["Trebuchet", 0])
+        if the_siege.trebuchets_ordered + the_siege.trebuchets_ready < the_siege.trebuchets_max_quantity:
+            the_siege.trebuchets_ordered += 1
+            the_siege.construction_orders.append(["Trebuchet", 0])
 
-        click_sound = pygame.mixer.Sound("Sound/Interface/Abstract1.ogg")
-        click_sound.play()
-    else:
-        click_sound = pygame.mixer.Sound("Sound/Interface/Minimalist2.ogg")
-        click_sound.play()
+            click_sound = pygame.mixer.Sound("Sound/Interface/Abstract1.ogg")
+            click_sound.play()
+        else:
+            click_sound = pygame.mixer.Sound("Sound/Interface/Minimalist2.ogg")
+            click_sound.play()
 
-    print("trebuchets_ordered - " + str(the_siege.trebuchets_ordered))
+        print("trebuchets_ordered - " + str(the_siege.trebuchets_ordered))
 
 
 def cancel_building_trebuchet():
-    print("cancel_building_trebuchet()")
-    the_siege = None
-    for city in game_obj.game_cities:
-        if city.city_id == game_stats.selected_settlement:
-            the_siege = city.siege
-            break
+    if game_stats.besieged_by_human:
+        print("cancel_building_trebuchet()")
+        the_siege = None
+        for city in game_obj.game_cities:
+            if city.city_id == game_stats.selected_settlement:
+                the_siege = city.siege
+                break
 
-    if the_siege.trebuchets_ordered > 0:
-        the_siege.trebuchets_ordered -= 1
-        index = -1
-        condition = True
-        while condition:
-            if the_siege.construction_orders[index][0] == "Trebuchet":
-                condition = False
-                del the_siege.construction_orders[index]
-                print("Construction orders: " + str(the_siege.construction_orders))
-            else:
-                index -= 1
-                if abs(index) > len(the_siege.construction_orders):
+        if the_siege.trebuchets_ordered > 0:
+            the_siege.trebuchets_ordered -= 1
+            index = -1
+            condition = True
+            while condition:
+                if the_siege.construction_orders[index][0] == "Trebuchet":
                     condition = False
+                    del the_siege.construction_orders[index]
+                    print("Construction orders: " + str(the_siege.construction_orders))
+                else:
+                    index -= 1
+                    if abs(index) > len(the_siege.construction_orders):
+                        condition = False
 
-        click_sound = pygame.mixer.Sound("Sound/Interface/Abstract2.ogg")
-        click_sound.play()
+            click_sound = pygame.mixer.Sound("Sound/Interface/Abstract2.ogg")
+            click_sound.play()
 
-    print("trebuchets_ordered - " + str(the_siege.trebuchets_ordered))
+        print("trebuchets_ordered - " + str(the_siege.trebuchets_ordered))
 
 
 def build_siege_tower():
-    print("build_siege_tower()")
-    the_siege = None
-    for city in game_obj.game_cities:
-        if city.city_id == game_stats.selected_settlement:
-            the_siege = city.siege
-            break
+    if game_stats.besieged_by_human:
+        print("build_siege_tower()")
+        the_siege = None
+        for city in game_obj.game_cities:
+            if city.city_id == game_stats.selected_settlement:
+                the_siege = city.siege
+                break
 
-    print("siege_towers_max_quantity - " + str(the_siege.siege_towers_max_quantity))
+        print("siege_towers_max_quantity - " + str(the_siege.siege_towers_max_quantity))
 
-    if the_siege.siege_towers_ordered + the_siege.siege_towers_ready < the_siege.siege_towers_max_quantity:
-        the_siege.siege_towers_ordered += 1
-        the_siege.battering_rams_max_quantity -= 1
-        the_siege.construction_orders.append(["Siege tower", 0])
+        if the_siege.siege_towers_ordered + the_siege.siege_towers_ready < the_siege.siege_towers_max_quantity:
+            the_siege.siege_towers_ordered += 1
+            the_siege.battering_rams_max_quantity -= 1
+            the_siege.construction_orders.append(["Siege tower", 0])
 
-        click_sound = pygame.mixer.Sound("Sound/Interface/Abstract1.ogg")
-        click_sound.play()
-    else:
-        click_sound = pygame.mixer.Sound("Sound/Interface/Minimalist2.ogg")
-        click_sound.play()
+            click_sound = pygame.mixer.Sound("Sound/Interface/Abstract1.ogg")
+            click_sound.play()
+        else:
+            click_sound = pygame.mixer.Sound("Sound/Interface/Minimalist2.ogg")
+            click_sound.play()
 
-    print("siege_towers_ordered - " + str(the_siege.siege_towers_ordered))
+        print("siege_towers_ordered - " + str(the_siege.siege_towers_ordered))
 
 
 def cancel_building_siege_tower():
-    print("cancel_building_siege_tower()")
-    the_siege = None
-    for city in game_obj.game_cities:
-        if city.city_id == game_stats.selected_settlement:
-            the_siege = city.siege
-            break
+    if game_stats.besieged_by_human:
+        print("cancel_building_siege_tower()")
+        the_siege = None
+        for city in game_obj.game_cities:
+            if city.city_id == game_stats.selected_settlement:
+                the_siege = city.siege
+                break
 
-    if the_siege.siege_towers_ordered > 0:
-        the_siege.siege_towers_ordered -= 1
-        the_siege.battering_rams_max_quantity += 1
-        index = -1
-        condition = True
-        while condition:
-            if the_siege.construction_orders[index][0] == "Siege tower":
-                condition = False
-                del the_siege.construction_orders[index]
-                print("Construction orders: " + str(the_siege.construction_orders))
-            else:
-                index -= 1
-                if abs(index) > len(the_siege.construction_orders):
+        if the_siege.siege_towers_ordered > 0:
+            the_siege.siege_towers_ordered -= 1
+            the_siege.battering_rams_max_quantity += 1
+            index = -1
+            condition = True
+            while condition:
+                if the_siege.construction_orders[index][0] == "Siege tower":
                     condition = False
+                    del the_siege.construction_orders[index]
+                    print("Construction orders: " + str(the_siege.construction_orders))
+                else:
+                    index -= 1
+                    if abs(index) > len(the_siege.construction_orders):
+                        condition = False
 
-        click_sound = pygame.mixer.Sound("Sound/Interface/Abstract2.ogg")
-        click_sound.play()
+            click_sound = pygame.mixer.Sound("Sound/Interface/Abstract2.ogg")
+            click_sound.play()
 
-    print("siege_towers_ordered - " + str(the_siege.siege_towers_ordered))
+        print("siege_towers_ordered - " + str(the_siege.siege_towers_ordered))
 
 
 def build_battering_ram():
-    print("build_battering_ram()")
-    the_siege = None
-    for city in game_obj.game_cities:
-        if city.city_id == game_stats.selected_settlement:
-            the_siege = city.siege
-            break
+    if game_stats.besieged_by_human:
+        print("build_battering_ram()")
+        the_siege = None
+        for city in game_obj.game_cities:
+            if city.city_id == game_stats.selected_settlement:
+                the_siege = city.siege
+                break
 
-    print("battering_rams_max_quantity - " + str(the_siege.battering_rams_max_quantity))
+        print("battering_rams_max_quantity - " + str(the_siege.battering_rams_max_quantity))
 
-    if the_siege.battering_rams_ordered + the_siege.battering_rams_ready < the_siege.battering_rams_max_quantity:
-        the_siege.battering_rams_ordered += 1
-        the_siege.siege_towers_max_quantity -= 1
-        the_siege.construction_orders.append(["Battering ram", 0])
+        if the_siege.battering_rams_ordered + the_siege.battering_rams_ready < the_siege.battering_rams_max_quantity:
+            the_siege.battering_rams_ordered += 1
+            the_siege.siege_towers_max_quantity -= 1
+            the_siege.construction_orders.append(["Battering ram", 0])
 
-        click_sound = pygame.mixer.Sound("Sound/Interface/Abstract1.ogg")
-        click_sound.play()
-    else:
-        click_sound = pygame.mixer.Sound("Sound/Interface/Minimalist2.ogg")
-        click_sound.play()
+            click_sound = pygame.mixer.Sound("Sound/Interface/Abstract1.ogg")
+            click_sound.play()
+        else:
+            click_sound = pygame.mixer.Sound("Sound/Interface/Minimalist2.ogg")
+            click_sound.play()
 
-    print("battering_rams_ordered - " + str(the_siege.battering_rams_ordered))
+        print("battering_rams_ordered - " + str(the_siege.battering_rams_ordered))
 
 
 def cancel_building_battering_ram():
-    print("cancel_building_battering_ram()")
-    the_siege = None
-    for city in game_obj.game_cities:
-        if city.city_id == game_stats.selected_settlement:
-            the_siege = city.siege
-            break
+    if game_stats.besieged_by_human:
+        print("cancel_building_battering_ram()")
+        the_siege = None
+        for city in game_obj.game_cities:
+            if city.city_id == game_stats.selected_settlement:
+                the_siege = city.siege
+                break
 
-    if the_siege.battering_rams_ordered > 0:
-        the_siege.battering_rams_ordered -= 1
-        the_siege.siege_towers_max_quantity += 1
-        index = -1
-        condition = True
-        while condition:
-            if the_siege.construction_orders[index][0] == "Battering ram":
-                condition = False
-                del the_siege.construction_orders[index]
-                print("Construction orders: " + str(the_siege.construction_orders))
-            else:
-                index -= 1
-                if abs(index) > len(the_siege.construction_orders):
+        if the_siege.battering_rams_ordered > 0:
+            the_siege.battering_rams_ordered -= 1
+            the_siege.siege_towers_max_quantity += 1
+            index = -1
+            condition = True
+            while condition:
+                if the_siege.construction_orders[index][0] == "Battering ram":
                     condition = False
+                    del the_siege.construction_orders[index]
+                    print("Construction orders: " + str(the_siege.construction_orders))
+                else:
+                    index -= 1
+                    if abs(index) > len(the_siege.construction_orders):
+                        condition = False
 
-        click_sound = pygame.mixer.Sound("Sound/Interface/Abstract2.ogg")
-        click_sound.play()
+            click_sound = pygame.mixer.Sound("Sound/Interface/Abstract2.ogg")
+            click_sound.play()
 
-    print("battering_rams_ordered - " + str(the_siege.battering_rams_ordered))
+        print("battering_rams_ordered - " + str(the_siege.battering_rams_ordered))
 
 
 def select_settlement():
-    game_stats.selected_object = "Settlement"
-    game_stats.game_board_panel = "settlement panel"
-    game_stats.details_panel_mode = "settlement lower panel"
-    algo_building.check_requirements()
-
-    game_stats.settlement_area = "Building"
-    game_stats.building_row_index = 0
-
+    print("select_settlement()")
     settlement = None
     for city in game_obj.game_cities:
         if city.city_id == game_stats.selected_settlement:
             settlement = city
             break
 
-    list_of_rows = []
-    for plot in settlement.buildings:
-        if int(plot.screen_position[1]) not in list_of_rows:
-            list_of_rows.append(int(plot.screen_position[1]))
+    if settlement.owner == game_stats.player_power and settlement.siege:
+        # Player's settlement is under siege
+        # Proceed to open blockade screen
+        open_blockade_panel(settlement)
+    else:
+        game_stats.selected_object = "Settlement"
+        game_stats.game_board_panel = "settlement panel"
+        game_stats.details_panel_mode = "settlement lower panel"
+        algo_building.check_requirements()
 
-    game_stats.building_rows_amount = max(list_of_rows)
-    # print("list_of_rows - " + str(list_of_rows))
+        game_stats.settlement_area = "Building"
+        game_stats.building_row_index = 0
+
+        list_of_rows = []
+        for plot in settlement.buildings:
+            if int(plot.screen_position[1]) not in list_of_rows:
+                list_of_rows.append(int(plot.screen_position[1]))
+
+        game_stats.building_rows_amount = max(list_of_rows)
+        # print("list_of_rows - " + str(list_of_rows))
+
+        # Update visuals
+        update_gf_game_board.update_regiment_sprites()
+        update_gf_game_board.update_settlement_misc_sprites()
+        update_gf_game_board.open_settlement_building_sprites()
+
+
+def open_blockade_panel(settlement):
+    print("open_blockade_panel()")
+    game_stats.assault_allowed = True
+    game_stats.blockaded_settlement_name = str(settlement.name)
+    game_stats.selected_settlement = settlement.city_id
+    game_stats.besieged_by_human = False
+    game_stats.siege_assault = False
+
+    game_stats.game_board_panel = "settlement blockade panel"
+
+    game_stats.attacker_army_id = int(settlement.siege.attacker_id)
+    game_stats.attacker_realm = str(settlement.siege.attacker_realm)
+
+    if game_obj.game_map[settlement.location].army_id:
+        game_stats.defender_army_id = int(game_obj.game_map[settlement.location].army_id)
+        for army in game_obj.game_armies:
+            if army.army_id == game_obj.game_map[settlement.location].army_id:
+                game_stats.defender_realm = str(army.owner)
+                break
 
     # Update visuals
+    update_gf_game_board.update_misc_sprites()
     update_gf_game_board.update_regiment_sprites()
-    update_gf_game_board.update_settlement_misc_sprites()
     update_gf_game_board.open_settlement_building_sprites()
 
 
@@ -1909,22 +1964,21 @@ def hire_regiment():
     if game_stats.unit_for_hire is not None:
         permit_unit_creation = True
 
-    # Index of settlement's tile in map list
-    x = int(game_stats.selected_tile[0])
-    y = int(game_stats.selected_tile[1])
-    TileNum = (y - 1) * game_stats.cur_level_width + x - 1
-
     settlement = None
     for city in game_obj.game_cities:
         if city.city_id == game_stats.selected_settlement:
             settlement = city
             break
 
-    if game_obj.game_map[TileNum].army_id is None:
+    # Index of settlement's tile in map list
+    TileNum = settlement.location
+    print("hire_regiment(): [x, y] - " + str(settlement.posxy) + "; location - " + str(settlement.location))
+
+    if game_obj.game_map[TileNum].army_id is None and permit_unit_creation:
         owner = settlement.owner
         game_stats.army_id_counter += 1
         game_obj.game_map[TileNum].army_id = int(game_stats.army_id_counter)
-        game_obj.game_armies.append(game_classes.Army([x, y], int(TileNum),
+        game_obj.game_armies.append(game_classes.Army([settlement.posxy[0], settlement.posxy[1]], int(TileNum),
                                                       int(game_stats.army_id_counter),
                                                       str(owner),
                                                       random.choice([True, False])))
@@ -1946,7 +2000,7 @@ def hire_regiment():
                     for new_unit in units_list:
                         if new_unit.name == game_stats.unit_for_hire.unit_name:
                             army.units.append(copy.deepcopy(new_unit))
-                            print("Added to army new unit - " + new_unit.name)
+                            print("Added to army " + str(army.army_id) + " new unit - " + new_unit.name)
                             print("Img - " + new_unit.img)
                             game_basic.establish_leader(army.army_id, "Game")
 
@@ -2027,18 +2081,15 @@ def hire_hero():
 
     print("permit_hero_creation - " + str(permit_hero_creation))
 
-    # Index of settlement's tile in map list
-    x = int(game_stats.selected_tile[0])
-    y = int(game_stats.selected_tile[1])
-    # print("game_stats.new_level_width - " + str(game_stats.new_level_width))
-    TileNum = (y - 1) * game_stats.cur_level_width + x - 1
-    print("game_stats.selected_tile - " + str(game_stats.selected_tile) + "; TileNum - " + str(TileNum))
-
     settlement = None
     for city in game_obj.game_cities:
         if city.city_id == game_stats.selected_settlement:
             settlement = city
             break
+
+    # Index of settlement's tile in map list
+    TileNum = settlement.location
+    print("hire_hero(): [x, y] - " + str(settlement.posxy) + "; location - " + str(settlement.location))
 
     treasury = None
     for realm in game_obj.game_powers:

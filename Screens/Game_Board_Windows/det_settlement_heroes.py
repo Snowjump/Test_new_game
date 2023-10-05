@@ -1,3 +1,4 @@
+## det_settlement_heroes
 ## Miracle battles!
 
 import pygame.draw
@@ -35,9 +36,11 @@ def draw_heroes(screen, settlement):
                          [637, 538],
                          [283, 538]])
 
-    x = int(game_stats.selected_tile[0])
-    y = int(game_stats.selected_tile[1])
-    TileNum = (y - 1) * game_stats.cur_level_width + x - 1
+    # x = int(game_stats.selected_tile[0])
+    # y = int(game_stats.selected_tile[1])
+    # TileNum = (y - 1) * game_stats.cur_level_width + x - 1
+    TileNum = settlement.location
+
     # units_length = 0
     no_hero_in_army = False
     for army in game_obj.game_armies:

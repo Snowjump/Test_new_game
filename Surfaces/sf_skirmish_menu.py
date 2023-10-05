@@ -70,6 +70,8 @@ def start_but():
     click_sound = pygame.mixer.Sound("Sound/Interface/Abstract1.ogg")
     click_sound.play()
 
+    game_stats.gf_menus_art = {}
+
 
 def previous_realm_but():
     start_new_level.skirmish_previous_realm()

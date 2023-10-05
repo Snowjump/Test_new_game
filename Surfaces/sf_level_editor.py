@@ -9,6 +9,7 @@ from Resources import game_classes
 from Resources import faction_classes
 from Resources import level_save
 from Resources import update_gf_level_editor
+from Resources import update_gf_menus
 from Resources import algo_building
 from Resources import game_road_img
 from Resources import game_basic
@@ -567,6 +568,8 @@ def return_to_main_menu_but():
 
     click_sound = pygame.mixer.Sound("Sound/Interface/Abstract1.ogg")
     click_sound.play()
+
+    update_gf_menus.update_menus_art()
 
 
 def brush_but():

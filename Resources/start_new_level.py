@@ -89,6 +89,8 @@ def begin_new_level(folder, level_to_load):
     game_stats.minutes = 0
     game_stats.count_started = False
 
+    game_stats.game_board_panel = ""
+
     game_stats.ongoing_wars = []
 
     game_obj.game_battles = []

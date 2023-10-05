@@ -1,4 +1,5 @@
 ## Miracle battles!
+## update_gf_game_board
 
 import math
 import pygame.draw
@@ -232,9 +233,9 @@ def update_sprites():
     game_stats.gf_hero_dict = {}
 
     # Terrain border 48x48
-    misc_img = pygame.image.load('img/Terrains/border_48_48_170.png').convert_alpha()
+    misc_img = pygame.image.load('img/Terrains/border_48_48_200.png').convert_alpha()
     # misc_img.set_colorkey(WhiteColor)
-    game_stats.gf_terrain_dict["Terrains/border_48_48_170"] = misc_img
+    game_stats.gf_terrain_dict["Terrains/border_48_48_200"] = misc_img
 
     for x in range(0, 27):
         for y in range(0, math.ceil(game_stats.game_window_height / 48)):

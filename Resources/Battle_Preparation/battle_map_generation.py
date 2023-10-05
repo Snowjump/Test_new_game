@@ -147,3 +147,13 @@ def create_battle_map():
                                                           game_stats.battle_result_script,
                                                           0, 0))
 
+    # New visuals
+    game_stats.gf_settlement_dict = {}
+    game_stats.gf_facility_dict = {}
+    game_stats.gf_exploration_dict = {}
+    game_stats.gf_misc_img_dict = {}
+
+    # Update visuals for battle
+    update_gf_battle.battle_update_sprites()
+    update_gf_battle.update_misc_sprites()
+    game_stats.gf_battle_effects_dict = {}

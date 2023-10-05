@@ -10,6 +10,7 @@ from Resources import display_graphics
 from Resources import game_stats
 from Resources import game_basic
 from Resources import game_battle
+from Resources import update_gf_menus
 from Surfaces.sf_create_level import *
 
 # Screens and surfaces
@@ -230,6 +231,10 @@ def key_handler(key_action):  # for keyboard
                        "Credits": credits_keys}
 
     key_action_list[game_stats.current_screen](key_action)
+
+
+# prepare art pictures for menu screens
+update_gf_menus.update_menus_art()
 
 
 # start everything
