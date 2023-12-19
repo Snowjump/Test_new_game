@@ -1,4 +1,4 @@
-## Miracle battles!
+## Among Myth and Wonder
 ## game_autobattle
 
 import math

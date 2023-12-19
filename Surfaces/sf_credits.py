@@ -1,4 +1,4 @@
-## Miracle battles!
+## Among Myth and Wonder
 ## sf_credits
 
 import pygame

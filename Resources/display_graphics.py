@@ -1,4 +1,4 @@
-## Miracle battles!
+## Among Myth and Wonder
 ## display_graphics
 
 import pygame.draw
@@ -37,7 +37,7 @@ def drawing(screen, screen_to_draw):
     global font15, font16, font20, font26
 ##    print("Attempt to process screen")
 ##    print(screen)
-    screen.fill(OldLace) # background
+    screen.fill(OldLace)  # background
 
 ##    print(screen_to_draw)
 

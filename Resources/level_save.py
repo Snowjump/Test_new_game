@@ -1,4 +1,4 @@
-## Miracle battles!
+## Among Myth and Wonder
 ## level_save
 
 import shelve

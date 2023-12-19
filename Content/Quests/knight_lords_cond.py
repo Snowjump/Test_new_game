@@ -1,4 +1,4 @@
-## Miracle battles!
+## Among Myth and Wonder
 # Check here conditions for creating new quests
 
 import random

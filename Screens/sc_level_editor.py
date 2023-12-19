@@ -1,4 +1,4 @@
-## Miracle battles!
+## Among Myth and Wonder
 ## sc_level_editor
 
 import pygame.draw, pygame.font, math

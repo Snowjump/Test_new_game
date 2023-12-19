@@ -1,4 +1,4 @@
-## Miracle battles!
+## Among Myth and Wonder
 
 neutrals_units_dict = {"Simurg's anarchists" : [["Florins", 200], ["Armament", 150]],
                        "Bandit archers" : [["Florins", 200], ["Armament", 150]],

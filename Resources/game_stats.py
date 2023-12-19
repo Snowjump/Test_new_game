@@ -1,12 +1,12 @@
 ## game_stats
-## Miracle battles!
+## Among Myth and Wonder
 
 # Software versioning
 version_major = 0
 version_minor = 1
-version_micro = 0
+version_micro = 1
 
-
+time_counted = 0
 fps = 0.0
 fps_status = True
 
@@ -39,6 +39,11 @@ mouse_position = ()
 pov_pos = [0, 0]
 game_window_width = 1280
 game_window_height = 700
+
+# Buttons and keys
+mouse_button1_pressed = False
+mouse_button3_pressed = False
+key_pressed = False
 
 # Typing
 input_text = ""

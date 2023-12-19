@@ -1,4 +1,4 @@
-## Miracle battles!
+## Among Myth and Wonder
 
 # Set of scripts to define how population buy products from the inner market
 

@@ -1,4 +1,4 @@
-## Miracle battles!
+## Among Myth and Wonder
 
 # Scripts to govern how population consume goods to fulfill their basic needs
 # BN - stands for basic needs

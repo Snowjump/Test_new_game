@@ -1,4 +1,4 @@
-## Miracle battles!
+## Among Myth and Wonder
 ## update_gf_level_editor
 
 import math

@@ -1,4 +1,4 @@
-## Miracle battles!
+## Among Myth and Wonder
 ## game_assets
 
 # Maybe it will help to make exe file work properly

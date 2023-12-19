@@ -1,4 +1,4 @@
-## Miracle battles!
+## Among Myth and Wonder
 ## sc_entrance_menu
 
 import pygame.draw, pygame.font
@@ -41,8 +41,8 @@ def main_menu_screen(screen):
     pygame.draw.line(screen, LineMainMenuColor1, [660, 220], [810, 220], 6)
 
     # Title
-    text_MainMenu1 = font26.render("MIRACLE BATTLES", True, TitleText)
-    screen.blit(text_MainMenu1, [310, 100])
+    text_MainMenu1 = font26.render("Among Myth and Wonder", True, TitleText)
+    screen.blit(text_MainMenu1, [290, 100])
 
     ## Buttons
 

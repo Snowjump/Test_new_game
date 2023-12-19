@@ -1,4 +1,4 @@
-## Miracle battles!
+## Among Myth and Wonder
 
 from Resources import campaign_effect_classes
 

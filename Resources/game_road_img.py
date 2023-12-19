@@ -1,4 +1,4 @@
-## Miracle battles!
+## Among Myth and Wonder
 
 from Resources import game_stats
 from Resources import game_classes

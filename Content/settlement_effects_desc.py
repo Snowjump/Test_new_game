@@ -1,4 +1,4 @@
-## Miracle battles!
+## Among Myth and Wonder
 
 desc_catalog = {"Base Knight Lords control" : ["Province populated by",
                                                "Knight Lords realm",

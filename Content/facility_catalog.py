@@ -1,4 +1,4 @@
-## Miracle battles!
+## Among Myth and Wonder
 
 LE_facility_list = ["Gold deposit",
                     "Arable land",

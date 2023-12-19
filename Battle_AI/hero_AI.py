@@ -1,4 +1,4 @@
-## Miracle battles!
+## Among Myth and Wonder
 ## hero_AI
 
 import random

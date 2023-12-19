@@ -1,4 +1,4 @@
-## Miracle battles!
+## Among Myth and Wonder
 
 import math
 import pygame.draw

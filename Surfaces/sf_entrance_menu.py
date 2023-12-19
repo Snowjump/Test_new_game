@@ -1,4 +1,4 @@
-## Miracle battles!
+## Among Myth and Wonder
 ## sf_entrance_menu
 
 import sys, pygame, glob

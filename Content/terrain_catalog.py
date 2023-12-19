@@ -1,4 +1,4 @@
-## Miracle battles!
+## Among Myth and Wonder
 
 # This catalog lists how every terrain looks like every month of year
 

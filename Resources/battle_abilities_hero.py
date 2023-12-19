@@ -1,4 +1,4 @@
-## Miracle battles!
+## Among Myth and Wonder
 ## battle_abilities_hero
 
 import math

@@ -1,4 +1,4 @@
-## Miracle battles!
+## Among Myth and Wonder
 
 # This catalog lists what seasons has every terrain
 

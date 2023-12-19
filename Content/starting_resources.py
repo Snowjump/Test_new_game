@@ -1,4 +1,4 @@
-## Miracle battles!
+## Among Myth and Wonder
 
 def provide_resources(resources_list):
     treasury = []

@@ -1,4 +1,4 @@
-## Miracle battles!
+## Among Myth and Wonder
 ## siege_map_generation
 
 import math

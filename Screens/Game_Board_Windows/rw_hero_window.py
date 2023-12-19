@@ -1,4 +1,4 @@
-## Miracle battles!
+## Among Myth and Wonder
 ## rw_hero_window
 
 import pygame.draw

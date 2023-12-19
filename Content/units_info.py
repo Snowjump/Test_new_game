@@ -1,4 +1,4 @@
-## Miracle battles!
+## Among Myth and Wonder
 
 LE_neutrals_units_list = ["Simurg's anarchists",
                           "Bandit archers",

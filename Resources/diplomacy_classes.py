@@ -1,4 +1,4 @@
-## Miracle battles!
+## Among Myth and Wonder
 
 class Realm_Relations:  # Keep information about diplomatic relations
     def __init__(self):

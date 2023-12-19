@@ -1,4 +1,4 @@
-## Miracle battles!
+## Among Myth and Wonder
 ## win_autobattle_conclusion
 
 import math

@@ -1,4 +1,4 @@
-## Miracle battles!
+## Among Myth and Wonder
 # Select and print quest message
 
 import pygame.draw

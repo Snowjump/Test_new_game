@@ -1,4 +1,4 @@
-## Miracle battles!
+## Among Myth and Wonder
 ## det_war
 
 import math

@@ -1,4 +1,4 @@
-## Miracle battles!
+## Among Myth and Wonder
 ## production_methods
 
 # Set of scripts for all kinds of population to define how they produce new resources and goods

@@ -1,4 +1,4 @@
-## Miracle battles!
+## Among Myth and Wonder
 
 # This catalog lists what image use for objects depending on current season in terrain
 # corresponds to lists in terrain_seasons

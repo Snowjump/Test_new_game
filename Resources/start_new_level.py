@@ -1,4 +1,4 @@
-## Miracle battles!
+## Among Myth and Wonder
 ## start_new_level
 
 import shelve

@@ -1,5 +1,5 @@
 ## det_settlement_heroes
-## Miracle battles!
+## Among Myth and Wonder
 
 import pygame.draw
 import pygame.font

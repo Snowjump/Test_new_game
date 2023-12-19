@@ -1,4 +1,4 @@
-## Miracle battles!
+## Among Myth and Wonder
 ## sc_settings
 
 import pygame.draw, pygame.font

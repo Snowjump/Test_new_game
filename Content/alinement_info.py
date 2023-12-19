@@ -1,4 +1,4 @@
-## Miracle battles!
+## Among Myth and Wonder
 
 alinements_list = ["Knight Lords", "Nature Keepers"]
 
