@@ -7,6 +7,9 @@ class army_roles:
         # Idle - stays still
         # Nothing to do - keep standing still
         # Conquest - looks for nearby enemies, prioritises settlements over armies
+        # Advance - enemy army - goes to battle enemy army
+        # Advance - enemy settlement - goes to capture unoccupied enemy settlement
+        # Advance - liberate settlement - goes to capture occupied own settlement
         # Adventure - explore territory around settlement
         # Travel to settlement - go to closest own settlement
         self.army_role = army_role

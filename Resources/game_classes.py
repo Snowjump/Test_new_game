@@ -1,4 +1,5 @@
-## Miracle battles
+## Among Myth and Wonder
+## game_classes
 
 import pygame.draw
 from Resources import diplomacy_classes
@@ -65,7 +66,7 @@ class Settlement:  # main class for cities that control surrounding lands and le
         self.name = name
         self.alignment = alignment
         self.owner = owner
-        self.control_zone = []
+        self.control_zone = []  # List of Int - tile numbers in game_obj.game_map
         self.obj_typ = "Settlement"
         self.property = []  # TileNum - facility type map objects that belong to this settlement
         self.factions = factions

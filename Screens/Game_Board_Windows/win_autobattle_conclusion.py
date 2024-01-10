@@ -41,7 +41,7 @@ def autobattle_conclusion_panel(screen):
 
     # Defender
     text_panel1 = font20.render(game_stats.defender_realm, True, TitleText)
-    screen.blit(text_panel1, [790 - len(game_stats.defender_realm), 133])
+    screen.blit(text_panel1, [750 - len(game_stats.defender_realm), 133])
 
     # Earned experience
     if game_stats.earned_experience > 0:

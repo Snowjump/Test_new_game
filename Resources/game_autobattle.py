@@ -268,6 +268,7 @@ def begin_battle(attacker, defender, battle_type, battle_result_script):
                                                        defender_action_level, attacker.hero,
                                                        defender.hero, attacker, defender, battle_type)
 
+    print("")
     print("Battle result is " + str(result) + "; exp_attackers - " + str(exp_attackers) + "; exp_defenders -  " +
           str(exp_defenders))
 

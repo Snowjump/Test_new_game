@@ -8,10 +8,8 @@ from Resources import game_obj
 from Resources import game_stats
 from Resources import game_diplomacy
 from Resources import algo_circle_range
-from Resources import algo_movement_range
 from Resources import game_pathfinding
 from Resources import algo_astar
-from Resources import algo_path_arrows
 from Resources import game_basic
 
 from Strategy_AI import diplomacy_logic
@@ -19,8 +17,14 @@ from Strategy_AI import economy_logic
 from Strategy_AI import AI_exploration_cond
 from Strategy_AI import quest_logic
 
+from Strategy_AI.Logic_Solutions import power_ranking
+from Strategy_AI.Logic_Solutions import immediate_targets
+from Strategy_AI.Logic_Solutions import territory_targets
+
 
 def manage_realm():
+    print("")
+    print("manage_realm()")
     ## Quest log
     for realm in game_obj.game_powers:
         if realm.AI_player:
@@ -297,7 +301,7 @@ def war_orders_AI(realm, friendly_cities, hostile_cities, at_war_list):
                         else:
                             if len(army.route) > 0:
                                 if role.army_role == "Advance - enemy army":
-                                    print("war_orders_AI - 1")
+                                    print("war_orders_AI - 1; army.action - " + str(army.action))
                                     next_point = list(army.route[-1])
                                     TileNum = (next_point[1] - 1) * game_stats.cur_level_width + next_point[0] - 1
                                     TileObj = game_obj.game_map[TileNum]
@@ -306,13 +310,11 @@ def war_orders_AI(realm, friendly_cities, hostile_cities, at_war_list):
                                         adjust_path(army, role, "Army")
 
                             else:
-                                print("war_orders_AI - 2")
+                                print("war_orders_AI - 2; army.action - " + str(army.action))
                                 # print("len(army.units): " + str(len(army.units)))
                                 if len(army.units) >= 5 and army.hero is not None:
                                     if game_obj.game_map[army.location].city_id is not None:
                                         new_war_order = True
-
-
 
                         if not at_war_list:
                             # If there is no enemy realms at war with this realm,
@@ -320,9 +322,18 @@ def war_orders_AI(realm, friendly_cities, hostile_cities, at_war_list):
                             new_war_order = False
 
                         if new_war_order:
+                            print("new_war_order")
                             next_order = False
-                            next_order = immediate_targets(realm, role, army, friendly_cities, hostile_cities,
-                                                           at_war_list)
+                            next_order = immediate_targets.solution(realm, role, army, friendly_cities, hostile_cities,
+                                                                    at_war_list)
+                            if next_order:
+                                next_order = territory_targets.solution(realm, role, army, friendly_cities,
+                                                                        hostile_cities, at_war_list)
+
+                            if next_order:
+                                if role.army_role in ["Advance - enemy army", "Advance - enemy settlement",
+                                                      "Advance - liberate settlement"]:
+                                    role.army_role = "Idle"
 
                         break
 
@@ -330,120 +341,6 @@ def war_orders_AI(realm, friendly_cities, hostile_cities, at_war_list):
         print("war_orders_AI: cognition_stage = Finished turn")
         print("")
         realm.AI_cogs.cognition_stage = "Finished turn"
-
-
-def immediate_targets(realm, role, army, friendly_cities, hostile_cities, at_war_list):
-    own_army_sum_rank = 0
-    army_MP = 0  # Movement points
-    for unit in army.units:
-        if not army_MP:
-            army_MP = float(unit.movement_points)
-        elif army_MP > unit.movement_points:
-            army_MP = float(unit.movement_points)
-
-    path, grid = algo_movement_range.range_astar(army, army.posxy, army_MP, friendly_cities,
-                                                 hostile_cities, realm.known_map, False, at_war_list)
-
-    closest_tile = None
-    shortest_distance = 0.0
-    for tile in grid:
-        distance = math.sqrt(((tile[0] - army.posxy[0]) ** 2) + ((tile[1] - army.posxy[1]) ** 2))
-        # print("tile - " + str(tile) + "; distance - " + str(distance))
-        TileNum = (tile[1] - 1) * game_stats.cur_level_width + tile[0] - 1
-        TileObj = game_obj.game_map[TileNum]
-        add_tile = False
-        if TileObj.army_id is not None:
-            for target in game_obj.game_armies:
-                if target.army_id == TileObj.army_id:
-                    if target.owner in at_war_list and target.owner != "Neutral":
-                        if not own_army_sum_rank:
-                            for unit in army.units:
-                                own_army_sum_rank += unit.rank
-                            print("immediate_targets(): Own army: len(army.units) - " + str(len(army.units))
-                                  + "; own_army_sum_rank - " + str(own_army_sum_rank))
-
-                            # Standard border is 120
-                            power_border = 120
-                            # But for human player factions increase to 145, since humans are better at battling
-                            for realm in game_obj.game_powers:
-                                if realm.name == target.owner:
-                                    if not realm.AI_player:
-                                        power_border = 135
-                                    break
-
-                            if rank_ratio_calculation(own_army_sum_rank, target, power_border, False):
-                                add_tile = True
-                                print("Add army - " + str(target.army_id) + "; distance - " + str(distance))
-                    break
-
-        elif TileObj.lot is not None:
-            if TileObj.lot == "City":
-                for settlement in game_obj.game_cities:
-                    if settlement.city_id == TileObj.city_id:
-                        if settlement.owner in at_war_list and not settlement.military_occupation:
-                            # Enemy unoccupied settlement is detected
-                            add_tile = True
-                            print("Add enemy settlement - " + str(settlement.name) + "; distance - " + str(distance))
-                        elif settlement.owner == army.owner and settlement.military_occupation:
-                            # Own occupied settlement is detected
-                            add_tile = True
-                            print("Add occupied settlement - " + str(settlement.name) + "; distance - " + str(distance))
-
-                        break
-
-        if add_tile:
-            if closest_tile is None:
-                closest_tile = list(tile)
-                shortest_distance = float(distance)
-
-            elif distance < shortest_distance:
-                closest_tile = list(tile)
-                shortest_distance = float(distance)
-
-    print("Military target search: closest_tile - " + str(closest_tile) + "; shortest_distance - " +
-          str(shortest_distance))
-
-    if closest_tile:
-        for node in path:
-            if node.position == closest_tile:
-                # print("node.position - " + str(node.position) + " and closest_tile - " + str(closest_tile))
-                pathway = []
-                current = node
-                while current is not None:
-                    pathway.append(current.position)
-                    current = current.parent
-
-                # print("Final unreversed path is " + str(pathway))
-                army.route = list(pathway[::-1])
-                algo_path_arrows.construct_path(army.army_id, army.route)
-                army.route = army.route[1:]
-
-                # print("Final reversed path is " + str(army.route))
-                # print("Arrows path is " + str(army.path_arrows))
-                army.action = "Ready to move"
-
-                TileNum = (node.position[1] - 1) * game_stats.cur_level_width + node.position[0] - 1
-                TileObj = game_obj.game_map[TileNum]
-                if TileObj.army_id is not None:
-                    role.army_role = "Advance - enemy army"
-                    role.target_army_id = int(TileObj.army_id)
-                elif TileObj.lot is not None:
-                    if TileObj.lot == "City":
-                        for settlement in game_obj.game_cities:
-                            if settlement.city_id == TileObj.city_id:
-                                role.target_city_id = int(TileObj.city_id)
-                                if settlement.owner in at_war_list and not settlement.military_occupation:
-                                    # Target is enemy unoccupied settlement
-                                    role.army_role = "Advance - enemy settlement"
-                                elif settlement.owner == army.owner and settlement.military_occupation:
-                                    # Target is own occupied settlement
-                                    role.army_role = "Advance - liberate settlement"
-
-                                break
-
-        return False
-    else:
-        return True
 
 
 def adventure_role_AI(realm, friendly_cities, hostile_cities, at_war_list):
@@ -516,6 +413,8 @@ def adventure_role_AI(realm, friendly_cities, hostile_cities, at_war_list):
                                 if settlement.city_id == city_id_in_location:
                                     if settlement.owner == realm.name:
                                         # role.army_role = "Adventure"
+                                        print("city_id_in_location - " + str(city_id_in_location) +
+                                              "; settlement.name - " + str(settlement.name))
                                         assemble_adventure_destinations(realm, role, army, settlement,
                                                                         friendly_cities, hostile_cities, at_war_list)
                                         issued_order = True
@@ -542,7 +441,7 @@ def assemble_adventure_destinations(realm, role, army, settlement, friendly_citi
     tile_list = []
     print("")
     # print("len(settlement.control_zone) : " + str(len(settlement.control_zone)))
-    # print("len(realm.known_map) : " + str(len(realm.known_map)))
+    # print(realm.name + " - len(realm.known_map) : " + str(len(realm.known_map)))
     # print("realm.known_map : " + str(realm.known_map))
     own_army_sum_rank = 0
     for unit in army.units:
@@ -556,6 +455,7 @@ def assemble_adventure_destinations(realm, role, army, settlement, friendly_citi
         # print(str(realm.known_map))
         # print(str(game_obj.game_map[TileNum].posxy))
         if list(game_obj.game_map[TileNum].posxy) not in realm.known_map:
+            # print("Undiscovered tile - " + str(list(game_obj.game_map[TileNum].posxy)))
             distance = math.sqrt(((army.posxy[0] - game_obj.game_map[TileNum].posxy[0]) ** 2) + (
                     (army.posxy[1] - game_obj.game_map[TileNum].posxy[1]) ** 2))
             distance = math.floor(distance * 100) / 100
@@ -595,7 +495,7 @@ def assemble_adventure_destinations(realm, role, army, settlement, friendly_citi
                             print("obj.properties.army_id - " + str(map_obj.properties.army_id))
                             for target in game_obj.game_armies:
                                 if target.army_id == map_obj.properties.army_id:
-                                    if rank_ratio_calculation(own_army_sum_rank, target, 120, False):
+                                    if power_ranking.rank_ratio_calculation(own_army_sum_rank, target, 120):
                                         print("Ready to attack lair")
                                         distance = math.sqrt(
                                             ((army.posxy[0] - game_obj.game_map[TileNum].posxy[0]) ** 2) + (
@@ -615,7 +515,7 @@ def assemble_adventure_destinations(realm, role, army, settlement, friendly_citi
                                 # Targeting standing armies
                                 if target.owner == "Neutral":
                                     # Targeting neutral armies
-                                    if rank_ratio_calculation(own_army_sum_rank, target, 120, False):
+                                    if power_ranking.rank_ratio_calculation(own_army_sum_rank, target, 120):
                                         print("Ready to attack neutral army")
                                         distance = math.sqrt(
                                             ((army.posxy[0] - game_obj.game_map[TileNum].posxy[0]) ** 2) + (
@@ -630,12 +530,12 @@ def assemble_adventure_destinations(realm, role, army, settlement, friendly_citi
                                     # Standard border is 120
                                     power_border = 120
                                     # But for human player factions increase to 145, since humans are better at battling
-                                    for realm in game_obj.game_powers:
-                                        if realm.name == target.owner:
-                                            if not realm.AI_player:
+                                    for power in game_obj.game_powers:
+                                        if power.name == target.owner:
+                                            if not power.AI_player:
                                                 power_border = 145
                                             break
-                                    if rank_ratio_calculation(own_army_sum_rank, target, power_border, False):
+                                    if power_ranking.rank_ratio_calculation(own_army_sum_rank, target, power_border):
                                         print("Ready to attack " + str(target.owner) + " army")
                                         distance = math.sqrt(
                                             ((army.posxy[0] - game_obj.game_map[TileNum].posxy[0]) ** 2) + (
@@ -732,7 +632,7 @@ def return_to_base(realm, friendly_cities, hostile_cities):
                 for settlement in game_obj.game_cities:
                     if settlement.city_id == city_id_in_location and settlement.owner == army.owner and\
                             settlement.military_occupation is None:
-                        print("settlement.military_occupation is None")
+                        # print("settlement.military_occupation is None")
                         # print("settlement.city_id == city_id_in_location")
                         if settlement.location == army.location:
                             # Army is already garrisoned at settlement
@@ -849,87 +749,11 @@ def destination_to_base(realm, role, army, settlement, friendly_cities, hostile_
         print("Not enough movement points to travel towards settlement")
 
 
-def rank_ratio_calculation(own_army_sum_rank, target, power_border, besieged):
-    # Besieged - True\False
-    # If true then this is siege battle and target could get a power bonus from defensive structures
-    target_sum_rank = 0
-    for unit in target.units:
-        target_sum_rank += unit.rank
-    print("len(target.units) - " + str(len(target.units)) + "; target_sum_rank - " +
-          str(target_sum_rank))
-
-    if besieged:
-        # print("besieged = " + str(besieged))
-        settlement_id = game_obj.game_map[target.location].city_id
-        for settlement in game_obj.game_cities:
-            if settlement.city_id == settlement_id:
-                target_sum_rank = defence_structures_rank_bonus(target_sum_rank, target, settlement)
-                print("Siege target_sum_rank - " + str(target_sum_rank))
-                break
-
-    rank_ratio = int(own_army_sum_rank / target_sum_rank * 100)
-    random_risk_level = random.randint(0, 40)
-    # Standard power border is 120, but against humans its 145
-    print("rank_ratio - " + str(rank_ratio) + "; random_risk_level - " +
-          str(random_risk_level) + "; result - " + str(power_border - random_risk_level))
-
-    if rank_ratio >= power_border - random_risk_level:
-        return True
-    else:
-        return False
-
-
-def defence_structures_rank_bonus(sum_rank, target, settlement):
-    number_of_rams = int(settlement.siege.battering_rams_ready)
-    number_of_siege_towers = int(settlement.siege.siege_towers_ready)
-
-    number_of_fighting_regiments = 0
-    for regiment in target.units:
-        number_of_fighting_regiments += 1
-
-    number_of_gates = 0
-    number_of_walls = 0
-    number_of_barriers = 0
-    for structure in settlement.defences:
-        for def_obj in structure.def_objects:
-            if def_obj.section_type in ["Wall", "Tower"]:
-                if def_obj.state == "Unbroken":
-                    number_of_walls += 1
-            elif def_obj.section_type == "Gate":
-                if def_obj.state == "Unbroken":
-                    number_of_gates += 1
-            elif def_obj.section_type == "Barrier":
-                number_of_barriers += 1
-
-    if number_of_rams > 0:
-        number_of_gates = 0
-
-    if number_of_walls - number_of_siege_towers < 0:
-        number_of_walls = 0
-    else:
-        number_of_walls -= number_of_siege_towers
-
-    number_of_walls += number_of_gates
-    print("number_of_walls - " + str(number_of_walls))
-
-    if number_of_barriers >= number_of_fighting_regiments:
-        sum_rank *= 1.1
-    else:
-        sum_rank = sum_rank * (1 + 0.1 * (number_of_barriers / number_of_fighting_regiments))
-
-    if number_of_walls >= number_of_fighting_regiments:
-        sum_rank *= 1.25
-    else:
-        sum_rank = sum_rank * (1 + 0.25 * (number_of_walls / number_of_fighting_regiments))
-
-    sum_rank = math.floor(sum_rank * 100) / 100
-
-    return sum_rank
-
-
 def facilitate_siege(attacker, attacker_realm):
-    settlement, defender = game_basic.find_siege(attacker)
-    game_basic.AI_blockade_settlement(settlement, attacker, defender, attacker_realm)
+    if game_stats.game_board_panel not in ["settlement blockade panel", "autobattle conclusion panel"]:
+        # Check to make sure that AI avoid to repeat siege action if siege window has already popped up
+        settlement, defender = game_basic.find_siege(attacker)
+        game_basic.AI_blockade_settlement(settlement, attacker, defender, attacker_realm)
 
 
 def complete_war_order(army, army_realm):

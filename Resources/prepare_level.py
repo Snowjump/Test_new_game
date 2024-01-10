@@ -84,10 +84,12 @@ def prepare_known_map(player_power):
         prepare_diplomatic_contacts(power, tiles_pool)
 
         if power.name == player_power:
-            print("power.known_map: " + str(power.known_map))
+            print("player power.known_map: " + str(power.known_map))
             game_stats.map_to_display = power.known_map
             print("map_to_display: " + str(game_stats.map_to_display))
             # print("prepare_known_map - contacts: " + str(power.contacts))
+        else:
+            print(str(power.name) + "'s known map: " + str(power.known_map))
 
         # if power.name == "Seventeenth":
         #     print("prepare_known_map - Seventeenth - contacts: " + str(power.contacts))

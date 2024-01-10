@@ -40,6 +40,8 @@ from Strategy_AI import AI_exploration_scripts
 from Strategy_AI import AI_learn_skills
 from Strategy_AI import AI_learn_attributes
 
+from Strategy_AI.Logic_Solutions import power_ranking
+
 
 def establish_leader(focus, mode):
     obj_list = None
@@ -90,6 +92,7 @@ def open_tiles(condition, the_army, location, next_point, own_realm):
     if condition == "Army":
         for tile in algo_circle_range.within_circle_range(next_point, 5):
             if tile not in own_realm.known_map:
+                # print("Discovered new tile - " + str(tile))
                 own_realm.known_map.append(tile)
 
                 if the_role == "Adventure":
@@ -1078,7 +1081,7 @@ def AI_blockade_settlement(settlement, attacker, defender, attacker_realm):
                     power_border = 135
                 break
 
-        if strategy_logic.rank_ratio_calculation(own_army_sum_rank, defender, power_border, True):
+        if power_ranking.rank_ratio_calculation(own_army_sum_rank, defender, power_border):
             print("Assault")
             continue_blockade = False
 

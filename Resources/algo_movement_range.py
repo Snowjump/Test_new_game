@@ -32,6 +32,8 @@ def range_astar(travel_agent, start, MP, friendly_cities, hostile_cities, known_
     # routeing - True/False
     # if True algorithm doesn't look for end nodes
 
+    # print("range_astar - known map: " + str(known_map))
+
     # Create start node
     start_node = Node(None, start)
     start_node.g = 0
