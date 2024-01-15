@@ -11,6 +11,7 @@ class army_roles:
         # Advance - enemy settlement - goes to capture unoccupied enemy settlement
         # Advance - liberate settlement - goes to capture occupied own settlement
         # Adventure - explore territory around settlement
+        # Exploration - explore territories in neutral lands
         # Travel to settlement - go to closest own settlement
         self.army_role = army_role
         ## Status: (str)

@@ -13,7 +13,7 @@ class Realm:  # player's information
         self.s_color = s_color
         self.alignment = alignment
         self.status = True
-        self.known_map = []
+        self.known_map = []  # List of lists [int x, int y]
         self.turn_completed = False
         self.coffers = coffers  # List - Information about obtained resources for the ruler
         self.building_priority_queue = []  # Realm's queue for preparing resources among for building structures
@@ -549,6 +549,7 @@ class AI_cognition:
         self.cognition_stage = "Diplomacy"
         self.army_roles = []  # Filled with strategy_AI_classes.army_roles objects
         self.economy_cogs = strategy_AI_classes.AI_economy()
+        self.exploration_targets = []  # List of lists [int x, int y]
 
 
 class LE_regiment_card:

@@ -32,3 +32,13 @@ def select_realm_by_name(given_realm_name):
             break
 
     return selected_realm
+
+
+def select_army_role_by_id(realm, given_army_id):
+    selected_role = None
+    for role in realm.AI_cogs.army_roles:
+        if role.army_id == given_army_id:
+            selected_role = role
+            break
+
+    return selected_role

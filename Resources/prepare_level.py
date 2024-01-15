@@ -1,4 +1,4 @@
-## Miracle battles
+## Among Myth and Wonder
 ## prepare_level
 
 import copy
@@ -13,6 +13,8 @@ from Resources import algo_circle_range
 from Resources import faction_classes
 
 from Strategy_AI import strategy_AI_classes
+
+from Strategy_AI.Logic_Solutions import exploration_targets
 
 from Content import realm_leader_traits
 from Content import unit_alignment_catalog
@@ -292,6 +294,11 @@ def prepare_diplomatic_contacts(power, tiles_pool):
 def prepare_AI_class_AI_cogs():
     for realm in game_obj.game_powers:
         realm.AI_cogs = game_classes.AI_cognition()
+
+        if realm.AI_player:
+            exploration_targets.collect_new_exploration_targets(realm, realm.known_map,
+                                                                realm.AI_cogs.exploration_targets)
+            # print("Exploration targets: " + str(realm.AI_cogs.exploration_targets))
 
 
 def prepare_AI_army_roles():

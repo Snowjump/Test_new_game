@@ -1,4 +1,4 @@
-## Miracle battles
+## Among Myth and Wonder
 # algo_circle_range
 
 from Resources import game_stats

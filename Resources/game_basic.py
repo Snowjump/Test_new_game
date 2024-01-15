@@ -31,6 +31,7 @@ from Resources import update_gf_game_board
 from Resources import algo_path_arrows
 from Resources import siege_warfare
 from Resources import game_autobattle
+from Resources import common_selects
 
 from Content.Quests import knight_lords_cond
 from Content.Quests import knight_lords_quest_result_scripts
@@ -41,6 +42,7 @@ from Strategy_AI import AI_learn_skills
 from Strategy_AI import AI_learn_attributes
 
 from Strategy_AI.Logic_Solutions import power_ranking
+from Strategy_AI.Logic_Solutions import exploration_targets
 
 
 def establish_leader(focus, mode):
@@ -90,10 +92,14 @@ def open_tiles(condition, the_army, location, next_point, own_realm):
             break
 
     if condition == "Army":
+        targets = []
         for tile in algo_circle_range.within_circle_range(next_point, 5):
             if tile not in own_realm.known_map:
-                # print("Discovered new tile - " + str(tile))
+                print("Discovered new tile - " + str(tile))
                 own_realm.known_map.append(tile)
+
+                if own_realm.AI_player:
+                    targets.append(tile)
 
                 if the_role == "Adventure":
                     if len(the_army.route) > 0:
@@ -113,6 +119,14 @@ def open_tiles(condition, the_army, location, next_point, own_realm):
             if TileObj.army_id is not None:
                 if TileObj.army_id not in explored_cities:
                     explored_armies.append(TileObj.army_id)
+
+        if targets:
+            for tile in targets:
+                if tile in own_realm.AI_cogs.exploration_targets:
+                    own_realm.AI_cogs.exploration_targets.remove(tile)
+
+            exploration_targets.collect_new_exploration_targets(own_realm, own_realm.known_map,
+                                                                own_realm.AI_cogs.exploration_targets)
 
     # Update contacts if met new realms
     for settlement in game_obj.game_cities:
@@ -445,7 +459,7 @@ def movement_action(army):
     elif army.action == "Move":
         # Check if route hasn't been blocked since last moment
         # or newly discovered tiles turned out to be unreachable
-        # print("army.route[:-1] - " + str(army.route[:-1]))
+        print("army.route[:-1] - " + str(army.route[:-1]))
         cancel_movement = False
         for tile in army.route[:-1]:
             xTileNum = (tile[1] - 1) * game_stats.cur_level_width + tile[0] - 1
@@ -479,14 +493,15 @@ def movement_action(army):
                     pass
                 elif yTileObj.lot.obj_typ == "Obstacle":
                     if not yTileObj.travel:
-                        # print("Cancel movement: yTileNum - " + str(yTileNum) + "; tile - " + str(tile))
+                        print("Untravelable - cancel movement: yTileNum - " + str(yTileNum) + "; tile - " + str(tile))
                         cancel_movement = True
 
         if cancel_movement:
-            # print("Movement has been canceled")
+            print("Movement has been canceled")
             army.action = "Stand"
             army.route = []
             army.path_arrows = []
+            reset_cognition_stage(realm)
             return
 
         # change_direction(army)
@@ -801,6 +816,8 @@ def change_position(army, own_realm):
     # if army.action == "Ready to move":
     #     army.action = "Move"
     # elif army.action == "Move":
+    role = common_selects.select_army_role_by_id(own_realm, army.army_id)
+
     if army.action == "Move":
         if enough_movement_points(army):
             spent_movement_points(army)
@@ -821,22 +838,22 @@ def change_position(army, own_realm):
 
             if len(army.route) == 0:
                 army.action = "Stand"
+                if own_realm.AI_player:
+                    if role.army_role in ["Adventure", "Exploration"]:
+                        reset_cognition_stage(own_realm)
 
             else:
                 if not enough_movement_points(army):
                     # Not enough movement points for army to make next move
                     army.action = "Stand"
-                    for role in own_realm.AI_cogs.army_roles:
-                        if role.army_id == army.army_id:
-                            role.status = "Finished"
-                            break
+                    if own_realm.AI_player:
+                        role.status = "Finished"
+
         else:
             # Not enough movement points for army to move
             army.action = "Stand"
-            for role in own_realm.AI_cogs.army_roles:
-                if role.army_id == army.army_id:
-                    role.status = "Finished"
-                    break
+            if own_realm.AI_player:
+                role.status = "Finished"
 
     elif army.action == "Routing":
         next_point = list(army.route[0])
@@ -857,11 +874,9 @@ def change_position(army, own_realm):
             print("army.action = Stand")
 
         # Won't be able to move anywhere after routing anyway
-        for role in own_realm.AI_cogs.army_roles:
-            if role.army_id == army.army_id:
-                if role.status != "Finished":
-                    role.status = "Finished"
-                break
+        if own_realm.AI_player:
+            if role.status != "Finished":
+                role.status = "Finished"
 
 
 def spent_movement_points(army):
@@ -2096,3 +2111,9 @@ def capture_settlement(settlement, attacker_realm, winner_alive, winner):
         game_obj.game_map[settlement.location].army_id = int(winner.army_id)
         winner.location = int(settlement.location)
         winner.posxy = list(settlement.posxy)
+
+
+def reset_cognition_stage(realm):
+    if realm.AI_player:
+        if realm.AI_cogs.cognition_stage == "Finished turn":
+            realm.AI_cogs.cognition_stage = "Manage armies"
