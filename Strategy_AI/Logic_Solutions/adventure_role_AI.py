@@ -68,16 +68,14 @@ def solution(realm, role, friendly_cities, hostile_cities, at_war_list):
 
     if go_to_adventure:
         issued_order = False
-        for settlement in game_obj.game_cities:
-            if settlement.city_id == city_id_in_location:
-                if settlement.owner == realm.name:
-                    # role.army_role = "Adventure"
-                    print("city_id_in_location - " + str(city_id_in_location) +
-                          "; settlement.name - " + str(settlement.name))
-                    assemble_adventure_destinations(realm, role, army, settlement,
-                                                    friendly_cities, hostile_cities, at_war_list)
-                    issued_order = True
-                    break
+        settlement = common_selects.select_settlement_by_id(city_id_in_location)
+        if settlement.owner == realm.name:
+            # role.army_role = "Adventure"
+            print("city_id_in_location - " + str(city_id_in_location) +
+                  "; settlement.name - " + str(settlement.name))
+            assemble_adventure_destinations(realm, role, army, settlement,
+                                            friendly_cities, hostile_cities, at_war_list)
+            issued_order = True
 
         if not issued_order:
             # It could happened if the army during adventuring stepped into foreign territory

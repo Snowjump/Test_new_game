@@ -95,7 +95,7 @@ def open_tiles(condition, the_army, location, next_point, own_realm):
         targets = []
         for tile in algo_circle_range.within_circle_range(next_point, 5):
             if tile not in own_realm.known_map:
-                print("Discovered new tile - " + str(tile))
+                # print("Discovered new tile - " + str(tile))
                 own_realm.known_map.append(tile)
 
                 if own_realm.AI_player:
@@ -2068,8 +2068,8 @@ def military_upkeep():
 
 
 def remove_army(id_list):
-    # print("remove_army()")
-    # print("1. id_list: " + str(id_list))
+    print("remove_army()")
+    print("1. id_list: " + str(id_list))
     while len(id_list) > 0:
         for army in game_obj.game_armies:
             if army.army_id == id_list[0]:
@@ -2117,3 +2117,4 @@ def reset_cognition_stage(realm):
     if realm.AI_player:
         if realm.AI_cogs.cognition_stage == "Finished turn":
             realm.AI_cogs.cognition_stage = "Manage armies"
+

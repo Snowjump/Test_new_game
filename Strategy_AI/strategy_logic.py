@@ -10,6 +10,8 @@ from Resources import game_diplomacy
 from Resources import algo_circle_range
 from Resources import game_pathfinding
 from Resources import game_basic
+from Resources import common_selects
+from Resources import common_lists
 
 from Strategy_AI import diplomacy_logic
 from Strategy_AI import economy_logic
@@ -17,6 +19,7 @@ from Strategy_AI import quest_logic
 
 from Strategy_AI.Logic_Solutions import immediate_targets
 from Strategy_AI.Logic_Solutions import territory_targets
+from Strategy_AI.Logic_Solutions import military_expedition
 from Strategy_AI.Logic_Solutions import explore_neutral_lands
 from Strategy_AI.Logic_Solutions import adventure_role_AI
 
@@ -269,6 +272,7 @@ def command_armies(realm):
 def war_orders_AI(realm, friendly_cities, hostile_cities, at_war_list):
     print("")
     all_finished = True
+    military_targets = common_lists.legitimate_settlement_targets(realm)
 
     for role in realm.AI_cogs.army_roles:
         print("war_orders_AI - role: " + str(role.army_id) + ", " + str(role.army_role))
@@ -276,68 +280,78 @@ def war_orders_AI(realm, friendly_cities, hostile_cities, at_war_list):
             all_finished = False
 
             if role.army_role == "Idle" or role.army_role in\
-                    ["Advance - enemy army", "Advance - enemy settlement", "Advance - liberate settlement"]:
+                    ["Advance - enemy army", "Advance - enemy settlement", "Advance - liberate settlement",
+                     "Exploration"]:
                 # if role.army_role == "Idle":
                 #     role.army_role = "Nothing to do"  # Preemptively
 
-                for army in game_obj.game_armies:
-                    if army.army_id == role.army_id:
-                        new_war_order = False
-                        if army.shattered == "Shattered":
-                            # Shouldn't go to adventure
-                            print("Army is shattered")
-                            pass
-                        elif army.action in ["Fighting", "Besieged", "Besieging"]:
-                            # Shouldn't go to adventure due to fighting
-                            print("Army " + str(army.army_id) + " is busy fighting")
-                            if army.action == "Besieging" and role.status == "Start":
-                                print("Army " + str(army.army_id) + " is besieging a settlement")
-                                print("Role - " + str(role.army_role) + "; role.status - " + str(role.status))
-                                facilitate_siege(army, realm)
+                army = common_selects.select_army_by_id(role.army_id)
+                new_war_order = False
+                if army.shattered == "Shattered":
+                    # Shouldn't go to adventure
+                    print("Army is shattered")
+                    pass
+                elif army.action in ["Fighting", "Besieged", "Besieging"]:
+                    # Shouldn't go to adventure due to fighting
+                    print("Army " + str(army.army_id) + " is busy fighting")
+                    if army.action == "Besieging" and role.status == "Start":
+                        print("Army " + str(army.army_id) + " is besieging a settlement")
+                        print("Role - " + str(role.army_role) + "; role.status - " + str(role.status))
+                        facilitate_siege(army, realm)
 
-                        ## elif role.army_role == "Adventure":
+                ## elif role.army_role == "Adventure":
+
+                else:
+                    if len(army.route) > 0:
+                        print("war_orders_AI - 1; army.action - " + str(army.action))
+                        next_point = list(army.route[-1])
+                        TileNum = (next_point[1] - 1) * game_stats.cur_level_width + next_point[0] - 1
+                        TileObj = game_obj.game_map[TileNum]
+
+                        if role.army_role == "Advance - enemy army":
+                            # Confirm that target still available
+                            print("next_point - " + str(next_point) + "; TileObj.army_id - " + str(TileObj.army_id)
+                                  + "; role.target_army_id - " + str(role.target_army_id))
+                            if TileObj.army_id != role.target_army_id:
+                                adjust_path(army, role, "Army")
+                        else:
+                            army.action = "Ready to move"
+
+                    else:
+                        print("war_orders_AI - 2; army.action - " + str(army.action))
+                        # print("len(army.units): " + str(len(army.units)))
+                        if len(army.units) >= 5 and army.hero is not None:
+                            if game_obj.game_map[army.location].city_id is not None:
+                                new_war_order = True
+
+                if not at_war_list:
+                    # If there is no enemy realms at war with this realm,
+                    # then there is no need to give military orders
+                    new_war_order = False
+
+                if new_war_order:
+                    while True:
+                        print("new_war_order")
+                        next_order = False
+                        next_order = immediate_targets.solution(realm, role, army, friendly_cities,
+                                                                hostile_cities, at_war_list)
+                        if next_order:
+                            next_order = territory_targets.solution(realm, role, army, friendly_cities,
+                                                                    hostile_cities, at_war_list)
+                        else:
+                            break
+
+                        if next_order:
+                            next_order = military_expedition.solution(realm, role, army, friendly_cities,
+                                                                      hostile_cities, military_targets)
 
                         else:
-                            if len(army.route) > 0:
-                                if role.army_role == "Advance - enemy army":
-                                    print("war_orders_AI - 1; army.action - " + str(army.action))
-                                    next_point = list(army.route[-1])
-                                    TileNum = (next_point[1] - 1) * game_stats.cur_level_width + next_point[0] - 1
-                                    TileObj = game_obj.game_map[TileNum]
-                                    # Confirm that target still available
-                                    if TileObj.army_id != role.target_army_id:
-                                        adjust_path(army, role, "Army")
+                            break
 
-                            else:
-                                print("war_orders_AI - 2; army.action - " + str(army.action))
-                                # print("len(army.units): " + str(len(army.units)))
-                                if len(army.units) >= 5 and army.hero is not None:
-                                    if game_obj.game_map[army.location].city_id is not None:
-                                        new_war_order = True
-
-                        if not at_war_list:
-                            # If there is no enemy realms at war with this realm,
-                            # then there is no need to give military orders
-                            new_war_order = False
-
-                        if new_war_order:
-                            while True:
-                                print("new_war_order")
-                                next_order = False
-                                next_order = immediate_targets.solution(realm, role, army, friendly_cities,
-                                                                        hostile_cities, at_war_list)
-                                if next_order:
-                                    next_order = territory_targets.solution(realm, role, army, friendly_cities,
-                                                                            hostile_cities, at_war_list)
-                                else:
-                                    break
-
-                                if next_order:
-                                    if role.army_role in ["Advance - enemy army", "Advance - enemy settlement",
-                                                          "Advance - liberate settlement"]:
-                                        role.army_role = "Idle"
-
-                                break
+                        if next_order:
+                            if role.army_role in ["Advance - enemy army", "Advance - enemy settlement",
+                                                  "Advance - liberate settlement"]:
+                                role.army_role = "Idle"
 
                         break
 
@@ -534,27 +548,23 @@ def facilitate_siege(attacker, attacker_realm):
 def complete_war_order(army, army_realm):
     print("complete_war_order(): " + army_realm.name + "; army_id " + str(army.army_id))
     if army_realm.AI_player:
-        the_role = None
-        for role in army_realm.AI_cogs.army_roles:
-            print("role: army_id " + str(role.army_id) + "; army_role " + str(role.army_role))
-            if role.army_id == army.army_id:
-                the_role = role
-                break
+        the_role = common_selects.select_army_role_by_id(army_realm, army.army_id)
 
-        if the_role.army_role in ["Advance - enemy army",
-                                  "Advance - enemy settlement",
-                                  "Advance - liberate settlement"]:
-            the_role.army_role = "Idle"
-        # print("army_role - " + str(the_role.army_role))
+        if the_role:
+            if the_role.army_role in ["Advance - enemy army",
+                                      "Advance - enemy settlement",
+                                      "Advance - liberate settlement"]:
+                the_role.army_role = "Idle"
+            # print("army_role - " + str(the_role.army_role))
 
 
 def adjust_path(the_army, role, target_type):
+    print("")
+    print("adjust_path()")
+    print("target_type - " + str(target_type))
     if target_type == "Army":
-        target_army = None
-        for army in game_obj.game_armies:
-            if army.army_id == role.target_army_id:
-                target_army = army
-                break
+        target_army = common_selects.select_army_by_id(role.target_army_id)
+        print("target_army.army_id - " + str(target_army.army_id))
 
         if target_army:
             print("adjust_path(): new path towards " + str(target_army.posxy))

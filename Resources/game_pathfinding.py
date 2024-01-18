@@ -7,8 +7,8 @@ from Resources import game_stats
 from Resources import game_obj
 from Resources import algo_astar
 from Resources import algo_path_arrows
-from Resources import game_classes
-from Resources import game_basic
+from Resources import common_selects
+from Resources import common_lists
 
 from Content import exploration_catalog
 
@@ -150,14 +150,9 @@ class found_path():
 def find_friendly_cities(player):
     list_of_friendly_city_id = []
     list_of_hostile_city_id = []
-    at_war_list = []
 
-    for realm in game_obj.game_powers:
-        if realm.name == player:
-            for enemy in realm.relations.at_war:
-                at_war_list.append(enemy[2])
-            # print("realm.relations.at_war:")
-            break
+    realm = common_selects.select_realm_by_name(player)
+    at_war_list = common_lists.realms_at_war(realm)
 
     for settlement in game_obj.game_cities:
         if settlement.owner == player:

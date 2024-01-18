@@ -31,6 +31,10 @@ def solution(realm, role, friendly_cities, hostile_cities, at_war_list):
             assemble_exploration_destinations(realm, role, army, realm.AI_cogs.exploration_targets, rank_sum,
                                               friendly_cities, hostile_cities, at_war_list)
 
+    else:
+        role.army_role = "Nothing to do"
+        army.action = "Stand"
+
 
 def assemble_exploration_destinations(realm, role, army, targets, rank_sum, friendly_cities, hostile_cities,
                                       at_war_list):

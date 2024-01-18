@@ -816,7 +816,7 @@ def after_battle_processing(attacker, defender, attacker_troops_power_level_list
 
     # Removing destroyed armies
     if len(remove_army_id) > 0:
-        # print("after_battle_processing() - # Removing destroyed armies ")
+        print("after_battle_processing() - # Removing destroyed armies ")
         # Removing army ID from location
         for id_item in remove_army_id:
             if id_item == attacker.army_id:
