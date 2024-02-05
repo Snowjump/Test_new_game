@@ -1,4 +1,5 @@
-## Miracle battles
+## Among Myth and Wonder
+## building_rw_det_cat
 
 from Resources import game_stats
 from Resources import game_classes
@@ -6,6 +7,8 @@ from Resources import skill_classes
 from Resources import game_obj
 from Resources import artifact_classes
 from Resources import update_gf_game_board
+from Resources import common_selects
+from Resources import graphics_basic
 
 from Content import rw_click_scripts
 from Content import artifact_catalog
@@ -34,11 +37,7 @@ def artifact_market_details():
                     game_stats.hero_inventory = army.hero.inventory
                 break
 
-    the_settlement = None
-    for city in game_obj.game_cities:
-        if city.city_id == game_stats.selected_settlement:
-            the_settlement = city
-            break
+    the_settlement = common_selects.select_settlement_by_id(game_stats.selected_settlement)
 
     for realm in game_obj.game_powers:
         if realm.name == the_settlement.owner:
@@ -62,25 +61,11 @@ def buy_artifact_for_hero():
             y = int(game_stats.selected_tile[1])
             TileNum = (y - 1) * game_stats.cur_level_width + x - 1
 
-            # if game_obj.game_map[TileNum].army_id is not None:
-            the_army = None
-            for army in game_obj.game_armies:
-                if army.army_id == game_obj.game_map[TileNum].army_id:
-                    the_army = army
-                    break
-                    # if army.hero is not None:
+            the_army = common_selects.select_army_by_id(game_obj.game_map[TileNum].army_id)
 
-            the_settlement = None
-            for city in game_obj.game_cities:
-                if city.city_id == game_stats.selected_settlement:
-                    the_settlement = city
-                    break
+            the_settlement = common_selects.select_settlement_by_id(game_stats.selected_settlement)
 
-            treasury = None
-            for realm in game_obj.game_powers:
-                if realm.name == the_settlement.owner:
-                    treasury = realm.coffers
-                    break
+            treasury = common_selects.select_treasury_by_realm_name(the_settlement.owner)
 
             # Spent money
             for res in treasury:
@@ -111,23 +96,16 @@ def buy_artifact_for_hero():
                                                                      details[3],
                                                                      details[4]))
 
+            graphics_basic.prepare_resource_ribbon()
+
 
 def buy_artifact_for_realm():
     print("buy_artifact_for_realm")
     if game_stats.enough_resources_to_pay:
-        the_settlement = None
-        for city in game_obj.game_cities:
-            if city.city_id == game_stats.selected_settlement:
-                the_settlement = city
-                break
+        the_settlement = common_selects.select_settlement_by_id(game_stats.selected_settlement)
 
-        the_realm = None
-        treasury = None
-        for realm in game_obj.game_powers:
-            if realm.name == the_settlement.owner:
-                the_realm = realm
-                treasury = realm.coffers
-                break
+        the_realm = common_selects.select_realm_by_name(the_settlement.owner)
+        treasury = common_selects.select_treasury_by_realm_name(the_settlement.owner)
 
         # Spent money
         for res in treasury:
@@ -158,6 +136,8 @@ def buy_artifact_for_realm():
                                                                        details[3],
                                                                        details[4]))
 
+        graphics_basic.prepare_resource_ribbon()
+
 
 def school_of_magic_details():
     game_stats.rw_panel_det = game_classes.Object_Surface({1: learn_skill_from_school},
@@ -177,31 +157,17 @@ def school_of_magic_details():
 def learn_skill_from_school():
     if game_stats.enough_resources_to_pay and game_stats.hero_in_settlement \
             and game_stats.selected_new_skill is not None and game_stats.hero_doesnt_know_this_skill:
-        hero = None
         # Index of settlement's tile in map list
         x = int(game_stats.selected_tile[0])
         y = int(game_stats.selected_tile[1])
         TileNum = (y - 1) * game_stats.cur_level_width + x - 1
 
-        if game_obj.game_map[TileNum].army_id is not None:
-            for army in game_obj.game_armies:
-                if army.army_id == game_obj.game_map[TileNum].army_id:
-                    hero = army.hero
-                    break
+        army = common_selects.select_army_by_id(game_obj.game_map[TileNum].army_id)
+        hero = army.hero
 
-        the_settlement = None
-        for city in game_obj.game_cities:
-            if city.city_id == game_stats.selected_settlement:
-                the_settlement = city
-                break
+        the_settlement = common_selects.select_settlement_by_id(game_stats.selected_settlement)
 
-        the_realm = None
-        treasury = None
-        for realm in game_obj.game_powers:
-            if realm.name == the_settlement.owner:
-                the_realm = realm
-                treasury = realm.coffers
-                break
+        treasury = common_selects.select_treasury_by_realm_name(the_settlement.owner)
 
         # Spent money
         for res in treasury:
@@ -231,6 +197,8 @@ def learn_skill_from_school():
 
         game_stats.enough_resources_to_pay = None
         game_stats.hero_doesnt_know_this_skill = False
+
+        graphics_basic.prepare_resource_ribbon()
 
 
 building_catalog = {"KL artifact market" : artifact_market_details,

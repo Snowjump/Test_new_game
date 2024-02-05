@@ -5,6 +5,7 @@ from Resources import game_obj
 from Resources import game_classes
 from Resources import update_gf_game_board
 from Resources import game_basic
+from Resources import common_selects
 
 
 def find_target():
@@ -40,22 +41,12 @@ def provide_stone_materials():
     quest, the_realm = quest_message_details()
     print(quest.name)
 
-    the_settlement = None
-    for settlement in game_obj.game_cities:
-        if settlement.city_id == game_obj.game_map[quest.settlement_location].city_id:
-            the_settlement = settlement
-            print(the_settlement.name)
-            break
+    the_settlement = common_selects.select_settlement_by_id(game_obj.game_map[quest.settlement_location].city_id)
+    print(the_settlement.name)
 
-    enough_resources = False
-    for res in the_realm.coffers:
-        if res[0] == "Stone":
-            if res[1] >= 1600:
-                res[1] -= 1600
-                enough_resources = True
-            break
+    if game_basic.enough_resources_to_pay([["Stone", 1600]]):
+        game_basic.realm_payment(the_realm.name, [["Stone", 1600]])
 
-    if enough_resources:
         for effect in the_settlement.local_effects:
             if effect.name == "Vassal awaits for stone":
                 the_settlement.local_effects.remove(effect)

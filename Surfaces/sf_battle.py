@@ -1,5 +1,5 @@
-## Miracle battles
-# sf_battle
+## Among Myth and Wonder
+## sf_battle
 
 import math
 import pygame
@@ -11,8 +11,8 @@ from Resources import game_stats
 from Resources import game_battle
 from Resources import game_classes
 from Resources import game_basic
+from Resources import graphics_basic
 from Resources import algo_movement_range
-from Resources import algo_path_arrows
 from Resources import battle_abilities_hero
 from Resources import battle_abilities_regiment
 from Resources import update_gf_game_board
@@ -1634,6 +1634,8 @@ def end_battle_but():
 
     game_stats.attacker_army_id = 0
     game_stats.defender_army_id = 0
+
+    graphics_basic.prepare_resource_ribbon()
 
     # Update visuals
     print("end_battle_but - update_visuals")

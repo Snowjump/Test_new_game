@@ -3,17 +3,11 @@
 
 import pygame.draw, pygame.font
 
+from Screens.colors_catalog import *
+
 from Resources import game_stats
 
 pygame.init()
-
-MainMenuColor = [0x9F, 0x97, 0x97]
-LineMainMenuColor1 = [0x60, 0x60, 0x60]
-LineMainMenuColor2 = [0xE0, 0xE0, 0xE0]
-
-TitleText = [0xFF, 0xFF, 0x99]
-
-BorderMainMenuColor = [0xFF, 0xCC, 0x99]
 
 # Fonts
 font26 = pygame.font.SysFont('timesnewroman', 26)

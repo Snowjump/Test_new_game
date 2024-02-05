@@ -6,6 +6,10 @@
 
 import math
 
+from Content.production_catalog import *
+
+from Resources import common_selects
+
 
 def add_resource(r_pops, goods, raw_material, extra_material, additional_amount, tax,
                  realm_treasury, records_local_fees):
@@ -217,130 +221,45 @@ def apply_effects(PM_pops, building_plots, goods, taxes):
                                             if res[0] == product[0]:
                                                 if base_ef.operator == "Addition":
                                                     product[1] += res[1]
+                                                break
 
                                 elif base_ef.application == "Tax":
                                     for res in base_ef.bonus:
                                         for product in taxes:
                                             if res[0] == product[0]:
                                                 if base_ef.operator == "Addition":
+                                                    # print("0) " + res[0] + " " + str(res[1]))
+                                                    # print("1) " + product[0] + " " + str(product[1]))
                                                     product[1] += res[1]
+                                                    # print("2) " + product[0] + " " + str(product[1]))
+                                                break
 
     return goods, taxes
 
 
-# Production methods
-def nobles_PM_gold_deposit(pops, realm_treasury, building_plots, records_local_fees, facility):
-    pass
+# Production method
+def production_method_by_pop(PM_pops, realm_treasury, building_plots, records_local_fees, facility):
+    reference = facility + "_" + PM_pops.name
+    # This if statement help determine whether this pop participate in production
+    if reference in output_by_place_and_pops_dict:
+        goods = common_selects.copy_nested_list(output_by_place_and_pops_dict[reference])  # Output of produced gods
 
+        raw_materials = None
+        if reference in raw_materials_by_place_and_pops_dict:
+            raw_materials = list(raw_materials_by_place_and_pops_dict[reference])
 
-def nobles_PM_arable_land(pops, realm_treasury, building_plots, records_local_fees, facility):
-    pass
+        extra_materials = None
+        if reference in extra_materials_by_place_and_pops_dict:
+            extra_materials = list(extra_materials_by_place_and_pops_dict[reference])
 
+        additional_surplus = None
+        if reference in additional_surplus_by_place_and_pops_dict:
+            additional_surplus = list(additional_surplus_by_place_and_pops_dict[reference])
 
-def nobles_PM_logging_camp(pops, realm_treasury, building_plots, records_local_fees, facility):
-    pass
+        taxes = common_selects.copy_nested_list(taxes_by_place_and_pops_dict[reference])  # Taxed product for realm
+        # print("Base taxes: " + str(taxes))
 
+        goods, taxes = apply_effects(PM_pops, building_plots, goods, taxes)
 
-def nobles_PM_stone_quarry(pops, realm_treasury, building_plots, records_local_fees, facility):
-    pass
-
-
-def nobles_PM_metal_mine(pops, realm_treasury, building_plots, records_local_fees, facility):
-    pass
-
-
-def serfs_PM_gold_deposit(PM_pops, realm_treasury, building_plots, records_local_fees, facility):
-    goods = [["Florins", 400]]  # Output of produced gods
-    taxes = list(taxes_by_place_and_pops_dict[facility + "_" + PM_pops.name])  # Taxed product for realm
-    goods, taxes = apply_effects(PM_pops, building_plots, goods, taxes)
-    add_resource(PM_pops, goods, None, ["Tools", 100], ["Florins", 400], taxes, realm_treasury, records_local_fees)
-    # add_resource(PM_pops, ["Florins"], 400, None, ["Tools", 100], ["Florins", 400],
-    # [["Florins", 1000]], realm_treasury)
-
-
-def serfs_PM_arable_land(PM_pops, realm_treasury, building_plots, records_local_fees, facility):
-    # print("serfs_PM_arable_land")
-    goods = [["Food", 200]]  # Output of produced gods
-    taxes = list(taxes_by_place_and_pops_dict[facility + "_" + PM_pops.name])  # Taxed product for realm
-    goods, taxes = apply_effects(PM_pops, building_plots, goods, taxes)
-    add_resource(PM_pops, goods, None, ["Tools", 100], ["Food", 300], taxes, realm_treasury, records_local_fees)
-    # add_resource(PM_pops, ["Food"], 200, None, None, None, [["Food", 200]], realm_treasury)
-
-
-def serfs_PM_logging_camp(PM_pops, realm_treasury, building_plots, records_local_fees, facility):
-    goods = [["Wood", 500]]  # Output of produced gods
-    taxes = list(taxes_by_place_and_pops_dict[facility + "_" + PM_pops.name])  # Taxed product for realm
-    goods, taxes = apply_effects(PM_pops, building_plots, goods, taxes)
-    add_resource(PM_pops, goods, None, ["Tools", 100], ["Wood", 350], taxes, realm_treasury, records_local_fees)
-    # add_resource(PM_pops, ["Wood"], 500, None, ["Tools", 100], ["Wood", 350], [["Wood", 500]], realm_treasury)
-
-
-def serfs_PM_stone_quarry(PM_pops, realm_treasury, building_plots, records_local_fees, facility):
-    goods = [["Stone", 200]]  # Output of produced gods
-    taxes = list(taxes_by_place_and_pops_dict[facility + "_" + PM_pops.name])  # Taxed product for realm
-    goods, taxes = apply_effects(PM_pops, building_plots, goods, taxes)
-    add_resource(PM_pops, goods, None, ["Tools", 100], ["Stone", 200], taxes, realm_treasury, records_local_fees)
-    # add_resource(PM_pops, ["Stone"], 400, None, ["Tools", 100], ["Stone", 200], [["Stone", 400]], realm_treasury)
-
-
-def serfs_PM_metal_mine(PM_pops, realm_treasury, building_plots, records_local_fees, facility):
-    goods = [["Metals", 400]]  # Output of produced gods
-    taxes = list(taxes_by_place_and_pops_dict[facility + "_" + PM_pops.name])  # Taxed product for realm
-    goods, taxes = apply_effects(PM_pops, building_plots, goods, taxes)
-    add_resource(PM_pops, goods, None, ["Tools", 100], ["Metals", 250], taxes, realm_treasury, records_local_fees)
-    # add_resource(PM_pops, ["Metals"], 400, None, ["Tools", 100], ["Metals", 250], [["Metals", 400]], realm_treasury)
-
-
-def artisans_PM_settlement(PM_pops, realm_treasury, building_plots, records_local_fees, facility):
-    goods = [["Armament", 800], ["Tools", 800]]  # Output of produced gods
-    taxes = list(taxes_by_place_and_pops_dict[facility + "_" + PM_pops.name])  # Taxed product for realm
-    goods, taxes = apply_effects(PM_pops, building_plots, goods, taxes)
-    add_resource(PM_pops, goods, [["Metals", 400], ["Wood", 400]], None, None, taxes, realm_treasury,
-                 records_local_fees)
-    # add_resource(PM_pops, ["Armament", "Tools"], 600, [["Metals", 400], ["Wood", 400]], None, None,
-    #              [["Armament", 600]], realm_treasury)
-
-
-def merchants_PM_settlement(PM_pops, realm_treasury, building_plots, records_local_fees, facility):
-    pass
-
-
-def clergy_PM_abbey(PM_pops, realm_treasury, building_plots, records_local_fees, facility):
-    goods = [["Ingredients", 800], ["Food", 50]]  # Output of produced goods
-    taxes = list(taxes_by_place_and_pops_dict[facility + "_" + PM_pops.name])  # Taxed product for realm
-    goods, taxes = apply_effects(PM_pops, building_plots, goods, taxes)
-    add_resource(PM_pops, goods, None, None, None, taxes, realm_treasury, records_local_fees)
-
-
-# Dictionary catalogs
-nobles_PM_cat = {"Gold deposit" : nobles_PM_gold_deposit,
-                 "Arable land" : nobles_PM_arable_land,
-                 "Logging camp" : nobles_PM_logging_camp,
-                 "Stone quarry" : nobles_PM_stone_quarry,
-                 "Metal mine" : nobles_PM_metal_mine}
-
-serfs_PM_cat = {"Gold deposit" : serfs_PM_gold_deposit,
-                "Arable land" : serfs_PM_arable_land,
-                "Logging camp" : serfs_PM_logging_camp,
-                "Stone quarry" : serfs_PM_stone_quarry,
-                "Metal mine" : serfs_PM_metal_mine}
-
-artisans_PM_cat = {"Settlement" : artisans_PM_settlement}
-
-merchants_PM_cat = {"Settlement" : merchants_PM_settlement}
-
-clergy_PM_cat = {"Magic source" : clergy_PM_abbey}
-
-pops_to_facility_cat = {"Serfs" : serfs_PM_cat,
-                        "Nobles" : nobles_PM_cat,
-                        "Artisans" : artisans_PM_cat,
-                        "Merchants" : merchants_PM_cat,
-                        "Clergy" : clergy_PM_cat}
-
-taxes_by_place_and_pops_dict = {"Gold deposit_Serfs" : [["Florins", 1800]],
-                                "Arable land_Serfs" : [["Food", 300]],
-                                "Logging camp_Serfs" : [["Wood", 500]],
-                                "Stone quarry_Serfs" : [["Stone", 400]],
-                                "Metal mine_Serfs" : [["Metals", 200]],
-                                "Magic source_Clergy" : [["Ingredients", 800]],
-                                "Settlement_Artisans" : [["Armament", 1200]]}
+        add_resource(PM_pops, goods, raw_materials, extra_materials, additional_surplus, taxes, realm_treasury,
+                     records_local_fees)

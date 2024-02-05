@@ -20,11 +20,10 @@ from Content import enlist_regiment_prices
 
 from Resources import game_classes
 from Resources import game_obj
-from Resources import game_pathfinding
 from Resources import game_stats
+from Resources import graphics_basic
 from Resources import game_diplomacy
 from Resources import algo_circle_range
-from Resources import game_battle
 from Resources import economy
 from Resources import algo_building
 from Resources import update_gf_game_board
@@ -402,6 +401,8 @@ def turn_end():
                     game_diplomacy.peace_acceptance()
                 else:
                     game_diplomacy.prepare_peace_demands_summary()
+
+        graphics_basic.prepare_resource_ribbon()
 
         # Update visuals
         update_gf_game_board.update_sprites()
@@ -1329,10 +1330,7 @@ def enough_resources_to_hire_hero(hero_for_hire, realm_treasury=None):
 def enough_resources_to_pay(cost_list, realm_treasury=None):
     treasury = realm_treasury
     if treasury is None:
-        for realm in game_obj.game_powers:
-            if realm.name == game_stats.player_power:
-                treasury = realm.coffers
-                break
+        treasury = common_selects.select_treasury_by_realm_name(game_stats.player_power)
 
     # Check available resources to pay a cost
     enough_resources = True
@@ -1364,11 +1362,7 @@ def realm_payment_for_object(unit_name, settlement):
     #         settlement = city
     #         break
 
-    treasury = None
-    for realm in game_obj.game_powers:
-        if realm.name == settlement.owner:
-            treasury = realm.coffers
-            break
+    treasury = common_selects.select_treasury_by_realm_name(settlement.owner)
 
     # Deduct resources
     alignment = unit_alignment_catalog.alignment_dict[unit_name]
@@ -1426,6 +1420,9 @@ def realm_payment(realm_source, cost_list):
                     treasury.remove(delete_res)
                     break
 
+    if realm_source == game_stats.player_power:
+        graphics_basic.prepare_resource_ribbon()
+
 
 def realm_income(realm_source, earnings_list):
     # When realm earn som resources
@@ -1465,6 +1462,9 @@ def realm_income(realm_source, earnings_list):
         if no_resource:
             treasury.append([str(earning[0]), int(earning[1])])
     print("2) treasury: " + str(treasury))
+
+    if realm_source == game_stats.player_power:
+        graphics_basic.prepare_resource_ribbon()
 
 
 def simple_add_resources(reserves, resources_list):
@@ -1567,12 +1567,7 @@ def gather_province_records():
     game_stats.allocated_gains_records = []
     game_stats.allocated_sold_records = []
     game_stats.allocated_bought_records = []
-    settlement = None
-
-    for city in game_obj.game_cities:
-        if city.city_id == game_stats.selected_settlement:
-            settlement = city
-            break
+    settlement = common_selects.select_settlement_by_id(game_stats.selected_settlement)
 
     game_stats.province_records.append(["Turnover tax", int(settlement.records_turnover_tax)])
     for res in settlement.records_local_fees:
@@ -1658,12 +1653,7 @@ def snapshot_local_market():
     game_stats.allocated_sold_records = []
     game_stats.allocated_requested_goods_records = []
     game_stats.allocated_bought_records = []
-    settlement = None
-
-    for city in game_obj.game_cities:
-        if city.city_id == game_stats.selected_settlement:
-            settlement = city
-            break
+    settlement = common_selects.select_settlement_by_id(game_stats.selected_settlement)
 
     for pops in settlement.residency:
         for res_rec in pops.records_sold:
@@ -1841,22 +1831,20 @@ def create_new_quest_message(settlement):
 
 
 def update_new_tasks_status(settlement):
-    for realm in game_obj.game_powers:
-        if realm.name == settlement.owner:
-            new_tasks_exist = False
-            for quest in realm.quests_messages:
-                if quest.message_type == "Dilemma":
-                    game_stats.new_tasks = True
-                    break
-
-            if realm.diplomatic_messages:
-                game_stats.new_tasks = True
-
-            if new_tasks_exist:
-                game_stats.new_tasks = True
-            else:
-                game_stats.new_tasks = False
+    realm = common_selects.select_realm_by_name(settlement.owner)
+    new_tasks_exist = False
+    for quest in realm.quests_messages:
+        if quest.message_type == "Dilemma":
+            game_stats.new_tasks = True
             break
+
+    if realm.diplomatic_messages:
+        game_stats.new_tasks = True
+
+    if new_tasks_exist:
+        game_stats.new_tasks = True
+    else:
+        game_stats.new_tasks = False
 
 
 def change_side_direction(army):
@@ -1901,11 +1889,7 @@ def simple_direction(start_pos, finish_pos):
 
 
 def move_out_army_from_settlement(army):
-    the_realm = None
-    for realm in game_obj.game_powers:
-        if realm.name == army.owner:
-            the_realm = realm
-            break
+    the_realm = common_selects.select_realm_by_name(army.owner)
 
     enemy_realms = []
     for opponent in the_realm.relations.at_war:

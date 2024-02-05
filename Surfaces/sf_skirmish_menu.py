@@ -6,6 +6,7 @@ import math
 
 from Resources import game_stats
 from Resources import start_new_level
+from Resources import graphics_basic
 
 button_zone = [[250, 513, 550, 545],
                [250, 443, 550, 475],
@@ -63,9 +64,11 @@ def start_but():
     start_new_level.begin_new_level("Skirmish", game_stats.levels_list[game_stats.level_index])
 
     game_stats.current_screen = "Game Board"
-    print(game_stats.current_screen)
+    # print(game_stats.current_screen)
     game_stats.screen_to_draw = "game_board_screen"
     game_stats.start_level_selected_realm = None
+
+    graphics_basic.prepare_resource_ribbon()
 
     click_sound = pygame.mixer.Sound("Sound/Interface/Abstract1.ogg")
     click_sound.play()

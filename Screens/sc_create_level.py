@@ -1,24 +1,13 @@
 ## Among Myth and Wonder
-## Create level
-
+## sc_create_level
 
 import pygame.draw, pygame.font
+
+from Screens.colors_catalog import *
 
 from Resources import game_stats
 
 pygame.init()
-
-NewGameColor = [0x8D, 0x86, 0x86]
-
-TitleText = [0xFF, 0xFF, 0x99]
-
-BorderNewGameColor = [0xDA, 0xAE, 0x83]
-HighlightBorder = [0xF7, 0x82, 0x0C]
-FieldColor = [0xA0, 0xA0, 0xA0]
-ApproveFieldColor = [0x00, 0x99, 0x00]
-ApproveElementsColor = [0x00, 0x66, 0x00]
-CancelFieldColor = [0xFF, 0x00, 0x00]
-CancelElementsColor = [0x99, 0x00, 0x00]
 
 # Fonts
 font26 = pygame.font.SysFont('timesnewroman', 26)

@@ -2,46 +2,12 @@
 ## sc_skirmish_menu
 
 import pygame.draw, pygame.font
+
+from Screens.colors_catalog import *
+
 from Resources import game_stats
+
 pygame.init()
-
-MainMenuColor = [0x9F, 0x97, 0x97]
-NewGameColor = [0x8D, 0x86, 0x86]
-
-TitleText = [0xFF, 0xFF, 0x99]
-
-RockTunel = [0x89, 0x89, 0x89]
-LineMainMenuColor1 = [0x60, 0x60, 0x60]
-WhiteBorder = [249, 238, 227, 200]
-BorderNewGameColor = [0xDA, 0xAE, 0x83]
-
-ScarletColor = [0xFF, 0x24, 0x00]
-CopperColor = [0xE9, 0x75, 0x00]
-NightBlueColor = [0x19, 0x2F, 0xF0]
-MoonColor = [0xD2, 0xD6, 0xFA]
-BullBrownColor = [0x40, 0x21, 0x02]
-BlackHoovesColor = [0x0A, 0x06, 0x02]
-RoyalPurple = [0x8B, 0x00, 0x8B]
-GoldColor = [0xFF, 0xD7, 0x00]
-TribesTide = [0x00, 0x64, 0x00]
-ForestGreen = [0x22, 0x8B, 0x22]
-MaroonColor = [0x80, 0x00, 0x00]
-SlateGray = [0x70, 0x80, 0x90]
-
-
-FlagColors = {"Scarlet": ScarletColor,
-              "Copper": CopperColor,
-              "NightBlue": NightBlueColor,
-              "Moon": MoonColor,
-              "BullBrown": BullBrownColor,
-              "BlackHooves": BlackHoovesColor,
-              "RoyalPurple": RoyalPurple,
-              "GoldColor": GoldColor,
-              "TribesTide": TribesTide,
-              "ForestGreen": ForestGreen,
-              "MaroonColor": MaroonColor,
-              "SlateGray": SlateGray}
-
 
 # Fonts
 font26 = pygame.font.SysFont('timesnewroman', 26)

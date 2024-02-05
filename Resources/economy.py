@@ -62,7 +62,6 @@ def snapshot_turnover():
                                   str(float(0)))
 
 
-
 def nullify_inner_market():
     for city in game_obj.game_cities:
         print("nullify_inner_market - " + str(city.name))
@@ -143,10 +142,14 @@ def production():
                     # if TileNum > 50:
                     # print("Population - " + str(pops.name) + ", id - " + str(pops.population_id)
                     #       + ", tilenum - " + str(TileNum) + " - " + str(pops))
-                    production_methods.pops_to_facility_cat[pops.name][TileObj.lot.obj_name](pops, realm_treasury,
-                                                                                             city.buildings,
-                                                                                             city.records_local_fees,
-                                                                                             TileObj.lot.obj_name)
+                    # production_methods.pops_to_facility_cat[pops.name][TileObj.lot.obj_name](pops, realm_treasury,
+                    #                                                                          city.buildings,
+                    #                                                                          city.records_local_fees,
+                    #                                                                          TileObj.lot.obj_name)
+                    production_methods.production_method_by_pop(pops, realm_treasury,
+                                                                city.buildings,
+                                                                city.records_local_fees,
+                                                                TileObj.lot.obj_name)
 
             # 2 stage: settlements
             # print("")
@@ -154,126 +157,136 @@ def production():
             for pops in city.residency:
                 # print("Population - " + str(pops.name) + ", id - " + str(pops.population_id)
                 #       + ", tilenum - " + str(city.location) + " - " + str(pops))
-                production_methods.pops_to_facility_cat[pops.name]["Settlement"](pops, realm_treasury, city.buildings,
-                                                                                 city.records_local_fees,
-                                                                                 "Settlement")
+                # production_methods.pops_to_facility_cat[pops.name]["Settlement"](pops, realm_treasury, city.buildings,
+                #                                                                  city.records_local_fees,
+                #                                                                  "Settlement")
+                production_methods.production_method_by_pop(pops, realm_treasury, city.buildings,
+                                                            city.records_local_fees,
+                                                            "Settlement")
 
 
 def sell_to_inner_market():
     for city in game_obj.game_cities:
 
-        realm_treasury = None
-        for realm in game_obj.game_powers:
-            if realm.name == city.owner:
-                realm_treasury = realm.coffers
+        # Temporary solution
+        if city.owner != "Neutral":
 
-        # 1 stage: facilities
-        print("sell_to_inner_market (facilities) - " + str(city.name))
-        for TileNum in city.property:
-            TileObj = game_obj.game_map[TileNum]
-            # print("Facility - " + str(TileNum) + " - " + str(TileObj.lot.obj_name) + " - " + str(TileObj))
+            realm_treasury = None
+            for realm in game_obj.game_powers:
+                if realm.name == city.owner:
+                    realm_treasury = realm.coffers
 
-            for pops in TileObj.lot.residency:
+            # 1 stage: facilities
+            print("sell_to_inner_market (facilities) - " + str(city.name))
+            for TileNum in city.property:
+                TileObj = game_obj.game_map[TileNum]
+                # print("Facility - " + str(TileNum) + " - " + str(TileObj.lot.obj_name) + " - " + str(TileObj))
+
+                for pops in TileObj.lot.residency:
+                    # print("Population - " + str(pops.name) + ", id - " + str(pops.population_id)
+                    #       + ", tilenum - " + str(TileNum) + " - " + str(pops))
+
+                    # Putting resources from population for selling on the inner market
+                    sell_resources.pops_to_facility_cat[pops.name][TileObj.lot.obj_name](pops, city)
+
+            # 2 stage: settlements
+            # print("sell_to_inner_market (settlements) - " + str(city.name))
+            for pops in city.residency:
                 # print("Population - " + str(pops.name) + ", id - " + str(pops.population_id)
-                #       + ", tilenum - " + str(TileNum) + " - " + str(pops))
+                #       + ", tilenum - " + str(city.location) + " - " + str(pops))
+                sell_resources.pops_to_facility_cat[pops.name]["Settlement"](pops, city)
 
-                # Putting resources from population for selling on the inner market
-                sell_resources.pops_to_facility_cat[pops.name][TileObj.lot.obj_name](pops, city)
-
-        # 2 stage: settlements
-        # print("sell_to_inner_market (settlements) - " + str(city.name))
-        for pops in city.residency:
-            # print("Population - " + str(pops.name) + ", id - " + str(pops.population_id)
-            #       + ", tilenum - " + str(city.location) + " - " + str(pops))
-            sell_resources.pops_to_facility_cat[pops.name]["Settlement"](pops, city)
-
-        print("")
-        # Merchants buy up resources from the inner market
-        for pops in city.residency:
-            sell_resources.pops_to_buy_up_cat[pops.name](pops, city, realm_treasury)
+            print("")
+            # Merchants buy up resources from the inner market
+            for pops in city.residency:
+                sell_resources.pops_to_buy_up_cat[pops.name](pops, city, realm_treasury)
 
 
 def buy_from_inner_market():
     for city in game_obj.game_cities:
-        realm_treasury = None
-        for realm in game_obj.game_powers:
-            if realm.name == city.owner:
-                realm_treasury = realm.coffers
+        # Temporary solution
+        if city.owner != "Neutral":
+            realm_treasury = None
+            for realm in game_obj.game_powers:
+                if realm.name == city.owner:
+                    realm_treasury = realm.coffers
 
-        trader = None
+            trader = None
 
-        # Merchants put products to sale in the inner market
-        for trader_pops in city.residency:
-            buy_resources.pops_sales_cat[trader_pops.name](trader_pops, city)
+            # Merchants put products to sale in the inner market
+            for trader_pops in city.residency:
+                buy_resources.pops_sales_cat[trader_pops.name](trader_pops, city)
 
-            if trader_pops.name == "Merchants":
-                trader = trader_pops
+                if trader_pops.name == "Merchants":
+                    trader = trader_pops
 
-        city.previous_inner_market = list(city.inner_market)
-        print("")
-        # 1 stage: facilities
-        for TileNum in city.property:
-            TileObj = game_obj.game_map[TileNum]
+            city.previous_inner_market = list(city.inner_market)
+            print("")
+            # 1 stage: facilities
+            for TileNum in city.property:
+                TileObj = game_obj.game_map[TileNum]
 
-            for pops in TileObj.lot.residency:
+                for pops in TileObj.lot.residency:
+                    # print("Population - " + str(pops.name) + ", id - " + str(pops.population_id)
+                    #       + ", tilenum - " + str(TileNum) + " - " + str(pops))
+                    buy_resources.pops_to_facility_cat[pops.name][TileObj.lot.obj_name](pops, city, True)
+
+            # 2 stage: settlements
+            for pops in city.residency:
                 # print("Population - " + str(pops.name) + ", id - " + str(pops.population_id)
-                #       + ", tilenum - " + str(TileNum) + " - " + str(pops))
-                buy_resources.pops_to_facility_cat[pops.name][TileObj.lot.obj_name](pops, city, True)
+                #       + ", tilenum - " + str(city.location) + " - " + str(pops))
+                buy_resources.pops_to_facility_cat[pops.name]["Settlement"](pops, city, True)
 
-        # 2 stage: settlements
-        for pops in city.residency:
-            # print("Population - " + str(pops.name) + ", id - " + str(pops.population_id)
-            #       + ", tilenum - " + str(city.location) + " - " + str(pops))
-            buy_resources.pops_to_facility_cat[pops.name]["Settlement"](pops, city, True)
+            # Adjust orders quantity on the inner market
+            buy_resources.adjust_orders(city)
 
-        # Adjust orders quantity on the inner market
-        buy_resources.adjust_orders(city)
+            print("")
+            # Perform purchase on the inner market
+            # 1 stage: facilities
+            for TileNum in city.property:
+                TileObj = game_obj.game_map[TileNum]
 
-        print("")
-        # Perform purchase on the inner market
-        # 1 stage: facilities
-        for TileNum in city.property:
-            TileObj = game_obj.game_map[TileNum]
+                for pops in TileObj.lot.residency:
+                    # print("")
+                    # print("Population - " + str(pops.name) + ", id - " + str(pops.population_id)
+                    #       + ", tilenum - " + str(TileNum) + " - " + str(pops))
+                    buy_resources.fulfill_orders(pops, city, trader, realm_treasury)
 
-            for pops in TileObj.lot.residency:
+            # 2 stage: settlements
+            for pops in city.residency:
                 # print("")
                 # print("Population - " + str(pops.name) + ", id - " + str(pops.population_id)
-                #       + ", tilenum - " + str(TileNum) + " - " + str(pops))
+                #       + ", tilenum - " + str(city.location) + " - " + str(pops))
                 buy_resources.fulfill_orders(pops, city, trader, realm_treasury)
-
-        # 2 stage: settlements
-        for pops in city.residency:
-            # print("")
-            # print("Population - " + str(pops.name) + ", id - " + str(pops.population_id)
-            #       + ", tilenum - " + str(city.location) + " - " + str(pops))
-            buy_resources.fulfill_orders(pops, city, trader, realm_treasury)
 
 
 def consume_goods():
     print("")
     for city in game_obj.game_cities:
-        # 1 stage: facilities
-        print("consumption (facilities) - " + str(city.name))
-        for TileNum in city.property:
+        # Temporary solution
+        if city.owner != "Neutral":
+            # 1 stage: facilities
+            print("consumption (facilities) - " + str(city.name))
+            for TileNum in city.property:
 
-            TileObj = game_obj.game_map[TileNum]
-            # print("")
-            # print("Facility - " + str(TileNum) + " - " + str(TileObj.lot.obj_name) + " - " + str(TileObj))
-            # print(TileObj.lot.obj_name)
+                TileObj = game_obj.game_map[TileNum]
+                # print("")
+                # print("Facility - " + str(TileNum) + " - " + str(TileObj.lot.obj_name) + " - " + str(TileObj))
+                # print(TileObj.lot.obj_name)
 
-            for pops in TileObj.lot.residency:
-                # if TileNum > 50:
+                for pops in TileObj.lot.residency:
+                    # if TileNum > 50:
+                    # print("Population - " + str(pops.name) + ", id - " + str(pops.population_id)
+                    #       + ", tilenum - " + str(TileNum) + " - " + str(pops))
+                    basic_needs.pops_to_facility_cat[pops.name][TileObj.lot.obj_name](pops)
+
+            # 2 stage: settlements
+            print("consumption (settlements) - " + str(city.name))
+            for pops in city.residency:
+                # print("")
                 # print("Population - " + str(pops.name) + ", id - " + str(pops.population_id)
-                #       + ", tilenum - " + str(TileNum) + " - " + str(pops))
-                basic_needs.pops_to_facility_cat[pops.name][TileObj.lot.obj_name](pops)
-
-        # 2 stage: settlements
-        print("consumption (settlements) - " + str(city.name))
-        for pops in city.residency:
-            # print("")
-            # print("Population - " + str(pops.name) + ", id - " + str(pops.population_id)
-            #       + ", tilenum - " + str(city.location) + " - " + str(pops))
-            basic_needs.pops_to_facility_cat[pops.name]["Settlement"](pops)
+                #       + ", tilenum - " + str(city.location) + " - " + str(pops))
+                basic_needs.pops_to_facility_cat[pops.name]["Settlement"](pops)
 
 
 def nullify_turnover():

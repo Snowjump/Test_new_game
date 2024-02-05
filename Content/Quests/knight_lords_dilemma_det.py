@@ -1,4 +1,5 @@
 ## Among Myth and Wonder
+## knight_lords_dilemma_det
 
 import copy
 import random
@@ -6,6 +7,7 @@ import random
 from Resources import game_stats
 from Resources import game_obj
 from Resources import game_basic
+from Resources import common_selects
 from Resources import game_classes
 from Resources import campaign_effect_classes
 from Resources import update_gf_game_board
@@ -32,44 +34,37 @@ def forrest_law_upheld():
                                                         ],
                                                        8)
 
-    the_settlement = None
-    for settlement in game_obj.game_cities:
-        if settlement.city_id == game_obj.game_map[quest.settlement_location].city_id:
-            the_settlement = settlement
-            # Adjust faction loyalty
-            settlement.local_effects.append(effect)
-            for faction in settlement.factions:
-                if faction.name == "Peasant estate":
-                    faction.loyalty -= 1
+    settlement = common_selects.select_settlement_by_id(game_obj.game_map[quest.settlement_location].city_id)
 
-            # Adjust recruitment
-            for plot in settlement.buildings:
-                if plot.structure is not None:
-                    if len(plot.structure.recruitment) > 0:
-                        if plot.status == "Built":
-                            for lodge in plot.structure.recruitment:
-                                if "peasant" in recruitment_structures.unit_tags[lodge.unit_name]:
-                                    lodge.time_passed = 0
-                                    lodge.ready_units = 0
-            break
+    # Adjust faction loyalty
+    settlement.local_effects.append(effect)
+    for faction in settlement.factions:
+        if faction.name == "Peasant estate":
+            faction.loyalty -= 1
+
+    # Adjust recruitment
+    for plot in settlement.buildings:
+        if plot.structure is not None:
+            if len(plot.structure.recruitment) > 0:
+                if plot.status == "Built":
+                    for lodge in plot.structure.recruitment:
+                        if "peasant" in recruitment_structures.unit_tags[lodge.unit_name]:
+                            lodge.time_passed = 0
+                            lodge.ready_units = 0
 
     remove_quest_message(quest.name)
     game_stats.quest_message_index = None
     game_stats.quest_message_panel = None
     game_stats.event_panel_det = None
-    game_basic.update_new_tasks_status(the_settlement)
+    game_basic.update_new_tasks_status(settlement)
 
 
 def forrest_law_lenient():
     print("forrest_law_lenient")
     quest, the_realm = quest_message_details()
     print("quest.settlement_location - " + str(quest.settlement_location))
-    the_settlement = None
-    for settlement in game_obj.game_cities:
-        if settlement.city_id == game_obj.game_map[quest.settlement_location].city_id:
-            the_settlement = settlement
-            print(the_settlement.name)
-            break
+    the_settlement = common_selects.select_settlement_by_id(game_obj.game_map[quest.settlement_location].city_id)
+    print(the_settlement.name)
 
     # Create neutral army
     unoccupied_territory = []
@@ -302,11 +297,7 @@ def support_monastery_school():
 def pass_on_this_opportunity():
     quest, the_realm = quest_message_details()
 
-    the_settlement = None
-    for settlement in game_obj.game_cities:
-        if settlement.city_id == game_obj.game_map[quest.settlement_location].city_id:
-            the_settlement = settlement
-            break
+    the_settlement = common_selects.select_settlement_by_id(game_obj.game_map[quest.settlement_location].city_id)
 
     remove_quest_message(quest.name)
     game_stats.quest_message_index = None
@@ -317,12 +308,8 @@ def pass_on_this_opportunity():
 
 def track_the_dragon():
     quest, the_realm = quest_message_details()
-    the_settlement = None
-    for settlement in game_obj.game_cities:
-        if settlement.city_id == game_obj.game_map[quest.settlement_location].city_id:
-            the_settlement = settlement
-            # print(the_settlement.name)
-            break
+    the_settlement = common_selects.select_settlement_by_id(game_obj.game_map[quest.settlement_location].city_id)
+    # print(the_settlement.name)
 
     # Create neutral army
     unoccupied_territory = []
@@ -405,11 +392,7 @@ def track_the_dragon():
 def send_party_of_huntsmen():
     quest, the_realm = quest_message_details()
 
-    the_settlement = None
-    for settlement in game_obj.game_cities:
-        if settlement.city_id == game_obj.game_map[quest.settlement_location].city_id:
-            the_settlement = settlement
-            break
+    the_settlement = common_selects.select_settlement_by_id(game_obj.game_map[quest.settlement_location].city_id)
 
     game_stats.dilemma_additional_options = []
     remove_quest_message(quest.name)
@@ -422,11 +405,7 @@ def send_party_of_huntsmen():
 def trade_with_dwarves():
     quest, the_realm = quest_message_details()
 
-    the_settlement = None
-    for settlement in game_obj.game_cities:
-        if settlement.city_id == game_obj.game_map[quest.settlement_location].city_id:
-            the_settlement = settlement
-            break
+    the_settlement = common_selects.select_settlement_by_id(game_obj.game_map[quest.settlement_location].city_id)
 
     if game_basic.enough_resources_to_pay([["Florins", 2500]]):
         game_basic.realm_payment(the_realm.name, [["Florins", 2500]])
@@ -442,11 +421,7 @@ def trade_with_dwarves():
 def dwarves_spend_money():
     quest, the_realm = quest_message_details()
 
-    the_settlement = None
-    for settlement in game_obj.game_cities:
-        if settlement.city_id == game_obj.game_map[quest.settlement_location].city_id:
-            the_settlement = settlement
-            break
+    the_settlement = common_selects.select_settlement_by_id(game_obj.game_map[quest.settlement_location].city_id)
 
     for pops in the_settlement.residency:
         if pops.name == "Merchants":
@@ -515,28 +490,24 @@ def provide_troops_to_vassal():
                                                         ],
                                                        10)
 
-    the_settlement = None
-    for settlement in game_obj.game_cities:
-        if settlement.city_id == game_obj.game_map[quest.settlement_location].city_id:
-            the_settlement = settlement
-            settlement.local_effects.append(effect)
+    settlement = common_selects.select_settlement_by_id(game_obj.game_map[quest.settlement_location].city_id)
+    settlement.local_effects.append(effect)
 
-            # Adjust recruitment
-            for plot in settlement.buildings:
-                if plot.structure is not None:
-                    if len(plot.structure.recruitment) > 0:
-                        if plot.status == "Built":
-                            for lodge in plot.structure.recruitment:
-                                if "men-at-arms" in recruitment_structures.unit_tags[lodge.unit_name]:
-                                    lodge.time_passed = 0
-                                    lodge.ready_units = 0
-            break
+    # Adjust recruitment
+    for plot in settlement.buildings:
+        if plot.structure is not None:
+            if len(plot.structure.recruitment) > 0:
+                if plot.status == "Built":
+                    for lodge in plot.structure.recruitment:
+                        if "men-at-arms" in recruitment_structures.unit_tags[lodge.unit_name]:
+                            lodge.time_passed = 0
+                            lodge.ready_units = 0
 
     remove_quest_message(quest.name)
     game_stats.quest_message_index = None
     game_stats.quest_message_panel = None
     game_stats.event_panel_det = None
-    game_basic.update_new_tasks_status(the_settlement)
+    game_basic.update_new_tasks_status(settlement)
 
 
 def reject_request_for_stone_materials():
@@ -552,22 +523,18 @@ def reject_request_for_stone_materials():
                                                          ],
                                                         20)
 
-    the_settlement = None
-    for settlement in game_obj.game_cities:
-        if settlement.city_id == game_obj.game_map[quest.settlement_location].city_id:
-            the_settlement = settlement
-            settlement.local_effects.append(effect2)
-            # Adjust faction loyalty
-            for faction in settlement.factions:
-                if faction.name == "Nobility estate":
-                    faction.loyalty -= 2
-            break
+    settlement = common_selects.select_settlement_by_id(game_obj.game_map[quest.settlement_location].city_id)
+    settlement.local_effects.append(effect2)
+    # Adjust faction loyalty
+    for faction in settlement.factions:
+        if faction.name == "Nobility estate":
+            faction.loyalty -= 2
 
     remove_quest_message(quest.name)
     game_stats.quest_message_index = None
     game_stats.quest_message_panel = None
     game_stats.event_panel_det = None
-    game_basic.update_new_tasks_status(the_settlement)
+    game_basic.update_new_tasks_status(settlement)
 
 
 def forrest_law_det():

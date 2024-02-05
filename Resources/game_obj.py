@@ -1,5 +1,5 @@
 ## Among Myth and Wonder
-
+## game_obj
 
 # realm objects - use Realm class
 game_powers = []

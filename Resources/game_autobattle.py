@@ -10,6 +10,8 @@ from Resources import game_basic
 from Resources import game_obj
 from Resources import algo_movement_range
 from Resources import game_pathfinding
+from Resources import common_selects
+from Resources import graphics_basic
 
 from Content import exploration_catalog
 from Content import reward_catalog
@@ -780,10 +782,7 @@ def after_battle_processing(attacker, defender, attacker_troops_power_level_list
 
     settlement = None
     if game_obj.game_map[defender.location].city_id:
-        for city in game_obj.game_cities:
-            if city.city_id == game_obj.game_map[defender.location].city_id:
-                settlement = city
-                break
+        settlement = common_selects.select_settlement_by_id(game_obj.game_map[defender.location].city_id)
 
     if settlement:
         if settlement.siege:
@@ -863,6 +862,14 @@ def after_battle_processing(attacker, defender, attacker_troops_power_level_list
         if attacker_no_troops_left:
             winner_alive = False
         game_basic.capture_settlement(settlement, attacker_realm.name, winner_alive, attacker)
+
+    # Update resource ribbon
+    if attacker_realm:
+        if attacker_realm.name == game_stats.player_power:
+            graphics_basic.prepare_resource_ribbon()
+    elif defender_realm:
+        if defender_realm.name == game_stats.player_power:
+            graphics_basic.prepare_resource_ribbon()
 
 
 def special_autobattle_result(winner_army):

@@ -1,4 +1,4 @@
-## Miracle battles
+## Among Myth and Wonder
 ## sf_game_board
 
 import math
@@ -9,6 +9,7 @@ import copy
 
 from Content import building_drafts
 from Resources import game_basic
+from Resources import graphics_basic
 from Resources import game_classes
 from Resources import game_obj
 from Resources import game_pathfinding
@@ -24,6 +25,7 @@ from Resources import algo_path_arrows
 from Resources import game_diplomacy
 from Resources import diplomacy_classes
 from Resources import game_autobattle
+from Resources import common_selects
 
 
 from Resources.Battle_Preparation import battle_map_generation
@@ -1875,12 +1877,8 @@ def build_new_structure(x_axis, y_axis):
             break
 
     if cost is not None:
-        treasury = None
-        for realm in game_obj.game_powers:
-            if realm.name == power_name:
-                treasury = realm.coffers
-                break
-        print(str(power_name) + ", treasury " + str(treasury) + ", cost " + str(cost))
+        treasury = common_selects.select_treasury_by_realm_name(power_name)
+        # print(str(power_name) + ", treasury " + str(treasury) + ", cost " + str(cost))
         if algo_building.check_available_resources(treasury, cost) \
                 and the_plot.upgrade.fulfilled_conditions:
             algo_building.consume_constructions_materials(treasury, cost, the_settlement)
@@ -1888,6 +1886,8 @@ def build_new_structure(x_axis, y_axis):
 
             click_sound = pygame.mixer.Sound("Sound/Interface/mining.wav")
             click_sound.play()
+
+            graphics_basic.prepare_resource_ribbon()
 
 
 def show_building_upgrade_information(x_axis, y_axis):
@@ -1964,11 +1964,7 @@ def hire_regiment():
     if game_stats.unit_for_hire is not None:
         permit_unit_creation = True
 
-    settlement = None
-    for city in game_obj.game_cities:
-        if city.city_id == game_stats.selected_settlement:
-            settlement = city
-            break
+    settlement = common_selects.select_settlement_by_id(game_stats.selected_settlement)
 
     # Index of settlement's tile in map list
     TileNum = settlement.location
@@ -2009,6 +2005,7 @@ def hire_regiment():
                             game_stats.enough_resources_to_pay = game_basic.enough_resources_to_hire(game_stats.rw_object.name,
                                                                                                      settlement)
                             # game_basic.enough_resources_to_hire()
+                            graphics_basic.prepare_resource_ribbon()
                             break
                 break
 
@@ -2081,21 +2078,13 @@ def hire_hero():
 
     print("permit_hero_creation - " + str(permit_hero_creation))
 
-    settlement = None
-    for city in game_obj.game_cities:
-        if city.city_id == game_stats.selected_settlement:
-            settlement = city
-            break
+    settlement = common_selects.select_settlement_by_id(game_stats.selected_settlement)
 
     # Index of settlement's tile in map list
     TileNum = settlement.location
     print("hire_hero(): [x, y] - " + str(settlement.posxy) + "; location - " + str(settlement.location))
 
-    treasury = None
-    for realm in game_obj.game_powers:
-        if realm.name == settlement.owner:
-            treasury = realm.coffers
-            break
+    treasury = common_selects.select_treasury_by_realm_name(settlement.owner)
 
     print("enough_resources_to_pay - " + str(game_stats.enough_resources_to_pay))
     if not game_stats.enough_resources_to_pay:
@@ -2106,13 +2095,10 @@ def hire_hero():
     print("selected_tile posxy - " + str(game_obj.game_map[TileNum].posxy))
     print("game_map[TileNum].army_id - " + str(game_obj.game_map[TileNum].army_id))
     if game_obj.game_map[TileNum].army_id is not None:
-        the_army = None
-        for army in game_obj.game_armies:
-            if army.army_id == game_obj.game_map[TileNum].army_id:
-                the_army = army
-                if army.hero is not None:
-                    permit_hero_creation = False
-                    break
+        the_army = common_selects.select_army_by_id(game_obj.game_map[TileNum].army_id)
+
+        if the_army.hero is not None:
+            permit_hero_creation = False
 
         if permit_hero_creation:
             print("the_army.army_id - " + str(the_army.army_id))
@@ -2190,6 +2176,8 @@ def hire_hero():
                     for delete_res in treasury:
                         if res[0] == delete_res[0]:
                             treasury.remove(delete_res)
+
+            graphics_basic.prepare_resource_ribbon()
 
             # Update visuals
             update_gf_game_board.update_regiment_sprites()

@@ -1,4 +1,5 @@
 ## Among Myth and Wonder
+## sell_resources
 
 # Set of scripts for all kinds of population to define how they sell produced resources to inner market
 

@@ -4,6 +4,15 @@
 from Resources import game_obj
 
 
+def copy_nested_list(original):
+    # Function to help copy two-level lists (list of lists) to avoid weird bugs with references
+    copied_list = []
+    for i in original:
+        copied_list.append(list(i))
+
+    return copied_list
+
+
 def select_settlement_by_id(given_settlement_id):
     selected_settlement = None
     for settlement in game_obj.game_cities:
@@ -42,3 +51,13 @@ def select_army_role_by_id(realm, given_army_id):
             break
 
     return selected_role
+
+
+def select_treasury_by_realm_name(realm_name):
+    selected_treasury = None
+    for realm in game_obj.game_powers:
+        if realm.name == realm_name:
+            selected_treasury = realm.coffers
+            break
+
+    return selected_treasury

@@ -26,6 +26,26 @@ WhiteColor = (255, 255, 255)
 def update_misc_sprites():
     game_stats.gf_misc_img_dict = {}
 
+    # Background - grey granite 559 x 30
+    misc_img = pygame.image.load('img/Icons/grey_granite_background_559_30.png').convert_alpha()
+    misc_img.set_colorkey(WhiteColor)
+    game_stats.gf_misc_img_dict["Icons/grey_granite_background_559_30"] = misc_img
+
+    # Background - matte grey granite 559 x 30
+    misc_img = pygame.image.load('img/Icons/matte_grey_granite_background_559_30.png').convert_alpha()
+    misc_img.set_colorkey(WhiteColor)
+    game_stats.gf_misc_img_dict["Icons/matte_grey_granite_background_559_30"] = misc_img
+
+    # Background - matte dark-grey granite 559 x 30
+    misc_img = pygame.image.load('img/Icons/matte_dark-grey_granite_background_559_30.png').convert_alpha()
+    misc_img.set_colorkey(WhiteColor)
+    game_stats.gf_misc_img_dict["Icons/matte_dark-grey_granite_background_559_30"] = misc_img
+
+    # Background - grey 559 x 30
+    misc_img = pygame.image.load('img/Icons/grey_background_559_30.png').convert_alpha()
+    misc_img.set_colorkey(WhiteColor)
+    game_stats.gf_misc_img_dict["Icons/grey_background_559_30"] = misc_img
+
     # Icon - hourglass false
     misc_img = pygame.image.load('img/Icons/hourglass_false.png').convert_alpha()
     misc_img.set_colorkey(WhiteColor)

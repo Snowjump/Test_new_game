@@ -1,4 +1,4 @@
-## Miracle battles
+## Among Myth and Wonder
 ## sf_battle_editor
 
 import copy
@@ -658,6 +658,13 @@ def terrain_brush_click():
 
             # Update visuals
             update_gf_level_editor.add_terrain_sprites(TileNum)
+
+            TileObj = game_stats.level_map[TileNum]
+            if TileObj.lot:
+                if TileObj.lot.obj_typ == "Obstacle":
+                    update_gf_level_editor.add_obstacle_sprites(TileObj,
+                                                                TileObj.lot.obj_name,
+                                                                TileObj.lot.img_path)
 
 
 def Earthen_road_but():

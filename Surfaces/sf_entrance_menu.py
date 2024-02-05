@@ -47,16 +47,16 @@ def skirmish_menu_but():
 
     game_stats.level_index = 0
     game_stats.levels_list = glob.glob("Levels/Skirmish/*.dat")
-    print("1 level_list: " + str(game_stats.levels_list))
-    for line in game_stats.levels_list:
-        print(str(line))
-        line = str(line[16:-4])
-        print(str(line))
-    print("2 level_list: " + str(game_stats.levels_list))
+    # print("1 level_list: " + str(game_stats.levels_list))
+    # for line in game_stats.levels_list:
+        # print(str(line))
+        # line = str(line[16:-4])
+        # print(str(line))
+    # print("2/vel_list: " + str(game_stats.levels_list))
     game_stats.levels_list = [w.replace(w, w[16:-4]) for w in game_stats.levels_list]
-    print("3 level_list: " + str(game_stats.levels_list))
-    for line in game_stats.levels_list:
-        print(str(line))
+    # print("3 level_list: " + str(game_stats.levels_list))
+    # for line in game_stats.levels_list:
+        # print(str(line))
 
     start_new_level.gather_level_information("Skirmish", game_stats.levels_list[game_stats.level_index])
 
