@@ -8,4 +8,6 @@ resource_ribbon = []
 
 # Temporary
 # Contains Panel object
-resource_ribbon_panel = None
+# resource_ribbon_panel = None
+game_board_objects = []
+

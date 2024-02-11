@@ -1,4 +1,4 @@
-## Miracle battles
+## Among Myth and Wonder
 ## sf_skirmish_menu
 
 import sys, pygame
@@ -68,7 +68,7 @@ def start_but():
     game_stats.screen_to_draw = "game_board_screen"
     game_stats.start_level_selected_realm = None
 
-    graphics_basic.prepare_resource_ribbon()
+    graphics_basic.init_game_board_graphics()
 
     click_sound = pygame.mixer.Sound("Sound/Interface/Abstract1.ogg")
     click_sound.play()

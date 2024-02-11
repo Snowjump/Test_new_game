@@ -21,7 +21,7 @@ class Resource_Ribbon(graphics_classes.Panel):
     def draw_ribbon_background(self, screen):
         # print(self.name + " draw_ribbon_background")
         # pygame.draw.polygon(screen, MainMenuColorDark1, [[41, 0], [600, 0], [600, 30], [41, 30]])
-        background_img = game_stats.gf_misc_img_dict["Icons/grey_background_559_30"]
+        background_img = game_stats.gf_misc_img_dict["Icons/grey_background_559_32"]
         screen.blit(background_img, (41, 0))
 
     def draw_resources(self, screen):

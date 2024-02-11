@@ -9,6 +9,7 @@ import math
 from Content.production_catalog import *
 
 from Resources import common_selects
+from Resources import game_basic
 
 
 def add_resource(r_pops, goods, raw_material, extra_material, additional_amount, tax,
@@ -173,36 +174,34 @@ def add_resource(r_pops, goods, raw_material, extra_material, additional_amount,
         # print(str(tax) + " to put into treasury " + str(realm_treasury))
         for res in tax:
             # Treasury
-            if len(realm_treasury) == 0:
-                realm_treasury.append([str(res[0]), math.ceil(int(res[1]) * float(lowest_material))])
-            else:
-                added_true = False
-                for abc in realm_treasury:
-                    # print(str(abc[0]) + " - " + str(abc[1]))
-                    if abc[0] == str(res[0]) :
-                        abc[1] += math.ceil(int(res[1]) * float(lowest_material))
-                        added_true = True
-                        # print(str(abc[0]) + " become " + str(abc[1]))
-
-                if not added_true:
-                    realm_treasury.append([str(res[0]), math.ceil(int(res[1]) * float(lowest_material))])
-                    # print("After taxing new resource " + str(realm_treasury))
+            game_basic.simple_add_resources(realm_treasury, [res])
+            # if len(realm_treasury) == 0:
+            #     realm_treasury.append([str(res[0]), math.ceil(int(res[1]) * float(lowest_material))])
+            # else:
+            #     added_true = False
+            #     for abc in realm_treasury:
+            #         # print(str(abc[0]) + " - " + str(abc[1]))
+            #         if abc[0] == str(res[0]) :
+            #             abc[1] += math.ceil(int(res[1]) * float(lowest_material))
+            #             added_true = True
+            #             # print(str(abc[0]) + " become " + str(abc[1]))
+            #
+            #     if not added_true:
+            #         realm_treasury.append([str(res[0]), math.ceil(int(res[1]) * float(lowest_material))])
+            #         # print("After taxing new resource " + str(realm_treasury))
 
             # Fees records
-            if len(records_local_fees) == 0:
-                records_local_fees.append([str(res[0]), math.ceil(int(res[1]) * float(lowest_material))])
-            else:
-                added_true = False
-                for abc in records_local_fees:
-                    # print(str(abc[0]) + " - " + str(abc[1]))
-                    if abc[0] == str(res[0]) :
-                        abc[1] += math.ceil(int(res[1]) * float(lowest_material))
-                        added_true = True
-                        # print(str(abc[0]) + " become " + str(abc[1]))
+            added_true = False
+            for abc in records_local_fees:
+                # print(str(abc[0]) + " - " + str(abc[1]))
+                if abc[0] == str(res[0]) :
+                    abc[1] += math.ceil(int(res[1]) * float(lowest_material))
+                    added_true = True
+                    # print(str(abc[0]) + " become " + str(abc[1]))
 
-                if not added_true:
-                    records_local_fees.append([str(res[0]), math.ceil(int(res[1]) * float(lowest_material))])
-                    # print("After taxing new resource " + str(records_local_fees))
+            if not added_true:
+                records_local_fees.append([str(res[0]), math.ceil(int(res[1]) * float(lowest_material))])
+                # print("After taxing new resource " + str(records_local_fees))
 
 
 def apply_effects(PM_pops, building_plots, goods, taxes):

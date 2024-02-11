@@ -1635,7 +1635,7 @@ def end_battle_but():
     game_stats.attacker_army_id = 0
     game_stats.defender_army_id = 0
 
-    graphics_basic.prepare_resource_ribbon()
+    graphics_basic.init_game_board_graphics()
 
     # Update visuals
     print("end_battle_but - update_visuals")

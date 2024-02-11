@@ -2071,48 +2071,30 @@ def game_board_screen(screen):
     text_NewGame1 = font20.render("Save", True, TitleText)
     screen.blit(text_NewGame1, [1070, 10])
 
-    # Next turn - hourglass icon
-    # print("Hourglass")
-    if not game_stats.turn_hourglass:
-        hourglass_img = game_stats.gf_misc_img_dict["Icons/hourglass_false"]
-    else:
-        hourglass_img = game_stats.gf_misc_img_dict["Icons/hourglass_true"]
-    screen.blit(hourglass_img, (1005, 5))
-
-    # Calendar
-    pygame.draw.polygon(screen, MainMenuColorDark1, [[910, 7], [1000, 7], [1000, 55], [910, 55]])
-    text_NewGame2 = font20.render("Year", True, TitleText)
-    screen.blit(text_NewGame2, [913, 8])
-    text_NewGame2 = font20.render(str(game_stats.game_year), True, TitleText)
-    screen.blit(text_NewGame2, [980, 8])
-    text_NewGame2 = font20.render("Month", True, TitleText)
-    screen.blit(text_NewGame2, [913, 32])
-    text_NewGame2 = font20.render(str(game_stats.game_month), True, TitleText)
-    screen.blit(text_NewGame2, [980, 32])
-
-    # Left ribbon menu
-    pygame.draw.polygon(screen, MainMenuColorDark1, [[0, 0], [31, 0], [31, 119], [0, 119]])
-
-    # Button - realm
-    icon_img = game_stats.gf_misc_img_dict["Icons/crown"]
-    screen.blit(icon_img, (4, 4))
-
-    # Button - tasks
-    if game_stats.new_tasks:
-        icon_img = game_stats.gf_misc_img_dict["Icons/new_task_scroll"]
-        screen.blit(icon_img, (4, 29))
-    else:
-        icon_img = game_stats.gf_misc_img_dict["Icons/old_task_scroll"]
-        screen.blit(icon_img, (4, 29))
-
-    # Button - Diplomacy
-    icon_img = game_stats.gf_misc_img_dict["Icons/diplomacy"]
-    screen.blit(icon_img, (4, 54))
-
     # Top ribbon
-    # Temporary implementation
-    if graphics_obj.resource_ribbon_panel:
-        graphics_obj.resource_ribbon_panel.draw_panel(screen)
+    # Next turn - hourglass icon
+    # Calendar
+    for obj in graphics_obj.game_board_objects:
+        obj.draw_panel(screen)
+
+    # # Left ribbon menu
+    # pygame.draw.polygon(screen, MainMenuColorDark1, [[0, 0], [31, 0], [31, 119], [0, 119]])
+
+    # # Button - realm
+    # icon_img = game_stats.gf_misc_img_dict["Icons/crown"]
+    # screen.blit(icon_img, (4, 4))
+    #
+    # # Button - tasks
+    # if game_stats.new_tasks:
+    #     icon_img = game_stats.gf_misc_img_dict["Icons/new_task_scroll"]
+    #     screen.blit(icon_img, (4, 29))
+    # else:
+    #     icon_img = game_stats.gf_misc_img_dict["Icons/old_task_scroll"]
+    #     screen.blit(icon_img, (4, 29))
+    #
+    # # Button - Diplomacy
+    # icon_img = game_stats.gf_misc_img_dict["Icons/diplomacy"]
+    # screen.blit(icon_img, (4, 54))
 
     # War symbols
     for num in range(0, 4):

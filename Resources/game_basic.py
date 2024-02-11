@@ -1386,11 +1386,7 @@ def realm_payment(realm_source, cost_list):
     # realm_source - either "settlement" or name of realm
     treasury = None
     if realm_source == "settlement":
-        settlement = None
-        for city in game_obj.game_cities:
-            if city.city_id == game_stats.selected_settlement:
-                settlement = city
-                break
+        settlement = common_selects.select_settlement_by_id(game_stats.selected_settlement)
 
         for realm in game_obj.game_powers:
             if realm.name == settlement.owner:
@@ -1425,16 +1421,11 @@ def realm_payment(realm_source, cost_list):
 
 
 def realm_income(realm_source, earnings_list):
-    # When realm earn som resources
+    # When realm receive some resources
     # realm_source - either "settlement" or name of realm
-
     treasury = None
     if realm_source == "settlement":
-        settlement = None
-        for city in game_obj.game_cities:
-            if city.city_id == game_stats.selected_settlement:
-                settlement = city
-                break
+        settlement = common_selects.select_settlement_by_id(game_stats.selected_settlement)
 
         for realm in game_obj.game_powers:
             if realm.name == settlement.owner:
@@ -1449,18 +1440,19 @@ def realm_income(realm_source, earnings_list):
 
     # Accumulate resources
     print("1) treasury: " + str(treasury))
-    for earning in earnings_list:
-        no_resource = True
-        for res in treasury:
-            print("res - " + str(res))
-
-            if earning[0] == res[0]:
-                res[1] += earning[1]
-                no_resource = False
-                break
-
-        if no_resource:
-            treasury.append([str(earning[0]), int(earning[1])])
+    simple_add_resources(treasury, earnings_list)
+    # for earning in earnings_list:
+    #     no_resource = True
+    #     for res in treasury:
+    #         # print("res - " + str(res))
+    #
+    #         if earning[0] == res[0]:
+    #             res[1] += earning[1]
+    #             no_resource = False
+    #             break
+    #
+    #     if no_resource:
+    #         treasury.append([str(earning[0]), int(earning[1])])
     print("2) treasury: " + str(treasury))
 
     if realm_source == game_stats.player_power:

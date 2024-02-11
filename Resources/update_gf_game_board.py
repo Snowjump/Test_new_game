@@ -26,6 +26,26 @@ WhiteColor = (255, 255, 255)
 def update_misc_sprites():
     game_stats.gf_misc_img_dict = {}
 
+    # Background - grey 32 x 120
+    misc_img = pygame.image.load('img/Icons/grey_background_32_120.png').convert_alpha()
+    misc_img.set_colorkey(WhiteColor)
+    game_stats.gf_misc_img_dict["Icons/grey_background_32_120"] = misc_img
+
+    # Background - grey 90 x 48
+    misc_img = pygame.image.load('img/Icons/grey_background_90_48.png').convert_alpha()
+    misc_img.set_colorkey(WhiteColor)
+    game_stats.gf_misc_img_dict["Icons/grey_background_90_48"] = misc_img
+
+    # Background - grey 559 x 32
+    misc_img = pygame.image.load('img/Icons/grey_background_559_32.png').convert_alpha()
+    misc_img.set_colorkey(WhiteColor)
+    game_stats.gf_misc_img_dict["Icons/grey_background_559_32"] = misc_img
+
+    # Background - light grey 559 x 32
+    misc_img = pygame.image.load('img/Icons/light_grey_background_559_32.png').convert_alpha()
+    misc_img.set_colorkey(WhiteColor)
+    game_stats.gf_misc_img_dict["Icons/light_grey_background_559_32"] = misc_img
+
     # Background - grey granite 559 x 30
     misc_img = pygame.image.load('img/Icons/grey_granite_background_559_30.png').convert_alpha()
     misc_img.set_colorkey(WhiteColor)

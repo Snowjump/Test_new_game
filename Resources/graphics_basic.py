@@ -12,6 +12,33 @@ from Resources import graphics_classes
 from Content import production_methods
 
 from Screens.Game_Board_Windows import panel_resource_ribbon
+from Screens.Game_Board_Windows import panel_calendar
+from Screens.Game_Board_Windows import panel_left_ribbon_menu
+
+
+def init_game_board_graphics():
+    prepare_resource_ribbon()
+    prepare_calendar()
+    prepare_left_ribbon_menu()
+
+
+def refresh_graphics_object(new_object):
+    for obj in graphics_obj.game_board_objects:
+        if obj.name == new_object.name:
+            graphics_obj.game_board_objects.remove(obj)
+            break
+
+    graphics_obj.game_board_objects.append(new_object)
+
+
+def prepare_calendar():
+    new_object = panel_calendar.Calendar_Panel("Calendar")
+    refresh_graphics_object(new_object)
+
+
+def prepare_left_ribbon_menu():
+    new_object = panel_left_ribbon_menu.Left_Ribbon_Menu("Left ribbon menu")
+    refresh_graphics_object(new_object)
 
 
 def prepare_resource_ribbon():
@@ -62,7 +89,8 @@ def prepare_resource_ribbon():
             graphics_obj.resource_ribbon.append(new_item)
 
     new_object = panel_resource_ribbon.Resource_Ribbon("Resource ribbon")
-    graphics_obj.resource_ribbon_panel = new_object
+    # graphics_obj.resource_ribbon_panel = new_object
+    refresh_graphics_object(new_object)
 
 
 def estimate_taxes_by_pop(pops, building_plots, facility, total_taxes):
