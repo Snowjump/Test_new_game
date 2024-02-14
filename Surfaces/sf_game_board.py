@@ -794,52 +794,51 @@ def game_board_surface_m1(position):
                         game_stats.selected_army = int(game_obj.game_map[TileNum].army_id)
                         game_stats.details_panel_mode = "army lower panel"
 
-                        for army in game_obj.game_armies:
-                            if army.army_id == game_stats.selected_army:
-                                if army.owner == game_stats.player_power:
-                                    if len(army.route) > 0:
-                                        route = list(army.route)
-                                        route.insert(0, list(army.posxy))
-                                        algo_path_arrows.construct_path(army.army_id, route)
+                        army = common_selects.select_army_by_id(game_stats.selected_army)
+                        if army.owner == game_stats.player_power:
+                            if len(army.route) > 0:
+                                route = list(army.route)
+                                route.insert(0, list(army.posxy))
+                                algo_path_arrows.construct_path(army.army_id, route)
 
-                                    if army.action == "Besieging":
-                                        game_stats.attacker_army_id = int(army.army_id)
-                                        game_stats.attacker_realm = str(army.owner)
+                            if army.action == "Besieging":
+                                game_stats.attacker_army_id = int(army.army_id)
+                                game_stats.attacker_realm = str(army.owner)
 
-                                        settlement, defender = game_basic.find_siege(army)
+                                settlement, defender = game_basic.find_siege(army)
 
-                                        if defender is not None:
-                                            game_stats.defender_army_id = int(defender.army_id)
-                                            game_stats.defender_realm = str(defender.owner)
+                                if defender is not None:
+                                    game_stats.defender_army_id = int(defender.army_id)
+                                    game_stats.defender_realm = str(defender.owner)
 
-                                        game_stats.assault_allowed = True
-                                        for defensive_structure in settlement.defences:
-                                            if defensive_structure.provide_wall:
-                                                game_stats.assault_allowed = False
-                                                for def_object in defensive_structure.def_objects:
-                                                    if def_object.state in ["Broken", "Opened"]:
-                                                        game_stats.assault_allowed = True
-                                                        break
-
-                                        # Check available siege equipment
-                                        if not game_stats.assault_allowed:
-                                            if settlement.siege.siege_towers_ready + \
-                                                    settlement.siege.battering_rams_ready > 0:
+                                game_stats.assault_allowed = True
+                                for defensive_structure in settlement.defences:
+                                    if defensive_structure.provide_wall:
+                                        game_stats.assault_allowed = False
+                                        for def_object in defensive_structure.def_objects:
+                                            if def_object.state in ["Broken", "Opened"]:
                                                 game_stats.assault_allowed = True
-                                                game_stats.siege_assault = True
+                                                break
 
-                                        game_stats.blockaded_settlement_name = str(settlement.name)
-                                        game_stats.selected_settlement = settlement.city_id
-                                        game_stats.besieged_by_human = True
+                                # Check available siege equipment
+                                if not game_stats.assault_allowed:
+                                    if settlement.siege.siege_towers_ready + \
+                                            settlement.siege.battering_rams_ready > 0:
+                                        game_stats.assault_allowed = True
+                                        game_stats.siege_assault = True
 
-                                        game_stats.game_board_panel = "settlement blockade panel"
+                                game_stats.blockaded_settlement_name = str(settlement.name)
+                                game_stats.selected_settlement = settlement.city_id
+                                game_stats.besieged_by_human = True
 
-                                        # Update visuals
-                                        print("Update visuals - gf_misc_img_dict: " + str(game_stats.gf_misc_img_dict))
-                                        update_gf_game_board.update_regiment_sprites()
-                                        update_gf_game_board.open_settlement_building_sprites()
+                                game_stats.game_board_panel = "settlement blockade panel"
 
-                                    break
+                                # Update visuals
+                                print("Update visuals - gf_misc_img_dict: " + str(game_stats.gf_misc_img_dict))
+                                update_gf_game_board.update_regiment_sprites()
+                                update_gf_game_board.open_settlement_building_sprites()
+
+                        graphics_basic.prepare_army_panel()
 
                         # Update visuals
                         update_gf_game_board.update_regiment_sprites()
@@ -925,6 +924,8 @@ def game_board_surface_m3(position):
             game_stats.first_army_exchange_list = []
             game_stats.second_army_exchange_list = []
 
+            graphics_basic.remove_selected_objects()
+
             # Update visuals
             update_gf_game_board.remove_regiment_sprites()
             update_gf_game_board.remove_hero_sprites()
@@ -935,9 +936,12 @@ def game_board_surface_m3(position):
             game_stats.selected_settlement = -1
             game_stats.details_panel_mode = ""
 
+            graphics_basic.remove_selected_objects()
+
         # If no army selected, then pop up window will appear with information about selected tile
         # NOTE: maybe I need to rebuild this if segment
         elif not game_stats.info_tile or game_stats.info_tile != [int(x), int(y)]:
+            graphics_basic.remove_selected_objects()
             game_stats.selected_object = "Tile"
             game_stats.info_tile = [int(x), int(y)]
             game_stats.right_click_pos = [int(position[0]), int(position[1])]
@@ -957,17 +961,18 @@ def game_board_surface_m3(position):
                 game_stats.tile_ownership = "Wild lands"
                 game_stats.tile_flag_colors = []
             else:
-                for settlement in game_obj.game_cities:
-                    if settlement.city_id == game_obj.game_map[TileNum].city_id:
-                        if settlement.owner == "Neutral":
-                            # This tile belongs to a nearby neutral settlement
-                            game_stats.tile_ownership = "Neutral lands"
-                        else:
-                            # Someone own this land
-                            game_stats.tile_ownership = str(settlement.owner)
-                            for realm in game_obj.game_powers:
-                                if realm.name == settlement.owner:
-                                    game_stats.tile_flag_colors = [str(realm.f_color), str(realm.s_color)]
+                settlement = common_selects.select_settlement_by_id(game_obj.game_map[TileNum].city_id)
+                if settlement.owner == "Neutral":
+                    # This tile belongs to a nearby neutral settlement
+                    game_stats.tile_ownership = "Neutral lands"
+                else:
+                    # Someone own this land
+                    game_stats.tile_ownership = str(settlement.owner)
+                    realm = common_selects.select_realm_by_name(settlement.owner)
+                    game_stats.tile_flag_colors = [str(realm.f_color), str(realm.s_color)]
+
+            graphics_basic.prepare_tile_obj_info_panel()
+
         else:
             # Right click on the same tile, therefore information screen should be closed
             game_stats.tile_ownership = "Wild lands"
@@ -978,6 +983,8 @@ def game_board_surface_m3(position):
             game_stats.i_p_index = 0
             game_stats.details_panel_mode = ""
             game_stats.right_click_city = -1
+
+            graphics_basic.remove_selected_objects()
 
 
 def exit_but():
@@ -1021,6 +1028,8 @@ def quest_log_but():
         game_stats.first_army_exchange_list = []
         game_stats.second_army_exchange_list = []
 
+        graphics_basic.remove_selected_objects()
+
         # Update visuals
         update_gf_game_board.update_settlement_misc_sprites()
 
@@ -1048,13 +1057,10 @@ def quest_log_but():
         game_stats.allocated_requested_goods_records = None
         game_stats.pops_details = None
 
-    for realm in game_obj.game_powers:
-        # print(str(realm.name))
-        # print(str(game_stats.player_power))
-        if realm.name == game_stats.player_power:
-            # print(str(treasury))
-            game_stats.selected_quest_messages = realm.quests_messages
-            break
+        graphics_basic.remove_selected_objects()
+
+    realm = common_selects.select_realm_by_name(game_stats.player_power)
+    game_stats.selected_quest_messages = realm.quests_messages
 
     game_stats.game_board_panel = "quest log panel"
     game_stats.quest_area = "Quest messages"
@@ -1311,6 +1317,8 @@ def encircle_but():
         game_stats.selected_settlement = -1
         game_stats.game_board_panel = ""
 
+        graphics_basic.remove_selected_objects()
+
         # Update visuals
         game_stats.gf_building_dict = {}
         if "Icons/paper_2_square_50_x_40" in game_stats.gf_misc_img_dict:
@@ -1520,11 +1528,7 @@ def cancel_building_battering_ram():
 
 def select_settlement():
     print("select_settlement()")
-    settlement = None
-    for city in game_obj.game_cities:
-        if city.city_id == game_stats.selected_settlement:
-            settlement = city
-            break
+    settlement = common_selects.select_settlement_by_id(game_stats.selected_settlement)
 
     if settlement.owner == game_stats.player_power and settlement.siege:
         # Player's settlement is under siege
@@ -1547,6 +1551,8 @@ def select_settlement():
         game_stats.building_rows_amount = max(list_of_rows)
         # print("list_of_rows - " + str(list_of_rows))
 
+        graphics_basic.prepare_settlement_info_panel()
+
         # Update visuals
         update_gf_game_board.update_regiment_sprites()
         update_gf_game_board.update_settlement_misc_sprites()
@@ -1568,10 +1574,9 @@ def open_blockade_panel(settlement):
 
     if game_obj.game_map[settlement.location].army_id:
         game_stats.defender_army_id = int(game_obj.game_map[settlement.location].army_id)
-        for army in game_obj.game_armies:
-            if army.army_id == game_obj.game_map[settlement.location].army_id:
-                game_stats.defender_realm = str(army.owner)
-                break
+        army = common_selects.select_army_by_id(game_obj.game_map[settlement.location].army_id)
+        game_stats.defender_realm = str(army.owner)
+
 
     # Update visuals
     update_gf_game_board.update_misc_sprites()
@@ -1613,48 +1618,39 @@ def close_settlement_panel_but():
 
 
 def next_turn_but():
-    for realm in game_obj.game_powers:
-        if realm.name == game_stats.player_power:
-            # if not game_stats.new_tasks:
-            #     print("game_stats.new_tasks: " + str(game_stats.new_tasks))
-            # if realm.diplomatic_messages:
-            #     print("diplomatic_messages: " + str(realm.diplomatic_messages))
-            if not game_stats.new_tasks and not realm.diplomatic_messages:
-                # Turn over hourglass icon
-                game_stats.turn_hourglass = True
+    realm = common_selects.select_realm_by_name(game_stats.player_power)
+    # if not game_stats.new_tasks:
+    #     print("game_stats.new_tasks: " + str(game_stats.new_tasks))
+    # if realm.diplomatic_messages:
+    #     print("diplomatic_messages: " + str(realm.diplomatic_messages))
+    if not game_stats.new_tasks and not realm.diplomatic_messages:
+        # Turn over hourglass icon
+        game_stats.turn_hourglass = True
 
-                realm.turn_completed = True
-                print(str(realm.name) + "'s turn is " + str(realm.turn_completed))
-            else:
-                # print("-> quest_log_but")
-                quest_log_but()
-            break
+        realm.turn_completed = True
+        print(str(realm.name) + "'s turn is " + str(realm.turn_completed))
+    else:
+        # print("-> quest_log_but")
+        quest_log_but()
 
 
 def select_stationed_army_but():
     TileObj = None
     TileNum = None
 
-    for settlement in game_obj.game_cities:
-        if settlement.city_id == game_stats.selected_settlement:
-            x2 = int(settlement.posxy[0])
-            y2 = int(settlement.posxy[1])
-            # x2 -= int(game_stats.pov_pos[0])
-            # y2 -= int(game_stats.pov_pos[1])
+    settlement = common_selects.select_settlement_by_id(game_stats.selected_settlement)
+    x2 = int(settlement.posxy[0])
+    y2 = int(settlement.posxy[1])
+    # x2 -= int(game_stats.pov_pos[0])
+    # y2 -= int(game_stats.pov_pos[1])
 
-            TileNum = (y2 - 1) * game_stats.cur_level_width + x2 - 1
-            TileObj = game_obj.game_map[TileNum]
-            break
+    TileNum = (y2 - 1) * game_stats.cur_level_width + x2 - 1
+    TileObj = game_obj.game_map[TileNum]
 
     print("TileObj.army_id - " + str(TileObj.army_id))
     if TileObj.army_id is not None:
         # Stationed army
-        army = None
-
-        for army_obj in game_obj.game_armies:
-            if army_obj.army_id == TileObj.army_id:
-                army = army_obj
-                break
+        army = common_selects.select_army_by_id(TileObj.army_id)
 
         if len(army.units) < 5:
             print("There is less then 5 regiments in army, can't operate outside of settlement")
@@ -1669,6 +1665,8 @@ def select_stationed_army_but():
             game_stats.details_panel_mode = "army lower panel"
             game_stats.right_window = ""
             game_stats.rw_object = None
+
+            graphics_basic.prepare_army_panel()
 
             # Update visuals
             img_list = ["Icons/building_icon", "Icons/recruiting_icon", "Icons/heroes_icon",
@@ -1837,11 +1835,7 @@ def plot_row_up():
 
 
 def plot_row_down():
-    settlement = None
-    for city in game_obj.game_cities:
-        if city.city_id == game_stats.selected_settlement:
-            settlement = city
-            break
+    settlement = common_selects.select_settlement_by_id(game_stats.selected_settlement)
 
     list_of_rows = []
     for plot in settlement.buildings:
@@ -1918,20 +1912,12 @@ def settlement_regiment_information():
         game_stats.right_window = "New regiment information"
 
     u = game_stats.rw_object
-    settlement = None
-    f_color = None
-    s_color = None
+    settlement = common_selects.select_settlement_by_id(game_stats.selected_settlement)
+    realm = common_selects.select_realm_by_name(settlement.owner)
+    f_color = realm.f_color
+    s_color = realm.s_color
     total_HP = int(len(u.crew) * u.base_HP)
     attack = u.attacks[0]
-
-    for city in game_obj.game_cities:
-        if city.city_id == game_stats.selected_settlement:
-            settlement = city
-
-    for realm in game_obj.game_powers:
-        if realm.name == settlement.owner:
-            f_color = realm.f_color
-            s_color = realm.s_color
 
     print("Morale - " + str(u.morale) + ", Leadership - " + str(u.leadership))
     game_stats.rw_unit_info = game_classes.Regiment_Info_Card(u.name, f_color, s_color, len(u.crew), total_HP, u.morale,
@@ -1988,26 +1974,24 @@ def hire_regiment():
         permit_unit_creation = False
 
     if permit_unit_creation:
-        for army in game_obj.game_armies:
-            if army.army_id == game_obj.game_map[TileNum].army_id:
-                if len(army.units) < 20:
-                    units_list = list(create_unit.LE_units_dict_by_alignment[settlement.alignment])
+        army = common_selects.select_army_by_id(game_obj.game_map[TileNum].army_id)
+        if len(army.units) < 20:
+            units_list = list(create_unit.LE_units_dict_by_alignment[settlement.alignment])
 
-                    for new_unit in units_list:
-                        if new_unit.name == game_stats.unit_for_hire.unit_name:
-                            army.units.append(copy.deepcopy(new_unit))
-                            print("Added to army " + str(army.army_id) + " new unit - " + new_unit.name)
-                            print("Img - " + new_unit.img)
-                            game_basic.establish_leader(army.army_id, "Game")
+            for new_unit in units_list:
+                if new_unit.name == game_stats.unit_for_hire.unit_name:
+                    army.units.append(copy.deepcopy(new_unit))
+                    print("Added to army " + str(army.army_id) + " new unit - " + new_unit.name)
+                    print("Img - " + new_unit.img)
+                    game_basic.establish_leader(army.army_id, "Game")
 
-                            game_stats.unit_for_hire.ready_units -= 1
-                            game_basic.realm_payment_for_object(game_stats.rw_object.name, settlement)
-                            game_stats.enough_resources_to_pay = game_basic.enough_resources_to_hire(game_stats.rw_object.name,
-                                                                                                     settlement)
-                            # game_basic.enough_resources_to_hire()
-                            graphics_basic.prepare_resource_ribbon()
-                            break
-                break
+                    game_stats.unit_for_hire.ready_units -= 1
+                    game_basic.realm_payment_for_object(game_stats.rw_object.name, settlement)
+                    game_stats.enough_resources_to_pay = game_basic.enough_resources_to_hire(game_stats.rw_object.name,
+                                                                                             settlement)
+                    # game_basic.enough_resources_to_hire()
+                    graphics_basic.prepare_resource_ribbon()
+                    break
 
 
 def new_hero_skill_tree():
@@ -2262,11 +2246,7 @@ def open_population_section():
 
 
 def up_pops_card_index():
-    settlement = None
-    for city in game_obj.game_cities:
-        if city.city_id == game_stats.selected_settlement:
-            settlement = city
-            break
+    settlement = common_selects.select_settlement_by_id(game_stats.selected_settlement)
 
     num = 0
     for pops in settlement.residency:
@@ -2289,11 +2269,7 @@ def up_pops_card_index():
 
 
 def down_pops_card_index():
-    settlement = None
-    for city in game_obj.game_cities:
-        if city.city_id == game_stats.selected_settlement:
-            settlement = city
-            break
+    settlement = common_selects.select_settlement_by_id(game_stats.selected_settlement)
 
     num = 0
     for pops in settlement.residency:
@@ -2314,11 +2290,7 @@ def down_pops_card_index():
 
 
 def up_faction_pops_index():
-    settlement = None
-    for city in game_obj.game_cities:
-        if city.city_id == game_stats.selected_settlement:
-            settlement = city
-            break
+    settlement = common_selects.select_settlement_by_id(game_stats.selected_settlement)
 
     if game_stats.faction_pops_index > 0:
         game_stats.faction_pops_index -= 1
@@ -2330,11 +2302,7 @@ def up_faction_pops_index():
 
 
 def down_faction_pops_index():
-    settlement = None
-    for city in game_obj.game_cities:
-        if city.city_id == game_stats.selected_settlement:
-            settlement = city
-            break
+    settlement = common_selects.select_settlement_by_id(game_stats.selected_settlement)
 
     if len(settlement.factions[game_stats.faction_screen_index].members) <= 6:
         game_stats.faction_pops_index = 0
@@ -2372,11 +2340,7 @@ def open_trade_routes_section():
 
 
 def select_pops(position):
-    settlement = None
-    for city in game_obj.game_cities:
-        if city.city_id == game_stats.selected_settlement:
-            settlement = city
-            break
+    settlement = common_selects.select_settlement_by_id(game_stats.selected_settlement)
 
     y_axis = position[1]
     y_axis -= 142
@@ -2426,25 +2390,22 @@ def open_hero_information():
 
     # Selected settlement
     elif game_stats.selected_settlement != -1:
-        for settlement in game_obj.game_cities:
-            if settlement.city_id == game_stats.selected_settlement:
-                x2 = int(settlement.posxy[0])
-                y2 = int(settlement.posxy[1])
-                TileNum = (y2 - 1) * game_stats.cur_level_width + x2 - 1
-                print("[x2, y2] - [" + str(x2) + ", " + str(y2) + "], TileNim - " + str(TileNum))
-                TileObj = game_obj.game_map[TileNum]
-                print("army_id - " + str(TileObj.army_id))
+        settlement = common_selects.select_settlement_by_id(game_stats.selected_settlement)
+        x2 = int(settlement.posxy[0])
+        y2 = int(settlement.posxy[1])
+        TileNum = (y2 - 1) * game_stats.cur_level_width + x2 - 1
+        print("[x2, y2] - [" + str(x2) + ", " + str(y2) + "], TileNim - " + str(TileNum))
+        TileObj = game_obj.game_map[TileNum]
+        print("army_id - " + str(TileObj.army_id))
 
-                for army in game_obj.game_armies:
-                    if army.army_id == TileObj.army_id:
-                        game_stats.rw_object = army.hero
-                        break
+        for army in game_obj.game_armies:
+            if army.army_id == TileObj.army_id:
+                game_stats.rw_object = army.hero
+                break
 
-                for realm in game_obj.game_powers:
-                    if realm.name == settlement.owner:
-                        game_stats.realm_artifact_collection = realm.artifact_collection
-                        break
-
+        for realm in game_obj.game_powers:
+            if realm.name == settlement.owner:
+                game_stats.realm_artifact_collection = realm.artifact_collection
                 break
 
     # Update visuals

@@ -1,4 +1,5 @@
-## Miracle battles
+## Among Myth and Wonder
+## exploration_catalog
 
 # Bonus catalog
 bonus_objects = ["Mythic monolith",

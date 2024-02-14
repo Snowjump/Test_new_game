@@ -1,11 +1,12 @@
 ## Among Myth and Wonder
+## det_settlement_buildings
 
 import math
 import pygame.draw
 import pygame.font
 
-from Resources import game_obj
 from Resources import game_stats
+from Resources import common_selects
 
 arrow_green = (0, 102, 0, 180)
 arrow_burgundy = (102, 0, 0, 180)
@@ -40,6 +41,8 @@ def draw_structures(screen, settlement):
     y2 = int(383 / game_stats.building_rows_amount * 4)
     pygame.draw.polygon(screen, RockTunel, [[615, y1], [634, y1], [634, y1 + y2], [615, y1 + y2]])
     pygame.draw.polygon(screen, LineMainMenuColor1, [[615, y1], [634, y1], [634, y1 + y2], [615, y1 + y2]], 2)
+
+    treasury = common_selects.select_treasury_by_realm_name(settlement.owner)
 
     for plot in settlement.buildings:
         xy = plot.screen_position
@@ -81,16 +84,10 @@ def draw_structures(screen, settlement):
                                 1)
 
             # Upgrade icon in lower part of structure card
-            treasury = None
-            for realm in game_obj.game_powers:
-                if realm.name == settlement.owner:
-                    treasury = realm.coffers
-                    break
-
             arrow_color = arrow_burgundy
             enough = True
 
-            if plot.upgrade is not None:
+            if plot.upgrade and treasury:
                 if len(treasury) > 0:
                     for res1 in plot.upgrade.construction_cost:
                         available = False

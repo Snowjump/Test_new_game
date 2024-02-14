@@ -1,5 +1,5 @@
 ## Among Myth and Wonder
-## graphics_basic
+    ## graphics_basic
 
 from Content.production_catalog import *
 
@@ -14,6 +14,9 @@ from Content import production_methods
 from Screens.Game_Board_Windows import panel_resource_ribbon
 from Screens.Game_Board_Windows import panel_calendar
 from Screens.Game_Board_Windows import panel_left_ribbon_menu
+from Screens.Game_Board_Windows import info_panel_army
+from Screens.Game_Board_Windows import info_panel_settlement
+from Screens.Game_Board_Windows import info_panel_tile_obj
 
 
 def init_game_board_graphics():
@@ -29,6 +32,21 @@ def refresh_graphics_object(new_object):
             break
 
     graphics_obj.game_board_objects.append(new_object)
+
+
+def remove_specific_objects(names_of_objects):
+    for name in names_of_objects:
+        for obj in graphics_obj.game_board_objects:
+            if obj.name == name:
+                graphics_obj.game_board_objects.remove(obj)
+                break
+
+
+def remove_selected_objects():
+    list_of_names = ["Info panel army",
+                     "Info panel settlement",
+                     "Info panel tile object"]
+    remove_specific_objects(list_of_names)
 
 
 def prepare_calendar():
@@ -134,3 +152,18 @@ def estimate_expenses(total_expenses):
                             break
                     if add_new_resource:
                         total_expenses.append([str(upkeep[0]), int(upkeep[1] * len(unit.crew))])
+
+
+def prepare_army_panel():
+    new_object = info_panel_army.Army_Panel("Info panel army")
+    refresh_graphics_object(new_object)
+
+
+def prepare_settlement_info_panel():
+    new_object = info_panel_settlement.Settlement_Info_Panel("Info panel settlement")
+    refresh_graphics_object(new_object)
+
+
+def prepare_tile_obj_info_panel():
+    new_object = info_panel_tile_obj.Tile_Obj_Panel("Info panel tile object")
+    refresh_graphics_object(new_object)

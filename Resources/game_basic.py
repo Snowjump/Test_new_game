@@ -84,11 +84,7 @@ def open_tiles(condition, the_army, location, next_point, own_realm):
     explored_cities = []  # IDs
     explored_armies = []  # IDs
 
-    the_role = None
-    for role in own_realm.AI_cogs.army_roles:
-        if role.army_id == the_army.army_id:
-            the_role = role.army_role
-            break
+    the_role = common_selects.select_army_role_by_id(own_realm, the_army.army_id)
 
     if condition == "Army":
         targets = []
@@ -128,27 +124,26 @@ def open_tiles(condition, the_army, location, next_point, own_realm):
                                                                 own_realm.AI_cogs.exploration_targets)
 
     # Update contacts if met new realms
-    for settlement in game_obj.game_cities:
-        if settlement.city_id in explored_cities:
-            if settlement.owner != own_realm.name:
-                if settlement.owner not in own_realm.contacts:
-                    own_realm.contacts.append(str(settlement.owner))
-                    for contacted_realm in game_obj.game_powers:
-                        if contacted_realm.name == settlement.owner:
-                            if own_realm.name not in contacted_realm.contacts:
-                                contacted_realm.contacts.append(str(own_realm.name))
-                            break
+    if explored_cities:
+        for settlement in game_obj.game_cities:
+            if settlement.city_id in explored_cities:
+                if settlement.owner not in [own_realm.name, "Neutral"]:
+                    if settlement.owner not in own_realm.contacts:
+                        own_realm.contacts.append(str(settlement.owner))
+                        contacted_realm = common_selects.select_realm_by_name(settlement.owner)
+                        if own_realm.name not in contacted_realm.contacts:
+                            contacted_realm.contacts.append(str(own_realm.name))
 
-    for army in game_obj.game_armies:
-        if army.army_id in explored_armies:
-            if army.owner != own_realm.name:
-                if army.owner not in own_realm.contacts:
-                    own_realm.contacts.append(str(army.owner))
-                    for contacted_realm in game_obj.game_powers:
-                        if contacted_realm.name == army.owner:
-                            if own_realm.name not in contacted_realm.contacts:
-                                contacted_realm.contacts.append(str(own_realm.name))
-                            break
+    if explored_armies:
+        for army in game_obj.game_armies:
+            if army.army_id in explored_armies:
+                if army.owner not in [own_realm.name, "Neutral"]:
+                    if army.owner not in own_realm.contacts:
+                        # print("Explored army’s realm name - " + army.owner)
+                        own_realm.contacts.append(str(army.owner))
+                        contacted_realm = common_selects.select_realm_by_name(army.owner)
+                        if own_realm.name not in contacted_realm.contacts:
+                            contacted_realm.contacts.append(str(own_realm.name))
 
 
 def advance_time():
@@ -369,25 +364,22 @@ def turn_end():
                 siege_warfare.advance_siege(settlement, settlement.siege)
 
         if game_stats.game_board_panel == "settlement blockade panel":
-            for army in game_obj.game_armies:
-                if army.army_id == game_stats.selected_army:
-                    settlement, defender = find_siege(army)
+            army = common_selects.select_army_by_id(game_stats.selected_army)
+            settlement, defender = find_siege(army)
 
-                    game_stats.assault_allowed = True
-                    for defensive_structure in settlement.defences:
-                        if defensive_structure.provide_wall:
-                            game_stats.assault_allowed = False
-                            for def_object in defensive_structure.def_objects:
-                                if def_object.state in ["Broken", "Opened"]:
-                                    game_stats.assault_allowed = True
-                                    break
-
-                    # Check available siege equipment
-                    if not game_stats.assault_allowed:
-                        if settlement.siege.siege_towers_ready + settlement.siege.battering_rams_ready > 0:
+            game_stats.assault_allowed = True
+            for defensive_structure in settlement.defences:
+                if defensive_structure.provide_wall:
+                    game_stats.assault_allowed = False
+                    for def_object in defensive_structure.def_objects:
+                        if def_object.state in ["Broken", "Opened"]:
                             game_stats.assault_allowed = True
+                            break
 
-                    break
+            # Check available siege equipment
+            if not game_stats.assault_allowed:
+                if settlement.siege.siege_towers_ready + settlement.siege.battering_rams_ready > 0:
+                    game_stats.assault_allowed = True
 
         # Advance war
         for war in game_obj.game_wars:
@@ -569,6 +561,8 @@ def movement_action(army):
                                     game_stats.game_board_panel = "settlement panel"
                                     game_stats.details_panel_mode = "settlement lower panel"
                                     algo_building.check_requirements()
+                                    graphics_basic.remove_selected_objects()
+                                    graphics_basic.prepare_settlement_info_panel()
 
                                     # Update visuals
                                     update_gf_game_board.update_settlement_misc_sprites()
@@ -606,6 +600,8 @@ def movement_action(army):
                                     game_stats.game_board_panel = "settlement panel"
                                     game_stats.details_panel_mode = "settlement lower panel"
                                     algo_building.check_requirements()
+                                    graphics_basic.remove_selected_objects()
+                                    graphics_basic.prepare_settlement_info_panel()
 
                                     list_of_rows = []
                                     for plot in settlement.buildings:
@@ -650,6 +646,8 @@ def movement_action(army):
                                 game_stats.game_board_panel = "settlement panel"
                                 game_stats.details_panel_mode = "settlement lower panel"
                                 algo_building.check_requirements()
+                                graphics_basic.remove_selected_objects()
+                                graphics_basic.prepare_settlement_info_panel()
 
                                 # Update visuals
                                 update_gf_game_board.update_settlement_misc_sprites()
@@ -691,6 +689,8 @@ def movement_action(army):
                                         game_stats.game_board_panel = "settlement panel"
                                         game_stats.details_panel_mode = "settlement lower panel"
                                         algo_building.check_requirements()
+                                        graphics_basic.remove_selected_objects()
+                                        graphics_basic.prepare_settlement_info_panel()
 
                                         # Update visuals
                                         update_gf_game_board.update_settlement_misc_sprites()
@@ -729,6 +729,8 @@ def movement_action(army):
                                     game_stats.game_board_panel = "settlement panel"
                                     game_stats.details_panel_mode = "settlement lower panel"
                                     algo_building.check_requirements()
+                                    graphics_basic.remove_selected_objects()
+                                    graphics_basic.prepare_settlement_info_panel()
 
                                     # Update visuals
                                     update_gf_game_board.update_settlement_misc_sprites()

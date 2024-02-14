@@ -1,4 +1,5 @@
-## Miracle battles
+## Among Myth and Wonder
+## exploration_objs_replenishment
 
 from Content import exploration_catalog
 from Content import lair_army_catalog
@@ -6,6 +7,7 @@ from Content import lair_army_catalog
 from Resources import game_obj
 from Resources import game_stats
 from Resources import game_classes
+from Resources import common_selects
 
 
 def replenish_objects():
@@ -15,8 +17,8 @@ def replenish_objects():
                 if TileObj.lot.obj_typ in exploration_catalog.exploration_objects_groups_cat:
                     fac = groups_cat[TileObj.lot.obj_typ]
                     fac[TileObj.lot.obj_name](TileObj.lot)
-                    print(TileObj.lot.obj_name + " - need_replenishment is " +
-                          str(TileObj.lot.properties.need_replenishment))
+                    # print(TileObj.lot.obj_name + " at " + str(TileObj.posxy) + " - need_replenishment is " +
+                    #       str(TileObj.lot.properties.need_replenishment))
 
 
 def replenish_mythic_monolith(lot):
@@ -84,19 +86,13 @@ def replenish_lair_with_army(lot):
 
                 lot.properties.army_id = int(game_stats.army_id_counter)
 
-                for army in game_obj.game_armies:
-                    if army.army_id == lot.properties.army_id:
-                        lair_army_catalog.lair_dictionary[lot.obj_name](army.units)
-
-                        break
+                army = common_selects.select_army_by_id(lot.properties.army_id)
+                lair_army_catalog.lair_dictionary[lot.obj_name](army.units)
 
             else:
-                for army in game_obj.game_armies:
-                    if army.army_id == lot.properties.army_id:
-                        army.units = []
-                        lair_army_catalog.lair_dictionary[lot.obj_name](army.units)
-
-                        break
+                army = common_selects.select_army_by_id(lot.properties.army_id)
+                army.units = []
+                lair_army_catalog.lair_dictionary[lot.obj_name](army.units)
 
 
 bonus_scripts = {"Mythic monolith" : replenish_mythic_monolith,

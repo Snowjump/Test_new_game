@@ -19,11 +19,11 @@ fpsClock = pygame.time.Clock()
 # display constants
 size = width, height = game_stats.game_window_width, game_stats.game_window_height
 
-print("test1")
+# print("test1")
 ## screen_to_draw = "main_menu_screen"
 game_stats.screen_to_draw = "main_menu_screen"
 screen = (0, 0)
-print("test2")
+# print("test2")
 
 # # mouse constants
 # mouse_button1_pressed = False

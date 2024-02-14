@@ -7,6 +7,7 @@ import pygame.draw
 import pygame.font
 
 from Screens.colors_catalog import *
+from Screens.fonts_catalog import *
 
 from Content import alinement_info
 from Content import city_catalog
@@ -79,18 +80,8 @@ font14 = pygame.font.SysFont('timesnewroman', 14)
 font12 = pygame.font.SysFont('timesnewroman', 10)
 font8 = pygame.font.SysFont('arial', 8)
 
-arial_font16 = pygame.font.SysFont('arial', 16)
-arial_font14 = pygame.font.SysFont('arial', 14)
-
-# resources_icons = {"Florins": "resource_florins",
-#                    "Food": "resource_food",
-#                    "Wood": "resource_wood",
-#                    "Metals": "resource_metals",
-#                    "Stone": "resource_stone",
-#                    "Armament": "resource_armament",
-#                    "Tools": "resource_tools",
-#                    "Ingredients": "resource_ingredients"}
-
+# arial_font16 = pygame.font.SysFont('arial', 16)
+# arial_font14 = pygame.font.SysFont('arial', 14)
 
 def draw_rect_alpha(surface, color, rect):
     shape_surf = pygame.Surface(pygame.Rect(rect).size, pygame.SRCALPHA)
@@ -116,7 +107,7 @@ def draw_tiles(screen):
         #     if power.name == game_stats.perspective:
         #         map_to_display = power.known_map
 
-        for x in range(0, 27):
+        for x in range(0, 28):
             for y in range(0, math.ceil(game_stats.game_window_height / 48 + 1)):
                 num_x = x + game_stats.pov_pos[0]
                 num_y = y + game_stats.pov_pos[1]
@@ -220,7 +211,7 @@ def draw_tiles(screen):
         #
         #         if [TileObj.posxy[0], TileObj.posxy[1]] in game_stats.map_to_display:
 
-        for x in range(0, 27):
+        for x in range(0, 28):
             for y in range(0, math.ceil(game_stats.game_window_height / 48 + 1)):
                 num_x = x + game_stats.pov_pos[0]
                 num_y = y + game_stats.pov_pos[1]
@@ -234,72 +225,70 @@ def draw_tiles(screen):
                         # Cities
                         if TileObj.lot is not None:
                             if TileObj.lot == "City":
-                                for city in game_obj.game_cities:
-                                    if city.city_id == TileObj.city_id:
-                                        # print("City")
-                                        # Previous code
-                                        # city_img = pygame.image.load('img/Cities/' +
-                                        #                              city_catalog.city_cat[city.alignment] +
-                                        #                              '.png').convert_alpha()
-                                        # city_img.set_colorkey(WhiteColor)
-                                        # screen.blit(city_img, ((x - 1) * 48 + 1, (y - 1) * 48 + 1))
+                                city = common_selects.select_settlement_by_id(TileObj.city_id)
+                                # print("City")
+                                # Previous code
+                                # city_img = pygame.image.load('img/Cities/' +
+                                #                              city_catalog.city_cat[city.alignment] +
+                                #                              '.png').convert_alpha()
+                                # city_img.set_colorkey(WhiteColor)
+                                # screen.blit(city_img, ((x - 1) * 48 + 1, (y - 1) * 48 + 1))
 
-                                        # New code
-                                        terrain_img = game_stats.gf_settlement_dict[
-                                            city_catalog.city_cat[city.alignment]]
-                                        screen.blit(terrain_img, ((x - 1) * 48 + 1, (y - 1) * 48 + 1))
+                                # New code
+                                terrain_img = game_stats.gf_settlement_dict[
+                                    city_catalog.city_cat[city.alignment]]
+                                screen.blit(terrain_img, ((x - 1) * 48 + 1, (y - 1) * 48 + 1))
 
-                                        # Name
-                                        indent = int(len(city.name) * 2)
-                                        text_panel1 = font12.render(city.name, True, TitleText)
-                                        screen.blit(text_panel1, ((x - 1) * 48 + 24 - indent, (y - 1) * 48 + 50))
+                                # Name
+                                indent = int(len(city.name) * 2)
+                                text_panel1 = font12.render(city.name, True, TitleText)
+                                screen.blit(text_panel1, ((x - 1) * 48 + 24 - indent, (y - 1) * 48 + 50))
 
-                                        # Flag
-                                        if city.owner != "Neutral":
-                                            for power in game_obj.game_powers:
-                                                if city.owner == power.name:
-                                                    yc = 0
-                                                    if city.military_occupation:
-                                                        mo = city.military_occupation
-                                                        yc += 5
+                                # Flag
+                                if city.owner != "Neutral":
+                                    power = common_selects.select_realm_by_name(city.owner)
+                                    yc = 0
+                                    if city.military_occupation:
+                                        mo = city.military_occupation
+                                        yc += 5
 
-                                                        # Occupation flag
-                                                        xb = (x - 1) * 48
-                                                        yb = (y - 1) * 48
-                                                        pygame.draw.polygon(screen, FlagpoleColor,
-                                                                            ([xb + 3, yb + 34],
-                                                                             [xb + 4, yb + 34],
-                                                                             [xb + 4, yb + 48],
-                                                                             [xb + 3, yb + 48]))
-                                                        pygame.draw.polygon(screen, FlagColors[mo[0]],
-                                                                            ([xb + 5, yb + 34],
-                                                                             [xb + 14, yb + 34],
-                                                                             [xb + 14, yb + 37],
-                                                                             [xb + 5, yb + 37]))
-                                                        pygame.draw.polygon(screen, FlagColors[mo[1]],
-                                                                            ([xb + 5, yb + 38],
-                                                                             [xb + 14, yb + 38],
-                                                                             [xb + 14, yb + 41],
-                                                                             [xb + 5, yb + 41]))
+                                        # Occupation flag
+                                        xb = (x - 1) * 48
+                                        yb = (y - 1) * 48
+                                        pygame.draw.polygon(screen, FlagpoleColor,
+                                                            ([xb + 3, yb + 34],
+                                                             [xb + 4, yb + 34],
+                                                             [xb + 4, yb + 48],
+                                                             [xb + 3, yb + 48]))
+                                        pygame.draw.polygon(screen, FlagColors[mo[0]],
+                                                            ([xb + 5, yb + 34],
+                                                             [xb + 14, yb + 34],
+                                                             [xb + 14, yb + 37],
+                                                             [xb + 5, yb + 37]))
+                                        pygame.draw.polygon(screen, FlagColors[mo[1]],
+                                                            ([xb + 5, yb + 38],
+                                                             [xb + 14, yb + 38],
+                                                             [xb + 14, yb + 41],
+                                                             [xb + 5, yb + 41]))
 
-                                                    xb = (x - 1) * 48 + 32
-                                                    yb = (y - 1) * 48
-                                                    pygame.draw.polygon(screen, FlagpoleColor,
-                                                                        ([xb + 3, yb + 34],
-                                                                         [xb + 4, yb + 34],
-                                                                         [xb + 4, yb + 48],
-                                                                         [xb + 3, yb + 48]))
-                                                    pygame.draw.polygon(screen, FlagColors[power.f_color],
-                                                                        ([xb + 5, yb + 34 + yc],
-                                                                         [xb + 14, yb + 34 + yc],
-                                                                         [xb + 14, yb + 37 + yc],
-                                                                         [xb + 5, yb + 37 + yc]))
-                                                    pygame.draw.polygon(screen, FlagColors[power.s_color],
-                                                                        ([xb + 5, yb + 38 + yc],
-                                                                         [xb + 14, yb + 38 + yc],
-                                                                         [xb + 14, yb + 41 + yc],
-                                                                         [xb + 5, yb + 41 + yc]))
-                                        break
+                                    xb = (x - 1) * 48 + 32
+                                    yb = (y - 1) * 48
+                                    pygame.draw.polygon(screen, FlagpoleColor,
+                                                        ([xb + 3, yb + 34],
+                                                         [xb + 4, yb + 34],
+                                                         [xb + 4, yb + 48],
+                                                         [xb + 3, yb + 48]))
+                                    pygame.draw.polygon(screen, FlagColors[power.f_color],
+                                                        ([xb + 5, yb + 34 + yc],
+                                                         [xb + 14, yb + 34 + yc],
+                                                         [xb + 14, yb + 37 + yc],
+                                                         [xb + 5, yb + 37 + yc]))
+                                    pygame.draw.polygon(screen, FlagColors[power.s_color],
+                                                        ([xb + 5, yb + 38 + yc],
+                                                         [xb + 14, yb + 38 + yc],
+                                                         [xb + 14, yb + 41 + yc],
+                                                         [xb + 5, yb + 41 + yc]))
+
                             else:
                                 # Objects
                                 if TileObj.lot.obj_typ == "Obstacle":
@@ -312,7 +301,7 @@ def draw_tiles(screen):
                                                               (y - 1) * 48 + item[1] - obj_img.get_height() / 2))
 
                                 elif TileObj.lot.obj_typ == "Facility":
-                                    # print("Facility - " + str(TileObj.lot.obj_name))
+                                    # print("Facility - " + str(TileObj.lot.obj_name) + " at " + str(TileObj.posxy))
                                     # if TileObj.city_id is None:
                                     # Old code
                                     # for item in TileObj.lot.disposition:
@@ -347,98 +336,94 @@ def draw_tiles(screen):
                         if TileObj.army_id is not None:
                             focus = TileObj.army_id
                             # print(TileObj.army_id)
+                            army = common_selects.select_army_by_id(focus)
 
-                            for army in game_obj.game_armies:
-                                if army.army_id == focus:
+                            if len(army.units) > 0 and army.leader is not None:
+                                xy_animation = [0, 0]
+                                if army.action in ["Move", "Routing"]:
+                                    xy_animation = anim_army_move.army_march(army.route[0], army.posxy)
 
-                                    if len(army.units) > 0 and army.leader is not None:
-                                        xy_animation = [0, 0]
-                                        if army.action in ["Move", "Routing"]:
-                                            xy_animation = anim_army_move.army_march(army.route[0], army.posxy)
+                                side = "_l"
+                                if army.right_side:
+                                    side = "_r"
 
-                                        side = "_l"
-                                        if army.right_side:
-                                            side = "_r"
+                                if army.hero is None:
+                                    unit = army.units[army.leader]
+                                    # print('img/Creatures/' +str(unit.img_source) + str(unit.img) + '.png')
+                                    # Old code
+                                    # army_img = pygame.image.load(
+                                    #     'img/Creatures/' + str(unit.img_source) + "/" + str(unit.img) + '.png')
+                                    # army_img.set_colorkey(WhiteColor)
 
-                                        if army.hero is None:
-                                            unit = army.units[army.leader]
-                                            # print('img/Creatures/' +str(unit.img_source) + str(unit.img) + '.png')
-                                            # Old code
-                                            # army_img = pygame.image.load(
-                                            #     'img/Creatures/' + str(unit.img_source) + "/" + str(unit.img) + '.png')
-                                            # army_img.set_colorkey(WhiteColor)
-
-                                            # New code
-                                            if unit.img_width > 44 or unit.img_height > 44:
-                                                army_img = game_stats.gf_regiment_dict[unit.img_source + "/"
-                                                                                       + unit.img + side]
-                                                if unit.img_width > 44:
-                                                    proportion = 44 / unit.img_width
-                                                    army_img = pygame.transform.scale(army_img,
-                                                                                      (44,
-                                                                                       int(unit.img_height * proportion)))
-                                                    x_offset = 3
-                                                    y_offset = (48 - (unit.img_height * proportion)) / 2
-                                                else:
-                                                    proportion = 44 / unit.img_height
-                                                    army_img = pygame.transform.scale(army_img,
-                                                                                      (int(unit.img_width * proportion),
-                                                                                       44))
-                                                    x_offset = (48 - (unit.img_width * proportion)) / 2
-                                                    y_offset = 3
-                                            else:
-                                                army_img = game_stats.gf_regiment_dict[unit.img_source + "/"
-                                                                                       + unit.img + side]
-                                                x_offset = unit.x_offset
-                                                y_offset = unit.y_offset
+                                    # New code
+                                    if unit.img_width > 44 or unit.img_height > 44:
+                                        army_img = game_stats.gf_regiment_dict[unit.img_source + "/"
+                                                                               + unit.img + side]
+                                        if unit.img_width > 44:
+                                            proportion = 44 / unit.img_width
+                                            army_img = pygame.transform.scale(army_img,
+                                                                              (44,
+                                                                               int(unit.img_height * proportion)))
+                                            x_offset = 3
+                                            y_offset = (48 - (unit.img_height * proportion)) / 2
                                         else:
-                                            img = army.hero.img
-                                            source = army.hero.img_source
-                                            # Old code
-                                            # army_img = pygame.image.load(
-                                            #     'img/Heroes/' + str(source) + "/" + str(img) + '.png')
-                                            # army_img.set_colorkey(WhiteColor)
+                                            proportion = 44 / unit.img_height
+                                            army_img = pygame.transform.scale(army_img,
+                                                                              (int(unit.img_width * proportion),
+                                                                               44))
+                                            x_offset = (48 - (unit.img_width * proportion)) / 2
+                                            y_offset = 3
+                                    else:
+                                        army_img = game_stats.gf_regiment_dict[unit.img_source + "/"
+                                                                               + unit.img + side]
+                                        x_offset = unit.x_offset
+                                        y_offset = unit.y_offset
+                                else:
+                                    img = army.hero.img
+                                    source = army.hero.img_source
+                                    # Old code
+                                    # army_img = pygame.image.load(
+                                    #     'img/Heroes/' + str(source) + "/" + str(img) + '.png')
+                                    # army_img.set_colorkey(WhiteColor)
 
-                                            # New code
-                                            army_img = game_stats.gf_hero_dict[source + "/" + img + side]
-                                            x_offset = army.hero.x_offset
-                                            y_offset = army.hero.y_offset
+                                    # New code
+                                    army_img = game_stats.gf_hero_dict[source + "/" + img + side]
+                                    x_offset = army.hero.x_offset
+                                    y_offset = army.hero.y_offset
 
-                                        screen.blit(army_img,
-                                                    ((x - 1) * 48 + x_offset + xy_animation[0],
-                                                     (y - 1) * 48 + y_offset + xy_animation[1]))
+                                screen.blit(army_img,
+                                            ((x - 1) * 48 + x_offset + xy_animation[0],
+                                             (y - 1) * 48 + y_offset + xy_animation[1]))
 
-                                    if army.owner != "Neutral":  # Draw flag
-                                        for power in game_obj.game_powers:
-                                            if army.owner == power.name:
-                                                pygame.draw.polygon(screen, FlagpoleColor,
-                                                                    ([(x - 1) * 48 + 3 + xy_animation[0],
-                                                                      (y - 1) * 48 + 34 + xy_animation[1]],
-                                                                     [(x - 1) * 48 + 4 + xy_animation[0],
-                                                                      (y - 1) * 48 + 34 + xy_animation[1]],
-                                                                     [(x - 1) * 48 + 4 + xy_animation[0],
-                                                                      (y - 1) * 48 + 48 + xy_animation[1]],
-                                                                     [(x - 1) * 48 + 3 + xy_animation[0],
-                                                                      (y - 1) * 48 + 48 + xy_animation[1]]))
-                                                pygame.draw.polygon(screen, FlagColors[power.f_color],
-                                                                    ([(x - 1) * 48 + 5 + xy_animation[0],
-                                                                      (y - 1) * 48 + 34 + xy_animation[1]],
-                                                                     [(x - 1) * 48 + 14 + xy_animation[0],
-                                                                      (y - 1) * 48 + 34 + xy_animation[1]],
-                                                                     [(x - 1) * 48 + 14 + xy_animation[0],
-                                                                      (y - 1) * 48 + 37 + xy_animation[1]],
-                                                                     [(x - 1) * 48 + 5 + xy_animation[0],
-                                                                      (y - 1) * 48 + 37 + xy_animation[1]]))
-                                                pygame.draw.polygon(screen, FlagColors[power.s_color],
-                                                                    ([(x - 1) * 48 + 5 + xy_animation[0],
-                                                                      (y - 1) * 48 + 38 + xy_animation[1]],
-                                                                     [(x - 1) * 48 + 14 + xy_animation[0],
-                                                                      (y - 1) * 48 + 38 + xy_animation[1]],
-                                                                     [(x - 1) * 48 + 14 + xy_animation[0],
-                                                                      (y - 1) * 48 + 41 + xy_animation[1]],
-                                                                     [(x - 1) * 48 + 5 + xy_animation[0],
-                                                                      (y - 1) * 48 + 41 + xy_animation[1]]))
-                                    break
+                            if army.owner != "Neutral":  # Draw flag
+                                power = common_selects.select_realm_by_name(army.owner)
+                                pygame.draw.polygon(screen, FlagpoleColor,
+                                                    ([(x - 1) * 48 + 3 + xy_animation[0],
+                                                      (y - 1) * 48 + 34 + xy_animation[1]],
+                                                     [(x - 1) * 48 + 4 + xy_animation[0],
+                                                      (y - 1) * 48 + 34 + xy_animation[1]],
+                                                     [(x - 1) * 48 + 4 + xy_animation[0],
+                                                      (y - 1) * 48 + 48 + xy_animation[1]],
+                                                     [(x - 1) * 48 + 3 + xy_animation[0],
+                                                      (y - 1) * 48 + 48 + xy_animation[1]]))
+                                pygame.draw.polygon(screen, FlagColors[power.f_color],
+                                                    ([(x - 1) * 48 + 5 + xy_animation[0],
+                                                      (y - 1) * 48 + 34 + xy_animation[1]],
+                                                     [(x - 1) * 48 + 14 + xy_animation[0],
+                                                      (y - 1) * 48 + 34 + xy_animation[1]],
+                                                     [(x - 1) * 48 + 14 + xy_animation[0],
+                                                      (y - 1) * 48 + 37 + xy_animation[1]],
+                                                     [(x - 1) * 48 + 5 + xy_animation[0],
+                                                      (y - 1) * 48 + 37 + xy_animation[1]]))
+                                pygame.draw.polygon(screen, FlagColors[power.s_color],
+                                                    ([(x - 1) * 48 + 5 + xy_animation[0],
+                                                      (y - 1) * 48 + 38 + xy_animation[1]],
+                                                     [(x - 1) * 48 + 14 + xy_animation[0],
+                                                      (y - 1) * 48 + 38 + xy_animation[1]],
+                                                     [(x - 1) * 48 + 14 + xy_animation[0],
+                                                      (y - 1) * 48 + 41 + xy_animation[1]],
+                                                     [(x - 1) * 48 + 5 + xy_animation[0],
+                                                      (y - 1) * 48 + 41 + xy_animation[1]]))
 
                     # # Draw undiscovered tiles as dark purple tiles
                     # else:
@@ -447,77 +432,6 @@ def draw_tiles(screen):
                     #                          [(x - 1) * 48 + 48, (y - 1) * 48 + 1],
                     #                          [(x - 1) * 48 + 48, (y - 1) * 48 + 48],
                     #                          [(x - 1) * 48 + 1, (y - 1) * 48 + 48]])
-
-
-def details_panel(screen):
-    yVar = game_stats.game_window_height - 800
-    pygame.draw.polygon(screen, MainMenuColor,
-                        [[200, 600 + yVar], [1080, 600 + yVar], [1080, 800 + yVar], [200, 800 + yVar]])
-
-    for fac in game_obj.game_factions:
-        if fac.name == game_stats.location_factions[game_stats.faction_num]:
-            id_var = game_stats.pop_in_location[game_stats.white_index]  # Selected character index
-
-            for pop in fac.population:
-                if pop.personal_id == id_var:
-                    # Character's name
-                    text_panel = font20.render(pop.name, True, TitleText)
-                    screen.blit(text_panel, [210, 604 + yVar])
-
-                    # Occupation
-                    text_panel = font20.render(pop.occupation, True, TitleText)
-                    screen.blit(text_panel, [310, 604 + yVar])
-
-                    # Gender
-                    if pop.gender == "Male":
-                        color = MaleGender
-                    else:
-                        color = FemaleGender
-                    text_panel = font20.render(pop.gender[0:1], True, color)
-                    screen.blit(text_panel, [210, 634 + yVar])
-
-                    # Race
-                    text_panel = font20.render(pop.race, True, TitleText)
-                    screen.blit(text_panel, [230, 634 + yVar])
-
-                    # Inventory
-                    text_panel = font20.render("Inventory", True, TitleText)
-                    screen.blit(text_panel, [450, 604 + yVar])
-
-                    if len(pop.inventory) > 0:
-                        shelf = []
-                        for resource in pop.inventory:
-                            if len(shelf) == 0:
-                                shelf.append([resource, 1])
-                            else:
-                                check = True
-                                for item in shelf:
-                                    if item[0] == resource:
-                                        item[1] += 1
-                                        check = False
-                                if check:
-                                    shelf.append([resource, 1])
-
-                        number = 0
-                        if len(shelf) > 0:
-                            for resource in shelf:
-                                number += 1
-                                text_panel = font20.render(str(resource[1]) + " X " + str(resource[0]), True, TitleText)
-                                screen.blit(text_panel,
-                                            [450 + math.floor(number / 6) * 120, 634 + (number - 1) % 6 * 30 + yVar])
-
-                    # Highlight destination tile
-                    if pop.goal is not None:
-                        x2 = int(pop.goal.destination[0])
-                        y2 = int(pop.goal.destination[1])
-                        x2 -= int(game_stats.pov_pos[0])
-                        y2 -= int(game_stats.pov_pos[1])
-
-                        pygame.draw.polygon(screen, LimeBorder,
-                                            [[(x2 - 1) * 48 + 1, (y2 - 1) * 48 + 1],
-                                             [(x2 - 1) * 48 + 48, (y2 - 1) * 48 + 1],
-                                             [(x2 - 1) * 48 + 48, (y2 - 1) * 48 + 48],
-                                             [(x2 - 1) * 48 + 1, (y2 - 1) * 48 + 48]], 1)
 
 
 def terrain_panel(screen, TileNum, xy_pos):
@@ -1055,195 +969,6 @@ def settlement_blockade_panel(screen):
                     number += 1
 
 
-def army_panel(screen):
-    # White border around selected tile
-    for army in game_obj.game_armies:
-        if army.army_id == game_stats.selected_army:
-            x2 = int(army.posxy[0])
-            y2 = int(army.posxy[1])
-            x2 -= int(game_stats.pov_pos[0])
-            y2 -= int(game_stats.pov_pos[1])
-
-            # Draw movement arrows
-            if len(army.path_arrows) > 0:
-                draw_movement_arrows.arrow_icon(screen, army.route, army.path_arrows)
-
-            # Border line
-            pygame.draw.polygon(screen, WhiteBorder,
-                                [[(x2 - 1) * 48, (y2 - 1) * 48], [(x2 - 1) * 48 + 47, (y2 - 1) * 48],
-                                 [(x2 - 1) * 48 + 47, (y2 - 1) * 48 + 47], [(x2 - 1) * 48, (y2 - 1) * 48 + 47]], 1)
-
-            break
-
-    # Lower panel
-    yVar = game_stats.game_window_height - 800
-    pygame.draw.polygon(screen, MainMenuColor,
-                        [[200, 650 + yVar], [1080, 650 + yVar], [1080, 800 + yVar], [200, 800 + yVar]])
-
-    # Army button
-    pygame.draw.polygon(screen, FieldColor,
-                        [[200, 627 + yVar], [260, 627 + yVar], [260, 649 + yVar], [200, 649 + yVar]])
-    if game_stats.selected_object == "Army":
-        color1 = HighlightOption
-    else:
-        color1 = LineMainMenuColor1
-    pygame.draw.polygon(screen, color1, [[200, 627 + yVar], [260, 627 + yVar], [260, 649 + yVar], [200, 649 + yVar]], 3)
-    text_panel5 = font20.render("Army", True, DarkText)
-    screen.blit(text_panel5, [206, 627 + yVar])
-
-    # Ownership
-    army = common_selects.select_army_by_id(game_stats.selected_army)
-
-    if army.owner == "Neutral":
-        text_panel = font20.render("Neutral", True, TitleText)
-        screen.blit(text_panel, [240, 654 + yVar])
-    else:
-        for power in game_obj.game_powers:
-            if power.name == army.owner:
-                # Country's name
-                text_panel = font20.render(power.name, True, TitleText)
-                screen.blit(text_panel, [240, 654 + yVar])
-
-                # Flag
-                pygame.draw.polygon(screen, FlagColors[power.f_color],
-                                    [[205, 654 + yVar], [235, 654 + yVar], [235, 665 + yVar],
-                                     [205, 665 + yVar]])
-                pygame.draw.polygon(screen, FlagColors[power.s_color],
-                                    [[205, 666 + yVar], [235, 666 + yVar], [235, 676 + yVar],
-                                     [205, 676 + yVar]])
-                break
-
-    # Hero
-    if army.hero is not None:
-        # Name
-        text_panel = font20.render(army.hero.name, True, TitleText)
-        screen.blit(text_panel, [203, 706 + yVar])
-
-        # Class
-        text_panel = font16.render(army.hero.hero_class, True, DarkText)
-        screen.blit(text_panel, [253, 726 + yVar])
-
-        # Level
-        text_panel = font16.render("Level " + str(army.hero.level), True, DarkText)
-        screen.blit(text_panel, [253, 746 + yVar])
-
-        # Hero image
-        img = army.hero.img
-        source = army.hero.img_source
-        # Previous code
-        # army_img = pygame.image.load('img/Heroes/' + str(source) + "/" + str(img) + '.png')
-        # army_img.set_colorkey(WhiteColor)
-        x_offset = army.hero.x_offset
-        y_offset = army.hero.y_offset
-        side = "_l"
-        if army.right_side:
-            side = "_r"
-        # New code
-        army_img = game_stats.gf_hero_dict[source + "/" + img + side]
-        screen.blit(army_img, (203 + x_offset, 726 + yVar + y_offset))
-
-        # Open hero window
-        border_color = HighlightOption
-        pygame.draw.polygon(screen, border_color,
-                            [[203, 776 + yVar], [253, 776 + yVar], [253, 794 + yVar], [203, 794 + yVar]], 2)
-        text_panel1 = font16.render("Hero", True, DarkText)
-        screen.blit(text_panel1, [213, 777 + yVar])
-
-        # New attribute or skill points are available
-        if army.hero.new_attribute_points > 0 or army.hero.new_skill_points > 0:
-            icon_img = game_stats.gf_misc_img_dict["Icons/plus_sign_24_2"]
-            # army_img.set_colorkey(WhiteColor)
-            screen.blit(icon_img, (258, 774 + yVar))
-
-    movement_points_left = -1
-    least_max_movement_points = -1
-    # Display units
-    side = "_l"
-    if army.right_side:
-        side = "_r"
-
-    # Units
-    if len(army.units) > 0:
-        number = 0
-        for unit in army.units:
-            x_pos = 430 + math.floor(number % 10) * 52
-            y_pos = 654 + yVar + math.floor(number / 10) * 57
-            # New code
-            if unit.img_width > 44 or unit.img_height > 44:
-                army_img = game_stats.gf_regiment_dict[unit.img_source + "/"
-                                                       + unit.img + side]
-                if unit.img_width > 44:
-                    proportion = 44 / unit.img_width
-                    army_img = pygame.transform.scale(army_img,
-                                                      (44,
-                                                       int(unit.img_height * proportion)))
-                    x_offset = 3
-                    y_offset = (48 - (unit.img_height * proportion)) / 2
-                else:
-                    proportion = 44 / unit.img_height
-                    army_img = pygame.transform.scale(army_img,
-                                                      (int(unit.img_width * proportion),
-                                                       44))
-                    x_offset = (48 - (unit.img_width * proportion)) / 2
-                    y_offset = 3
-            else:
-                army_img = game_stats.gf_regiment_dict[unit.img_source + "/" + unit.img + side]
-                x_offset = unit.x_offset
-                y_offset = unit.y_offset
-
-            screen.blit(army_img, [x_pos + x_offset, y_pos + y_offset])
-            # screen.blit(army_img, [x_pos + unit.x_offset, y_pos + unit.y_offset])
-
-            # Number of creatures
-            number_of_creatures = str(len(unit.crew)) + "/" + str(unit.rows * unit.number)
-            text_panel = arial_font14.render(number_of_creatures, True, DarkText)
-            screen.blit(text_panel, [x_pos + 12, y_pos + 42])
-
-            if int(number) in game_stats.first_army_exchange_list:
-                pygame.draw.polygon(screen, ApproveElementsColor,
-                                    [[x_pos + unit.x_offset - 10, y_pos + unit.y_offset - 3],
-                                     [x_pos + unit.x_offset + 21, y_pos + unit.y_offset - 3],
-                                     [x_pos + unit.x_offset + 6, y_pos + unit.y_offset - 9]])
-
-            number += 1
-
-            # Update movement points information
-            if movement_points_left < 0:
-                movement_points_left = int(unit.movement_points)
-            elif unit.movement_points < movement_points_left:
-                movement_points_left = int(unit.movement_points)
-
-            if least_max_movement_points < 0:
-                least_max_movement_points = int(unit.max_movement_points)
-            elif unit.max_movement_points < least_max_movement_points:
-                least_max_movement_points = int(unit.max_movement_points)
-
-    # Not the best way to design additional points from skills
-    if army.hero is not None:
-        for skill in army.hero.skills:
-            for effect in skill.effects:
-                if effect.application == "Movement points":
-                    if effect.method == "addition":
-                        least_max_movement_points += int(effect.quantity)
-
-        if len(army.hero.inventory) > 0:
-            # print("len(army.hero.inventory) > 0")
-            for artifact in army.hero.inventory:
-                for effect in artifact.effects:
-                    if effect.application == "Movement points":
-                        # print("effect.application == Movement points")
-                        if effect.method == "addition":
-                            least_max_movement_points += int(effect.quantity)
-                            # print(str(least_max_movement_points))
-
-    # Movement points bar
-    xVar = int(movement_points_left / least_max_movement_points * 80)
-    pygame.draw.polygon(screen, ApproveFieldColor,
-                        [[203, 684 + yVar], [203 + xVar, 684 + yVar], [203 + xVar, 706 + yVar], [203, 706 + yVar]])
-    pygame.draw.polygon(screen, ApproveElementsColor,
-                        [[203, 684 + yVar], [283, 684 + yVar], [283, 706 + yVar], [203, 706 + yVar]], 3)
-
-
 def settlement_panel(screen):
     # Draw top left panel with interface to interact with settlement mechanics
     pygame.draw.polygon(screen, MainMenuColor,
@@ -1335,11 +1060,7 @@ def settlement_panel(screen):
     pygame.draw.line(screen, CancelElementsColor, [618, 88], [631, 101], 2)
     pygame.draw.line(screen, CancelElementsColor, [618, 101], [631, 88], 2)
 
-    settlement = None
-    for city in game_obj.game_cities:
-        if city.city_id == game_stats.selected_settlement:
-            settlement = city
-            break
+    settlement = common_selects.select_settlement_by_id(game_stats.selected_settlement)
 
     # Draw area content
     detail_functions_voc = {"Building": det_settlement_buildings.draw_structures,
@@ -1349,177 +1070,6 @@ def settlement_panel(screen):
                             "Factions": det_settlement_factions.draw_factions}
 
     detail_functions_voc[game_stats.settlement_area](screen, settlement)
-
-
-def settlement_info_panel(screen):
-    # Draw lower panel with information about settlement
-    stationed_id = -1
-    TileObj = None
-
-    # White border around selected tile
-    for settlement in game_obj.game_cities:
-        if settlement.city_id == game_stats.selected_settlement:
-            x2 = int(settlement.posxy[0])
-            y2 = int(settlement.posxy[1])
-
-            TileNum = (y2 - 1) * game_stats.cur_level_width + x2 - 1
-            TileObj = game_obj.game_map[TileNum]
-            # print("settlement TileNum is " + str(TileNum))
-
-            x2 -= int(game_stats.pov_pos[0])
-            y2 -= int(game_stats.pov_pos[1])
-
-            # Border line
-            pygame.draw.polygon(screen, WhiteBorder,
-                                [[(x2 - 1) * 48, (y2 - 1) * 48], [(x2 - 1) * 48 + 47, (y2 - 1) * 48],
-                                 [(x2 - 1) * 48 + 47, (y2 - 1) * 48 + 47], [(x2 - 1) * 48, (y2 - 1) * 48 + 47]], 1)
-
-            break
-
-    # Lower panel
-    yVar = game_stats.game_window_height - 800
-    pygame.draw.polygon(screen, MainMenuColor,
-                        [[200, 650 + yVar], [1080, 650 + yVar], [1080, 800 + yVar], [200, 800 + yVar]])
-
-    if TileObj.army_id is not None:
-        stationed_id = int(TileObj.army_id)
-        # print("stationed_id - " + str(stationed_id))
-
-        # Stationed army
-        army = common_selects.select_army_by_id(stationed_id)
-
-        side = "_l"
-        if army.right_side:
-            side = "_r"
-
-        # Ownership
-        if army.owner == "Neutral":
-            text_panel = font20.render("Neutral", True, TitleText)
-            screen.blit(text_panel, [240, 654 + yVar])
-        else:
-            for power in game_obj.game_powers:
-                if power.name == army.owner:
-                    # Country's name
-                    text_panel = font20.render(power.name, True, TitleText)
-                    screen.blit(text_panel, [240, 654 + yVar])
-
-                    # Flag
-                    pygame.draw.polygon(screen, FlagColors[power.f_color],
-                                        [[205, 654 + yVar], [235, 654 + yVar], [235, 665 + yVar],
-                                         [205, 665 + yVar]])
-                    pygame.draw.polygon(screen, FlagColors[power.s_color],
-                                        [[205, 666 + yVar], [235, 666 + yVar], [235, 676 + yVar],
-                                         [205, 676 + yVar]])
-
-        movement_points_left = -1
-        least_max_movement_points = -1
-        # Display units
-        if len(army.units) > 0:
-            number = 0
-
-            for unit in army.units:
-                x_pos = 430 + math.floor(number % 10) * 52
-                y_pos = 654 + yVar + math.floor(number / 10) * 52
-                # New code
-                if unit.crew[0].img_width > 44 or unit.crew[0].img_height > 44:
-                    army_img = game_stats.gf_regiment_dict[unit.img_source + "/"
-                                                           + unit.img + side]
-                    if unit.crew[0].img_width > 44:
-                        proportion = 44 / unit.crew[0].img_width
-                        army_img = pygame.transform.scale(army_img,
-                                                          (44,
-                                                           int(unit.crew[0].img_height * proportion)))
-                        x_offset = 3
-                        y_offset = (48 - (unit.crew[0].img_height * proportion)) / 2
-                    else:
-                        proportion = 44 / unit.crew[0].img_height
-                        army_img = pygame.transform.scale(army_img,
-                                                          (int(unit.crew[0].img_width * proportion),
-                                                           44))
-                        x_offset = (48 - (unit.crew[0].img_width * proportion)) / 2
-                        y_offset = 3
-                else:
-                    army_img = game_stats.gf_regiment_dict[unit.img_source + "/" + unit.img + side]
-                    x_offset = unit.x_offset
-                    y_offset = unit.y_offset
-
-                screen.blit(army_img, [x_pos + x_offset, y_pos + y_offset])
-                # screen.blit(army_img, [x_pos + unit.x_offset, y_pos + unit.y_offset])
-
-                # Number of creatures
-                number_of_creatures = str(len(unit.crew)) + "/" + str(unit.rows * unit.number)
-                text_panel = arial_font14.render(number_of_creatures, True, DarkText)
-                screen.blit(text_panel, [x_pos + 12, y_pos + 42])
-
-                number += 1
-
-                # Update movement points information
-                if movement_points_left < 0:
-                    movement_points_left = int(unit.movement_points)
-                elif unit.movement_points < movement_points_left:
-                    movement_points_left = int(unit.movement_points)
-
-                if least_max_movement_points < 0:
-                    least_max_movement_points = int(unit.max_movement_points)
-                elif unit.max_movement_points < least_max_movement_points:
-                    least_max_movement_points = int(unit.max_movement_points)
-
-        # Movement points bar
-        xVar = int(movement_points_left / least_max_movement_points * 80)
-        pygame.draw.polygon(screen, ApproveFieldColor,
-                            [[203, 684 + yVar], [203 + xVar, 684 + yVar], [203 + xVar, 706 + yVar], [203, 706 + yVar]])
-        pygame.draw.polygon(screen, ApproveElementsColor,
-                            [[203, 684 + yVar], [283, 684 + yVar], [283, 706 + yVar], [203, 706 + yVar]], 3)
-
-        # Select army button
-        border_color = HighlightOption
-        if len(army.units) < 5:
-            text_panel1 = font14.render("Less than", True, DarkText)
-            screen.blit(text_panel1, [312, 709 + yVar])
-            text_panel1 = font14.render("5 regiments", True, DarkText)
-            screen.blit(text_panel1, [312, 725 + yVar])
-            border_color = LineMainMenuColor1
-        pygame.draw.polygon(screen, border_color,
-                            [[303, 684 + yVar], [393, 684 + yVar], [393, 706 + yVar], [303, 706 + yVar]], 3)
-        text_panel1 = font16.render("Select army", True, DarkText)
-        screen.blit(text_panel1, [312, 686 + yVar])
-
-        # Hero
-        if army.hero is not None:
-            # Name
-            text_panel = font20.render(army.hero.name, True, TitleText)
-            screen.blit(text_panel, [203, 706 + yVar])
-
-            # Class
-            text_panel = font16.render(army.hero.hero_class, True, DarkText)
-            screen.blit(text_panel, [253, 726 + yVar])
-
-            # Level
-            text_panel = font16.render("Level " + str(army.hero.level), True, DarkText)
-            screen.blit(text_panel, [253, 746 + yVar])
-
-            # Hero image
-            img = army.hero.img
-            source = army.hero.img_source
-            x_offset = army.hero.x_offset
-            y_offset = army.hero.y_offset
-
-            # New code
-            army_img = game_stats.gf_hero_dict[source + "/" + img + side]
-            screen.blit(army_img, (203 + x_offset, 726 + yVar + y_offset))
-
-            # Open hero window
-            border_color = HighlightOption
-            pygame.draw.polygon(screen, border_color,
-                                [[203, 776 + yVar], [253, 776 + yVar], [253, 794 + yVar], [203, 794 + yVar]], 2)
-            text_panel1 = font16.render("Hero", True, DarkText)
-            screen.blit(text_panel1, [213, 777 + yVar])
-
-            # New attribute or skill points are available
-            if army.hero.new_attribute_points > 0 or army.hero.new_skill_points > 0:
-                icon_img = game_stats.gf_misc_img_dict["Icons/plus_sign_24_2"]
-                # army_img.set_colorkey(WhiteColor)
-                screen.blit(icon_img, (258, 774 + yVar))
 
 
 def realm_panel(screen):
@@ -1601,262 +1151,6 @@ def realm_panel(screen):
     text_panel = font16.render(power.leader.lifestyle_traits[1], True, DarkText)
     screen.blit(text_panel, [x_base, y_base + y_shift * y_num])
     y_num += 1
-
-
-def tile_obj_panel(screen):
-    # White border around selected tile
-    x2 = int(game_stats.info_tile[0])
-    y2 = int(game_stats.info_tile[1])
-    # x2 -= int(game_stats.pov_pos[0])
-    # y2 -= int(game_stats.pov_pos[1])
-    TileNum = (y2 - 1) * game_stats.cur_level_width + x2 - 1
-
-    x3 = x2 - int(game_stats.pov_pos[0])
-    y3 = y2 - int(game_stats.pov_pos[1])
-    # Border line
-    pygame.draw.polygon(screen, WhiteBorder,
-                        [[(x3 - 1) * 48, (y3 - 1) * 48], [(x3 - 1) * 48 + 47, (y3 - 1) * 48],
-                         [(x3 - 1) * 48 + 47, (y3 - 1) * 48 + 47], [(x3 - 1) * 48, (y3 - 1) * 48 + 47]], 1)
-
-    # Lower panel
-    yVar = game_stats.game_window_height - 800
-    pygame.draw.polygon(screen, MainMenuColor,
-                        [[200, 650 + yVar], [1080, 650 + yVar], [1080, 800 + yVar], [200, 800 + yVar]])
-
-    # Terrain information
-    # Ownership
-    if game_stats.tile_ownership == "Wild lands":
-        text_panel = font20.render("Wild lands", True, TitleText)
-        screen.blit(text_panel, [205, 654 + yVar])
-    elif game_stats.tile_ownership == "Neutral lands":
-        text_panel = font20.render("Neutral lands", True, TitleText)
-        screen.blit(text_panel, [205, 654 + yVar])
-    else:
-        # Country's name
-        text_panel = font20.render(game_stats.tile_ownership, True, TitleText)
-        screen.blit(text_panel, [240, 654 + yVar])
-
-        # Flag
-        pygame.draw.polygon(screen, FlagColors[game_stats.tile_flag_colors[0]],
-                            [[205, 654 + yVar], [235, 654 + yVar], [235, 665 + yVar],
-                             [205, 665 + yVar]])
-        pygame.draw.polygon(screen, FlagColors[game_stats.tile_flag_colors[1]],
-                            [[205, 666 + yVar], [235, 666 + yVar], [235, 676 + yVar],
-                             [205, 676 + yVar]])
-
-    # Terrain type
-    TileObj = game_obj.game_map[TileNum]
-    text_panel = font20.render(TileObj.terrain, True, TitleText)
-    screen.blit(text_panel, [205, 684 + yVar])
-
-    # Road information
-    yVar2 = 0
-    if TileObj.road:
-        yVar2 += 30
-        text_panel = font20.render(TileObj.road.material, True, TitleText)
-        screen.blit(text_panel, [205, 684 + yVar + yVar2])
-
-    ### Lot object information
-
-    if TileObj.lot is not None:
-        if TileObj.lot == "City":
-            # If object is a city
-            yVar2 += 30
-            text_panel = font20.render("Settlement", True, TitleText)
-            screen.blit(text_panel, [205, 684 + yVar + yVar2])
-
-            settlement = None
-            for city in game_obj.game_cities:
-                if city.city_id == game_stats.right_click_city:
-                    settlement = city
-
-            ### Population information
-            text_panel = font20.render("Population", True, TitleText)
-            screen.blit(text_panel, [391, 654 + yVar])
-
-            yPos = 0
-            for pops in settlement.residency:
-                # Population's name
-                # print(pops)
-                text_panel = font20.render(pops.name, True, DarkText)
-                screen.blit(text_panel, [391, 680 + yVar + yPos])
-
-                yPos += 30
-
-            # White line
-            pygame.draw.lines(screen, WhiteBorder, False, [(391, 702 + yVar + 30 * game_stats.i_p_index),
-                                                           (480, 702 + yVar + 30 * game_stats.i_p_index)], 1)
-
-            ### Resources
-            # Only shows player's resources
-            if game_stats.tile_ownership == game_stats.player_power:
-                # Property
-                text_panel = font20.render("Property:", True, TitleText)
-                screen.blit(text_panel, [510, 654 + yVar])
-
-                # Resources in reserve
-                # print(TileObj.lot.residency[game_stats.i_p_index])
-                if len(settlement.residency[game_stats.i_p_index].reserve) > 0:
-                    yPos = 0
-                    for resource in settlement.residency[game_stats.i_p_index].reserve:
-                        text_panel = arial_font14.render(resource[0] + "  " + str(resource[1]), True, DarkText)
-                        screen.blit(text_panel, [510, 677 + yVar + yPos])
-
-                        yPos += 15
-
-                # Produced resources
-                text_panel = font20.render("Produced:", True, TitleText)
-                screen.blit(text_panel, [625, 654 + yVar])
-
-                # Records from last turn
-                if len(settlement.residency[game_stats.i_p_index].records_gained) > 0:
-                    yPos = 0
-                    for resource in settlement.residency[game_stats.i_p_index].records_gained:
-                        text_panel = arial_font14.render(resource[0] + "  " + str(resource[1]), True, DarkText)
-                        screen.blit(text_panel, [625, 677 + yVar + yPos])
-
-                        yPos += 15
-
-                # Sold resources
-                text_panel = font20.render("Sold:", True, TitleText)
-                screen.blit(text_panel, [740, 654 + yVar])
-
-                # Records from last turn
-                if len(settlement.residency[game_stats.i_p_index].records_sold) > 0:
-                    yPos = 0
-                    for resource in settlement.residency[game_stats.i_p_index].records_sold:
-                        text_panel = arial_font14.render(resource[0] + "  " + str(resource[1]), True, DarkText)
-                        screen.blit(text_panel, [740, 677 + yVar + yPos])
-
-                        yPos += 15
-
-                # Bought resources
-                text_panel = font20.render("Bought:", True, TitleText)
-                screen.blit(text_panel, [855, 654 + yVar])
-
-                # Records from last turn
-                if len(settlement.residency[game_stats.i_p_index].records_bought) > 0:
-                    yPos = 0
-                    for resource in settlement.residency[game_stats.i_p_index].records_bought:
-                        text_panel = arial_font14.render(resource[0] + "  " + str(resource[1]), True, DarkText)
-                        screen.blit(text_panel, [855, 677 + yVar + yPos])
-
-                        yPos += 15
-
-                # Consumed resources
-                text_panel = font20.render("Consumed:", True, TitleText)
-                screen.blit(text_panel, [970, 654 + yVar])
-
-                # Records from last turn
-                if len(settlement.residency[game_stats.i_p_index].records_consumed) > 0:
-                    yPos = 0
-                    for resource in settlement.residency[game_stats.i_p_index].records_consumed:
-                        text_panel = arial_font14.render(resource[0] + "  " + str(resource[1]), True, DarkText)
-                        screen.blit(text_panel, [970, 677 + yVar + yPos])
-
-                        yPos += 15
-
-        else:
-            # If object is not a city
-            yVar2 += 30
-            text_panel = font20.render(TileObj.lot.obj_typ, True, TitleText)
-            screen.blit(text_panel, [205, 684 + yVar + yVar2])
-
-            # If object is facility, then show its name
-            if TileObj.lot.obj_typ == "Facility":
-                yVar2 += 30
-                text_panel = font20.render(TileObj.lot.obj_name, True, TitleText)
-                screen.blit(text_panel, [205, 684 + yVar + yVar2])
-
-            if TileObj.lot.obj_typ == "Facility":
-                ### Population information
-                text_panel = font20.render("Population", True, TitleText)
-                screen.blit(text_panel, [391, 654 + yVar])
-
-                yPos = 0
-                for pops in TileObj.lot.residency:
-                    # Population's name
-                    # print(pops)
-                    text_panel = font20.render(pops.name, True, DarkText)
-                    screen.blit(text_panel, [391, 680 + yVar + yPos])
-
-                    yPos += 30
-
-                # White line
-                pygame.draw.lines(screen, WhiteBorder, False, [(391, 702 + yVar + 30 * game_stats.i_p_index),
-                                                               (480, 702 + yVar + 30 * game_stats.i_p_index)], 1)
-
-                ### Resources
-                # Only shows player's resources
-                if game_stats.tile_ownership == game_stats.player_power:
-                    # Property
-                    text_panel = font20.render("Property:", True, TitleText)
-                    screen.blit(text_panel, [510, 654 + yVar])
-
-                    # Resources in reserve
-                    # print(TileObj.lot.residency[game_stats.i_p_index])
-                    if len(TileObj.lot.residency[game_stats.i_p_index].reserve) > 0:
-                        yPos = 0
-                        for resource in TileObj.lot.residency[game_stats.i_p_index].reserve:
-                            text_panel = arial_font14.render(resource[0] + "  " + str(resource[1]), True, DarkText)
-                            screen.blit(text_panel, [510, 677 + yVar + yPos])
-
-                            yPos += 15
-
-                    # Produced resources
-                    text_panel = font20.render("Produced:", True, TitleText)
-                    screen.blit(text_panel, [625, 654 + yVar])
-
-                    # Records from last turn
-                    if len(TileObj.lot.residency[game_stats.i_p_index].records_gained) > 0:
-                        yPos = 0
-                        for resource in TileObj.lot.residency[game_stats.i_p_index].records_gained:
-                            text_panel = arial_font14.render(resource[0] + "  " + str(resource[1]), True, DarkText)
-                            screen.blit(text_panel, [625, 677 + yVar + yPos])
-
-                            yPos += 15
-
-                    # Sold resources
-                    text_panel = font20.render("Sold:", True, TitleText)
-                    screen.blit(text_panel, [740, 654 + yVar])
-
-                    # Records from last turn
-                    if len(TileObj.lot.residency[game_stats.i_p_index].records_sold) > 0:
-                        yPos = 0
-                        for resource in TileObj.lot.residency[game_stats.i_p_index].records_sold:
-                            text_panel = arial_font14.render(resource[0] + "  " + str(resource[1]), True,
-                                                             DarkText)
-                            screen.blit(text_panel, [740, 677 + yVar + yPos])
-
-                            yPos += 15
-
-                    # Bought resources
-                    text_panel = font20.render("Bought:", True, TitleText)
-                    screen.blit(text_panel, [855, 654 + yVar])
-
-                    # Records from last turn
-                    if len(TileObj.lot.residency[game_stats.i_p_index].records_bought) > 0:
-                        yPos = 0
-                        for resource in TileObj.lot.residency[game_stats.i_p_index].records_bought:
-                            text_panel = arial_font14.render(resource[0] + "  " + str(resource[1]), True,
-                                                             DarkText)
-                            screen.blit(text_panel, [855, 677 + yVar + yPos])
-
-                            yPos += 15
-
-                    # Consumed resources
-                    text_panel = font20.render("Consumed:", True, TitleText)
-                    screen.blit(text_panel, [970, 654 + yVar])
-
-                    # Records from last turn
-                    if len(TileObj.lot.residency[game_stats.i_p_index].records_consumed) > 0:
-                        yPos = 0
-                        for resource in TileObj.lot.residency[game_stats.i_p_index].records_consumed:
-                            text_panel = arial_font14.render(resource[0] + "  " + str(resource[1]), True,
-                                                             DarkText)
-                            screen.blit(text_panel, [970, 677 + yVar + yPos])
-
-                            yPos += 15
 
 
 def army_exchange_panel(screen):
@@ -2127,12 +1421,6 @@ def game_board_screen(screen):
         text_NewGame2 = font20.render(str(game_stats.display_time), True, TitleText)
         screen.blit(text_NewGame2, [400, 70])
 
-    # Information panel
-    # Displayed when player makes left click on game map choosing army, settlement or facility
-
-    if game_stats.selected_object != "":
-        info_panels[game_stats.selected_object](screen)
-
     ## Panels
     # print("game_board_panel - " + game_stats.game_board_panel)
     if game_stats.game_board_panel != "":
@@ -2189,10 +1477,6 @@ draw_panel_ext = {  # Bonus
     "slay the grey dragon result panel": slay_the_grey_dragon_result_win.slay_the_grey_dragon_result_draw_panel,
     # Quest result message
     "poachers in royal forest result panel": poachers_in_royal_forest_result_win.poachers_in_royal_forest_result_draw_panel}
-
-info_panels = {"Army": army_panel,
-               "Tile": tile_obj_panel,
-               "Settlement": settlement_info_panel}
 
 draw_right_window = {"Building upgrade information": rw_upgrade_building.draw_upgrade_info,
                      "Building information": rw_building.draw_building_info,

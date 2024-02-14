@@ -278,16 +278,18 @@ def begin_battle(attacker, defender, battle_type, battle_result_script):
     # print("After battle defender_troops_power_level_list: " + str(len(defender_troops_power_level_list)))
 
     if result == "Attacker has won" and attacker.hero is not None:
-        if attacker_realm.AI_player:
-            game_basic.hero_next_level(attacker.hero, exp_defenders)
-        else:
-            attacker.hero.experience += int(exp_defenders)
+        game_basic.hero_next_level(attacker.hero, exp_defenders)
+        # if attacker_realm.AI_player:
+        #     game_basic.hero_next_level(attacker.hero, exp_defenders)
+        # else:
+        #     attacker.hero.experience += int(exp_defenders)
 
     elif result == "Defender has won" and defender.hero is not None and battle_type != "special":
-        if defender_realm.AI_player:
-            game_basic.hero_next_level(defender.hero, exp_attackers)
-        else:
-            defender.hero.experience += int(exp_attackers)
+        game_basic.hero_next_level(defender.hero, exp_attackers)
+        # if defender_realm.AI_player:
+        #     game_basic.hero_next_level(defender.hero, exp_attackers)
+        # else:
+        #     defender.hero.experience += int(exp_attackers)
 
     AI_battle = True
     if attacker_realm is not None:

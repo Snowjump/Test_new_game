@@ -6,6 +6,7 @@ import pygame.draw
 
 from Resources import game_stats
 from Resources import game_obj
+from Resources import common_selects
 
 from Content import city_catalog
 from Content import objects_img_catalog
@@ -277,8 +278,8 @@ def update_sprites():
     # misc_img.set_colorkey(WhiteColor)
     game_stats.gf_terrain_dict["Terrains/border_48_48_200"] = misc_img
 
-    for x in range(0, 27):
-        for y in range(0, math.ceil(game_stats.game_window_height / 48)):
+    for x in range(0, 28):
+        for y in range(0, math.ceil(game_stats.game_window_height / 48 + 1)):
             num_x = x + game_stats.pov_pos[0]
             num_y = y + game_stats.pov_pos[1]
             if 0 < num_x <= game_stats.cur_level_width and 0 < num_y <= game_stats.cur_level_height:
@@ -315,17 +316,15 @@ def update_sprites():
                 if TileObj.lot is not None:
                     # Settlements
                     if TileObj.lot == "City":
-                        for city in game_obj.game_cities:
-                            if city.city_id == TileObj.city_id:
-                                settlement = city_catalog.city_cat[city.alignment]
-                                if settlement not in game_stats.gf_settlement_dict:
-                                    city_img = pygame.image.load('img/Cities/' +
-                                                                 settlement +
-                                                                 '.png').convert_alpha()
-                                    city_img.set_colorkey(WhiteColor)
-                                    game_stats.gf_settlement_dict[str(settlement)] = city_img
+                        city = common_selects.select_settlement_by_id(TileObj.city_id)
+                        settlement = city_catalog.city_cat[city.alignment]
+                        if settlement not in game_stats.gf_settlement_dict:
+                            city_img = pygame.image.load('img/Cities/' +
+                                                         settlement +
+                                                         '.png').convert_alpha()
+                            city_img.set_colorkey(WhiteColor)
+                            game_stats.gf_settlement_dict[str(settlement)] = city_img
 
-                                break
                     else:
                         # Objects
                         # -------
@@ -363,39 +362,37 @@ def update_sprites():
 
                 # Armies
                 if TileObj.army_id is not None:
-                    for army in game_obj.game_armies:
-                        if army.army_id == TileObj.army_id:
-                            if army.hero is None:
-                                unit = army.units[army.leader]
-                                # print(game_stats.gf_regiment_dict)
-                                if unit.img_source + "/" + unit.img + "_r" not in game_stats.gf_regiment_dict:
-                                    army_img = pygame.image.load(
-                                        'img/Creatures/' + str(unit.img_source) + '/' + str(unit.img) + '_r.png')
-                                    army_img.set_colorkey(WhiteColor)
-                                    game_stats.gf_regiment_dict[
-                                        str(unit.img_source + "/" + unit.img + "_r")] = army_img
+                    army = common_selects.select_army_by_id(TileObj.army_id)
+                    if army.hero is None:
+                        unit = army.units[army.leader]
+                        # print(game_stats.gf_regiment_dict)
+                        if unit.img_source + "/" + unit.img + "_r" not in game_stats.gf_regiment_dict:
+                            army_img = pygame.image.load(
+                                'img/Creatures/' + str(unit.img_source) + '/' + str(unit.img) + '_r.png')
+                            army_img.set_colorkey(WhiteColor)
+                            game_stats.gf_regiment_dict[
+                                str(unit.img_source + "/" + unit.img + "_r")] = army_img
 
-                                if unit.img_source + "/" + unit.img + "_l" not in game_stats.gf_regiment_dict:
-                                    army_img = pygame.image.load(
-                                        'img/Creatures/' + str(unit.img_source) + '/' + str(unit.img) + '_l.png')
-                                    army_img.set_colorkey(WhiteColor)
-                                    game_stats.gf_regiment_dict[
-                                        str(unit.img_source + "/" + unit.img + "_l")] = army_img
-                            else:
-                                if army.hero.img + "/" + army.hero.img_source + "_r" not in game_stats.gf_hero_dict:
-                                    army_img = pygame.image.load('img/Heroes/' + str(army.hero.img_source) + '/' +
-                                                                 str(army.hero.img) + '_r.png')
-                                    army_img.set_colorkey(WhiteColor)
-                                    game_stats.gf_hero_dict[
-                                        str(army.hero.img_source + "/" + army.hero.img + "_r")] = army_img
+                        if unit.img_source + "/" + unit.img + "_l" not in game_stats.gf_regiment_dict:
+                            army_img = pygame.image.load(
+                                'img/Creatures/' + str(unit.img_source) + '/' + str(unit.img) + '_l.png')
+                            army_img.set_colorkey(WhiteColor)
+                            game_stats.gf_regiment_dict[
+                                str(unit.img_source + "/" + unit.img + "_l")] = army_img
+                    else:
+                        if army.hero.img + "/" + army.hero.img_source + "_r" not in game_stats.gf_hero_dict:
+                            army_img = pygame.image.load('img/Heroes/' + str(army.hero.img_source) + '/' +
+                                                         str(army.hero.img) + '_r.png')
+                            army_img.set_colorkey(WhiteColor)
+                            game_stats.gf_hero_dict[
+                                str(army.hero.img_source + "/" + army.hero.img + "_r")] = army_img
 
-                                if army.hero.img + "/" + army.hero.img_source + "_l" not in game_stats.gf_hero_dict:
-                                    army_img = pygame.image.load('img/Heroes/' + str(army.hero.img_source) + '/' +
-                                                                 str(army.hero.img) + '_l.png')
-                                    army_img.set_colorkey(WhiteColor)
-                                    game_stats.gf_hero_dict[
-                                        str(army.hero.img_source + "/" + army.hero.img + "_l")] = army_img
-                            break
+                        if army.hero.img + "/" + army.hero.img_source + "_l" not in game_stats.gf_hero_dict:
+                            army_img = pygame.image.load('img/Heroes/' + str(army.hero.img_source) + '/' +
+                                                         str(army.hero.img) + '_l.png')
+                            army_img.set_colorkey(WhiteColor)
+                            game_stats.gf_hero_dict[
+                                str(army.hero.img_source + "/" + army.hero.img + "_l")] = army_img
 
     update_regiment_sprites()
 
@@ -403,113 +400,99 @@ def update_sprites():
 def update_regiment_sprites():
     # print("update_regiment_sprites()")
     if game_stats.selected_object == "Army":
-        for army in game_obj.game_armies:
-            if army.army_id == game_stats.selected_army:
-                for unit in army.units:
-                    if unit.img_source + "/" + unit.img + "_r" not in game_stats.gf_regiment_dict:
-                        army_img = pygame.image.load(
-                            'img/Creatures/' + str(unit.img_source) + '/' + str(unit.img) + '_r.png')
-                        army_img.set_colorkey(WhiteColor)
-                        game_stats.gf_regiment_dict[str(unit.img_source + "/" + unit.img + "_r")] = army_img
+        army = common_selects.select_army_by_id(game_stats.selected_army)
+        for unit in army.units:
+            if unit.img_source + "/" + unit.img + "_r" not in game_stats.gf_regiment_dict:
+                army_img = pygame.image.load(
+                    'img/Creatures/' + str(unit.img_source) + '/' + str(unit.img) + '_r.png')
+                army_img.set_colorkey(WhiteColor)
+                game_stats.gf_regiment_dict[str(unit.img_source + "/" + unit.img + "_r")] = army_img
 
-                    if unit.img_source + "/" + unit.img + "_l" not in game_stats.gf_regiment_dict:
-                        army_img = pygame.image.load(
-                            'img/Creatures/' + str(unit.img_source) + '/' + str(unit.img) + '_l.png')
-                        army_img.set_colorkey(WhiteColor)
-                        game_stats.gf_regiment_dict[str(unit.img_source + "/" + unit.img + "_l")] = army_img
+            if unit.img_source + "/" + unit.img + "_l" not in game_stats.gf_regiment_dict:
+                army_img = pygame.image.load(
+                    'img/Creatures/' + str(unit.img_source) + '/' + str(unit.img) + '_l.png')
+                army_img.set_colorkey(WhiteColor)
+                game_stats.gf_regiment_dict[str(unit.img_source + "/" + unit.img + "_l")] = army_img
 
-                # print(game_stats.gf_regiment_dict)
-                break
+        # print(game_stats.gf_regiment_dict)
 
     elif game_stats.selected_object == "Settlement":
         TileObj = None
-        for settlement in game_obj.game_cities:
-            if settlement.city_id == game_stats.selected_settlement:
-                x2 = int(settlement.posxy[0])
-                y2 = int(settlement.posxy[1])
-                TileNum = (y2 - 1) * game_stats.cur_level_width + x2 - 1
-                TileObj = game_obj.game_map[TileNum]
-
-                break
+        settlement = common_selects.select_settlement_by_id(game_stats.selected_settlement)
+        x2 = int(settlement.posxy[0])
+        y2 = int(settlement.posxy[1])
+        TileNum = (y2 - 1) * game_stats.cur_level_width + x2 - 1
+        TileObj = game_obj.game_map[TileNum]
 
         if TileObj.army_id is not None:
-            for army_obj in game_obj.game_armies:
-                if army_obj.army_id == TileObj.army_id:
-                    army = army_obj
-                    for unit in army.units:
-                        if unit.img_source + "/" + unit.img + "_r" not in game_stats.gf_regiment_dict:
-                            army_img = pygame.image.load(
-                                'img/Creatures/' + str(unit.img_source) + '/' + str(unit.img) + '_r.png')
-                            army_img.set_colorkey(WhiteColor)
-                            game_stats.gf_regiment_dict[str(unit.img_source + "/" + unit.img + "_r")] = army_img
+            army = common_selects.select_army_by_id(TileObj.army_id)
+            for unit in army.units:
+                if unit.img_source + "/" + unit.img + "_r" not in game_stats.gf_regiment_dict:
+                    army_img = pygame.image.load(
+                        'img/Creatures/' + str(unit.img_source) + '/' + str(unit.img) + '_r.png')
+                    army_img.set_colorkey(WhiteColor)
+                    game_stats.gf_regiment_dict[str(unit.img_source + "/" + unit.img + "_r")] = army_img
 
-                        if unit.img_source + "/" + unit.img + "_l" not in game_stats.gf_regiment_dict:
-                            army_img = pygame.image.load(
-                                'img/Creatures/' + str(unit.img_source) + '/' + str(unit.img) + '_l.png')
-                            army_img.set_colorkey(WhiteColor)
-                            game_stats.gf_regiment_dict[str(unit.img_source + "/" + unit.img + "_l")] = army_img
+                if unit.img_source + "/" + unit.img + "_l" not in game_stats.gf_regiment_dict:
+                    army_img = pygame.image.load(
+                        'img/Creatures/' + str(unit.img_source) + '/' + str(unit.img) + '_l.png')
+                    army_img.set_colorkey(WhiteColor)
+                    game_stats.gf_regiment_dict[str(unit.img_source + "/" + unit.img + "_l")] = army_img
 
-                    # Hero
-                    if army.hero is not None:
-                        # print(army.hero.hero_class)
-                        if army.hero.img + "/" + army.hero.img_source + "_r" not in game_stats.gf_hero_dict:
-                            army_img = pygame.image.load('img/Heroes/' + str(army.hero.img_source) + '/' +
-                                                         str(army.hero.img) + '_r.png')
-                            army_img.set_colorkey(WhiteColor)
-                            game_stats.gf_hero_dict[str(army.hero.img_source + "/" + army.hero.img + "_r")] = army_img
+            # Hero
+            if army.hero is not None:
+                # print(army.hero.hero_class)
+                if army.hero.img + "/" + army.hero.img_source + "_r" not in game_stats.gf_hero_dict:
+                    army_img = pygame.image.load('img/Heroes/' + str(army.hero.img_source) + '/' +
+                                                 str(army.hero.img) + '_r.png')
+                    army_img.set_colorkey(WhiteColor)
+                    game_stats.gf_hero_dict[str(army.hero.img_source + "/" + army.hero.img + "_r")] = army_img
 
-                        if army.hero.img + "/" + army.hero.img_source + "_l" not in game_stats.gf_hero_dict:
-                            army_img = pygame.image.load('img/Heroes/' + str(army.hero.img_source) + '/' +
-                                                         str(army.hero.img) + '_l.png')
-                            army_img.set_colorkey(WhiteColor)
-                            game_stats.gf_hero_dict[str(army.hero.img_source + "/" + army.hero.img + "_l")] = army_img
-
-                    break
+                if army.hero.img + "/" + army.hero.img_source + "_l" not in game_stats.gf_hero_dict:
+                    army_img = pygame.image.load('img/Heroes/' + str(army.hero.img_source) + '/' +
+                                                 str(army.hero.img) + '_l.png')
+                    army_img.set_colorkey(WhiteColor)
+                    game_stats.gf_hero_dict[str(army.hero.img_source + "/" + army.hero.img + "_l")] = army_img
 
         if game_stats.settlement_area == "Heroes":
-            for settlement in game_obj.game_cities:
-                if settlement.city_id == game_stats.selected_settlement:
-                    for hero in new_heroes_catalog.heroes_classes_dict_by_alignment[settlement.alignment]:
-                        hero_info = new_heroes_catalog.heroes_img_dict_by_alignment[settlement.alignment][hero]
+            settlement = common_selects.select_settlement_by_id(game_stats.selected_settlement)
+            for hero in new_heroes_catalog.heroes_classes_dict_by_alignment[settlement.alignment]:
+                hero_info = new_heroes_catalog.heroes_img_dict_by_alignment[settlement.alignment][hero]
 
-                        if hero_info[1] + "/" + hero_info[0] + "_r" not in game_stats.gf_hero_dict:
-                            army_img = pygame.image.load('img/Heroes/' + str(hero_info[1]) + '/' +
-                                                         str(hero_info[0]) + '_r.png')
-                            army_img.set_colorkey(WhiteColor)
-                            game_stats.gf_hero_dict[str(hero_info[1] + "/" + hero_info[0] + "_r")] = army_img
+                if hero_info[1] + "/" + hero_info[0] + "_r" not in game_stats.gf_hero_dict:
+                    army_img = pygame.image.load('img/Heroes/' + str(hero_info[1]) + '/' +
+                                                 str(hero_info[0]) + '_r.png')
+                    army_img.set_colorkey(WhiteColor)
+                    game_stats.gf_hero_dict[str(hero_info[1] + "/" + hero_info[0] + "_r")] = army_img
 
-                        if hero_info[1] + "/" + hero_info[0] + "_l" not in game_stats.gf_hero_dict:
-                            army_img = pygame.image.load('img/Heroes/' + str(hero_info[1]) + '/' +
-                                                         str(hero_info[0]) + '_l.png')
-                            army_img.set_colorkey(WhiteColor)
-                            game_stats.gf_hero_dict[str(hero_info[1] + "/" + hero_info[0] + "_l")] = army_img
+                if hero_info[1] + "/" + hero_info[0] + "_l" not in game_stats.gf_hero_dict:
+                    army_img = pygame.image.load('img/Heroes/' + str(hero_info[1]) + '/' +
+                                                 str(hero_info[0]) + '_l.png')
+                    army_img.set_colorkey(WhiteColor)
+                    game_stats.gf_hero_dict[str(hero_info[1] + "/" + hero_info[0] + "_l")] = army_img
 
-                    break
         elif game_stats.settlement_area == "Recruiting":
-            for settlement in game_obj.game_cities:
-                if settlement.city_id == game_stats.selected_settlement:
-                    for plot in settlement.buildings:
-                        if plot.structure is not None:
-                            if len(plot.structure.recruitment) > 0 and plot.status == "Built":
-                                for recruit in plot.structure.recruitment:
-                                    unit_info = unit_img_catalog.units_img_dict_by_alignment[settlement.alignment][
-                                        recruit.unit_name]
+            settlement = common_selects.select_settlement_by_id(game_stats.selected_settlement)
+            for plot in settlement.buildings:
+                if plot.structure is not None:
+                    if len(plot.structure.recruitment) > 0 and plot.status == "Built":
+                        for recruit in plot.structure.recruitment:
+                            unit_info = unit_img_catalog.units_img_dict_by_alignment[settlement.alignment][
+                                recruit.unit_name]
 
-                                    if unit_info[1] + "/" + unit_info[0] + "_r" not in game_stats.gf_regiment_dict:
-                                        army_img = pygame.image.load(
-                                            'img/Creatures/' + str(unit_info[1]) + '/' + str(unit_info[0]) + '_r.png')
-                                        army_img.set_colorkey(WhiteColor)
-                                        game_stats.gf_regiment_dict[
-                                            str(unit_info[1] + "/" + unit_info[0] + "_r")] = army_img
+                            if unit_info[1] + "/" + unit_info[0] + "_r" not in game_stats.gf_regiment_dict:
+                                army_img = pygame.image.load(
+                                    'img/Creatures/' + str(unit_info[1]) + '/' + str(unit_info[0]) + '_r.png')
+                                army_img.set_colorkey(WhiteColor)
+                                game_stats.gf_regiment_dict[
+                                    str(unit_info[1] + "/" + unit_info[0] + "_r")] = army_img
 
-                                    if unit_info[1] + "/" + unit_info[0] + "_l" not in game_stats.gf_regiment_dict:
-                                        army_img = pygame.image.load(
-                                            'img/Creatures/' + str(unit_info[1]) + '/' + str(unit_info[0]) + '_l.png')
-                                        army_img.set_colorkey(WhiteColor)
-                                        game_stats.gf_regiment_dict[
-                                            str(unit_info[1] + "/" + unit_info[0] + "_l")] = army_img
-
-                    break
+                            if unit_info[1] + "/" + unit_info[0] + "_l" not in game_stats.gf_regiment_dict:
+                                army_img = pygame.image.load(
+                                    'img/Creatures/' + str(unit_info[1]) + '/' + str(unit_info[0]) + '_l.png')
+                                army_img.set_colorkey(WhiteColor)
+                                game_stats.gf_regiment_dict[
+                                    str(unit_info[1] + "/" + unit_info[0] + "_l")] = army_img
 
     if game_stats.game_board_panel in ["begin battle panel", "settlement blockade panel"]:
         for army in game_obj.game_armies:
@@ -528,20 +511,19 @@ def update_regiment_sprites():
                         game_stats.gf_regiment_dict[str(unit.img_source + "/" + unit.img + "_l")] = army_img
 
     elif game_stats.game_board_panel == "army exchange panel":
-        for army in game_obj.game_armies:
-            if army.army_id == game_stats.selected_second_army:
-                for unit in army.units:
-                    if unit.img_source + "/" + unit.img + "_r" not in game_stats.gf_regiment_dict:
-                        army_img = pygame.image.load(
-                            'img/Creatures/' + str(unit.img_source) + '/' + str(unit.img) + '_r.png')
-                        army_img.set_colorkey(WhiteColor)
-                        game_stats.gf_regiment_dict[str(unit.img_source + "/" + unit.img + "_r")] = army_img
+        army = common_selects.select_army_by_id(game_stats.selected_second_army)
+        for unit in army.units:
+            if unit.img_source + "/" + unit.img + "_r" not in game_stats.gf_regiment_dict:
+                army_img = pygame.image.load(
+                    'img/Creatures/' + str(unit.img_source) + '/' + str(unit.img) + '_r.png')
+                army_img.set_colorkey(WhiteColor)
+                game_stats.gf_regiment_dict[str(unit.img_source + "/" + unit.img + "_r")] = army_img
 
-                    if unit.img_source + "/" + unit.img + "_l" not in game_stats.gf_regiment_dict:
-                        army_img = pygame.image.load(
-                            'img/Creatures/' + str(unit.img_source) + '/' + str(unit.img) + '_l.png')
-                        army_img.set_colorkey(WhiteColor)
-                        game_stats.gf_regiment_dict[str(unit.img_source + "/" + unit.img + "_l")] = army_img
+            if unit.img_source + "/" + unit.img + "_l" not in game_stats.gf_regiment_dict:
+                army_img = pygame.image.load(
+                    'img/Creatures/' + str(unit.img_source) + '/' + str(unit.img) + '_l.png')
+                army_img.set_colorkey(WhiteColor)
+                game_stats.gf_regiment_dict[str(unit.img_source + "/" + unit.img + "_l")] = army_img
 
     # If reward contains regiments, load regiment images
     if game_stats.reward_for_demonstration is not None:
@@ -595,8 +577,8 @@ def update_regiment_sprites_from_object(army):
 def remove_regiment_sprites():
     game_stats.gf_regiment_dict = {}
 
-    for x in range(0, 27):
-        for y in range(0, math.ceil(game_stats.game_window_height / 48)):
+    for x in range(0, 28):
+        for y in range(0, math.ceil(game_stats.game_window_height / 48 + 1)):
             num_x = x + game_stats.pov_pos[0]
             num_y = y + game_stats.pov_pos[1]
             if 0 < num_x <= game_stats.cur_level_width and 0 < num_y <= game_stats.cur_level_height:
@@ -605,30 +587,27 @@ def remove_regiment_sprites():
 
                 # Armies
                 if TileObj.army_id is not None:
-                    for army in game_obj.game_armies:
-                        if army.army_id == TileObj.army_id:
-                            if army.hero is None:
-                                unit = army.units[army.leader]
-                                if unit.img_source + "/" + unit.img + "_r" not in game_stats.gf_regiment_dict:
-                                    army_img = pygame.image.load(
-                                        'img/Creatures/' + str(unit.img_source) + '/' + str(unit.img) + '_r.png')
-                                    army_img.set_colorkey(WhiteColor)
-                                    game_stats.gf_regiment_dict[str(unit.img_source + "/" + unit.img + "_r")] = army_img
+                    army = common_selects.select_army_by_id(TileObj.army_id)
+                    if army.hero is None:
+                        unit = army.units[army.leader]
+                        if unit.img_source + "/" + unit.img + "_r" not in game_stats.gf_regiment_dict:
+                            army_img = pygame.image.load(
+                                'img/Creatures/' + str(unit.img_source) + '/' + str(unit.img) + '_r.png')
+                            army_img.set_colorkey(WhiteColor)
+                            game_stats.gf_regiment_dict[str(unit.img_source + "/" + unit.img + "_r")] = army_img
 
-                                if unit.img_source + "/" + unit.img + "_l" not in game_stats.gf_regiment_dict:
-                                    army_img = pygame.image.load(
-                                        'img/Creatures/' + str(unit.img_source) + '/' + str(unit.img) + '_l.png')
-                                    army_img.set_colorkey(WhiteColor)
-                                    game_stats.gf_regiment_dict[str(unit.img_source + "/" + unit.img + "_l")] = army_img
-
-                            break
+                        if unit.img_source + "/" + unit.img + "_l" not in game_stats.gf_regiment_dict:
+                            army_img = pygame.image.load(
+                                'img/Creatures/' + str(unit.img_source) + '/' + str(unit.img) + '_l.png')
+                            army_img.set_colorkey(WhiteColor)
+                            game_stats.gf_regiment_dict[str(unit.img_source + "/" + unit.img + "_l")] = army_img
 
 
 def remove_hero_sprites():
     game_stats.gf_hero_dict = {}
 
-    for x in range(0, 27):
-        for y in range(0, math.ceil(game_stats.game_window_height / 48)):
+    for x in range(0, 28):
+        for y in range(0, math.ceil(game_stats.game_window_height / 48 + 1)):
             num_x = x + game_stats.pov_pos[0]
             num_y = y + game_stats.pov_pos[1]
             if 0 < num_x <= game_stats.cur_level_width and 0 < num_y <= game_stats.cur_level_height:
@@ -637,24 +616,21 @@ def remove_hero_sprites():
 
                 # Armies
                 if TileObj.army_id is not None:
-                    for army in game_obj.game_armies:
-                        if army.army_id == TileObj.army_id:
-                            if army.hero is not None:
-                                if army.hero.img + "/" + army.hero.img_source + "_r" not in game_stats.gf_hero_dict:
-                                    army_img = pygame.image.load('img/Heroes/' + str(army.hero.img_source) + '/' +
-                                                                 str(army.hero.img) + '_r.png')
-                                    army_img.set_colorkey(WhiteColor)
-                                    game_stats.gf_hero_dict[
-                                        str(army.hero.img_source + "/" + army.hero.img + "_r")] = army_img
+                    army = common_selects.select_army_by_id(TileObj.army_id)
+                    if army.hero is not None:
+                        if army.hero.img + "/" + army.hero.img_source + "_r" not in game_stats.gf_hero_dict:
+                            army_img = pygame.image.load('img/Heroes/' + str(army.hero.img_source) + '/' +
+                                                         str(army.hero.img) + '_r.png')
+                            army_img.set_colorkey(WhiteColor)
+                            game_stats.gf_hero_dict[
+                                str(army.hero.img_source + "/" + army.hero.img + "_r")] = army_img
 
-                                if army.hero.img + "/" + army.hero.img_source + "_l" not in game_stats.gf_hero_dict:
-                                    army_img = pygame.image.load('img/Heroes/' + str(army.hero.img_source) + '/' +
-                                                                 str(army.hero.img) + '_l.png')
-                                    army_img.set_colorkey(WhiteColor)
-                                    game_stats.gf_hero_dict[
-                                        str(army.hero.img_source + "/" + army.hero.img + "_l")] = army_img
-
-                            break
+                        if army.hero.img + "/" + army.hero.img_source + "_l" not in game_stats.gf_hero_dict:
+                            army_img = pygame.image.load('img/Heroes/' + str(army.hero.img_source) + '/' +
+                                                         str(army.hero.img) + '_l.png')
+                            army_img.set_colorkey(WhiteColor)
+                            game_stats.gf_hero_dict[
+                                str(army.hero.img_source + "/" + army.hero.img + "_l")] = army_img
 
 
 def update_settlement_misc_sprites():
@@ -707,38 +683,34 @@ def add_misc_sprites(img_list):
 
 def open_settlement_building_sprites():
     if game_stats.game_board_panel == "settlement panel":
-        for settlement in game_obj.game_cities:
-            if settlement.city_id == game_stats.selected_settlement:
-                for plot in settlement.buildings:
-                    if plot.structure is not None:
-                        building_img = pygame.image.load(plot.structure.img).convert_alpha()
-                        building_img.set_colorkey(WhiteColor)
-                        game_stats.gf_building_dict[plot.structure.name] = building_img
+        settlement = common_selects.select_settlement_by_id(game_stats.selected_settlement)
+        for plot in settlement.buildings:
+            if plot.structure is not None:
+                building_img = pygame.image.load(plot.structure.img).convert_alpha()
+                building_img.set_colorkey(WhiteColor)
+                game_stats.gf_building_dict[plot.structure.name] = building_img
 
-                    if plot.status == "Building" and "Icons/duration_icon" not in game_stats.gf_misc_img_dict:
-                        misc_img = pygame.image.load('img/Icons/duration_icon.png').convert_alpha()
-                        misc_img.set_colorkey(WhiteColor)
-                        game_stats.gf_misc_img_dict["Icons/duration_icon"] = misc_img
-                break
+            if plot.status == "Building" and "Icons/duration_icon" not in game_stats.gf_misc_img_dict:
+                misc_img = pygame.image.load('img/Icons/duration_icon.png').convert_alpha()
+                misc_img.set_colorkey(WhiteColor)
+                game_stats.gf_misc_img_dict["Icons/duration_icon"] = misc_img
 
     elif game_stats.game_board_panel == "settlement blockade panel":
         if "Icons/paper_2_square_50_x_40" not in game_stats.gf_misc_img_dict:
             misc_img = pygame.image.load('img/Icons/paper_2_square_50_x_40.png').convert()
             game_stats.gf_misc_img_dict["Icons/paper_2_square_50_x_40"] = misc_img
 
-        for settlement in game_obj.game_cities:
-            if settlement.city_id == game_stats.selected_settlement:
-                for plot in settlement.buildings:
-                    if plot.structure is not None:
-                        if plot.status == "Built" and plot.structure.defensive_structure is not None:
-                            building_img = pygame.image.load(plot.structure.img).convert_alpha()
-                            building_img.set_colorkey(WhiteColor)
-                            game_stats.gf_building_dict[plot.structure.name] = building_img
+        settlement = common_selects.select_settlement_by_id(game_stats.selected_settlement)
+        for plot in settlement.buildings:
+            if plot.structure is not None:
+                if plot.status == "Built" and plot.structure.defensive_structure is not None:
+                    building_img = pygame.image.load(plot.structure.img).convert_alpha()
+                    building_img.set_colorkey(WhiteColor)
+                    game_stats.gf_building_dict[plot.structure.name] = building_img
 
-                            if "Icons/paper_2_square_50_x_40" not in game_stats.gf_misc_img_dict:
-                                misc_img = pygame.image.load('img/Icons/paper_2_square_50_x_40.png').convert()
-                                game_stats.gf_misc_img_dict["Icons/paper_2_square_50_x_40"] = misc_img
-                break
+                    if "Icons/paper_2_square_50_x_40" not in game_stats.gf_misc_img_dict:
+                        misc_img = pygame.image.load('img/Icons/paper_2_square_50_x_40.png').convert()
+                        game_stats.gf_misc_img_dict["Icons/paper_2_square_50_x_40"] = misc_img
 
 
 def add_settlement_building_sprites(building_name, building_img):

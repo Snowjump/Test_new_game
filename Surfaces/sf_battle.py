@@ -1508,7 +1508,8 @@ def end_battle_but():
                     army.action = "Stand"
                     # Gain experience
                     if army.hero is not None:
-                        army.hero.experience += int(b.earned_experience)
+                        game_basic.hero_next_level(army.hero, b.earned_experience)
+                        # army.hero.experience += int(b.earned_experience)
 
             if army.army_id not in remove_army_id:
                 if army.owner != "Neutral":

@@ -4,7 +4,7 @@
 # Software versioning
 version_major = 0
 version_minor = 1
-version_micro = 6
+version_micro = 7
 
 time_counted = 0
 fps = 0.0
@@ -297,7 +297,7 @@ battle_result_script = None  # None is standard for regular battles, but battles
 # Ending of the battle
 battle_result = ""  # 4 variations: "Attacker has won", "Defender has won", "Draw", ""
 result_statement = ""  # 4 variations: "Victory", "Defeat", "Draw", ""
-earned_experience = 0  # experience earned from the battle
+earned_experience = 0  # experience earned from the battle for demonstration in victory screen
 attacker_army = None
 defender_army = None
 attacker_troops_power_level_list = []

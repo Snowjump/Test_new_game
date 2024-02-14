@@ -5,5 +5,9 @@ import pygame.font
 
 
 tnr_font20 = pygame.font.SysFont('timesnewroman', 20)
+tnr_font18 = pygame.font.SysFont('timesnewroman', 18)
 tnr_font16 = pygame.font.SysFont('timesnewroman', 16)
 tnr_font14 = pygame.font.SysFont('timesnewroman', 14)
+
+arial_font16 = pygame.font.SysFont('arial', 16)
+arial_font14 = pygame.font.SysFont('arial', 14)

@@ -29,16 +29,16 @@ def control_input():
 
         # Typing
         if event.type == KEYDOWN:
-            print("event.key: " + str(event.key) + "; key_pressed: " + str(game_stats.key_pressed))
+            # print("event.key: " + str(event.key) + "; key_pressed: " + str(game_stats.key_pressed))
             # game_stats.input_text += event.unicode
             # print(game_stats.input_text)
-            print("unicode: " + event.unicode + "; record_text: " + str(game_stats.record_text))
+            # print("unicode: " + event.unicode + "; record_text: " + str(game_stats.record_text))
             if game_stats.record_text:
                 game_stats.input_text += event.unicode
 
             # if not key_pressed or event.key in [304]:
             if not game_stats.key_pressed:
-                print("key_handler")
+                # print("key_handler")
                 if event.key not in [304]:
                     game_stats.key_pressed = True
                 key_handler(event.key)
