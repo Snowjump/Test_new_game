@@ -39,6 +39,8 @@ def save_new_level():
 
     shelfFile["new_level_LE_population_id_counter"] = game_stats.LE_population_id_counter
 
+    shelfFile["new_level_LE_faction_id_counter"] = game_stats.LE_faction_id_counter
+
     shelfFile.close()
 
 

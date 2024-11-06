@@ -108,7 +108,7 @@ def draw_tiles(screen):
         #         map_to_display = power.known_map
 
         for x in range(0, 28):
-            for y in range(0, math.ceil(game_stats.game_window_height / 48 + 1)):
+            for y in range(0, math.ceil(game_stats.game_window_height / 48) + 1):
                 num_x = x + game_stats.pov_pos[0]
                 num_y = y + game_stats.pov_pos[1]
                 if 0 < num_x <= game_stats.cur_level_width and 0 < num_y <= game_stats.cur_level_height:
@@ -212,7 +212,7 @@ def draw_tiles(screen):
         #         if [TileObj.posxy[0], TileObj.posxy[1]] in game_stats.map_to_display:
 
         for x in range(0, 28):
-            for y in range(0, math.ceil(game_stats.game_window_height / 48 + 1)):
+            for y in range(0, math.ceil(game_stats.game_window_height / 48) + 1):
                 num_x = x + game_stats.pov_pos[0]
                 num_y = y + game_stats.pov_pos[1]
                 if 0 < num_x <= game_stats.cur_level_width and 0 < num_y <= game_stats.cur_level_height:

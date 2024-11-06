@@ -1,6 +1,8 @@
-## Miracle battles
+## Among Myth and Wonder
+## game_start
 
-import random, pygame, math
+import random, pygame, math, shelve
+from pathlib import Path
 
 from Resources import game_stats
 from Resources import game_classes
@@ -13,10 +15,10 @@ def new_game():
     game_stats.pov_pos = [0, 0]
     game_stats.edit_instrument = "select"
     game_stats.selected_tile = []
-    game_stats.faction_num = 0
-    game_stats.cities_id_counter = 0
-    game_stats.lv_year = 0
-    game_stats.lv_month = 5
+    # game_stats.faction_num = 0
+    # game_stats.cities_id_counter = 0
+    # game_stats.lv_year = 0
+    # game_stats.lv_month = 5
 
     # Create level map
     nullify_level_editor_variables()
@@ -49,3 +51,44 @@ def nullify_level_editor_variables():
     game_stats.LE_hero_id_counter = 0
     game_stats.LE_population_id_counter = 0
     game_stats.LE_faction_id_counter = 0
+
+
+def load_level_into_editor():
+    folder = "Skirmish"
+    level_to_load = game_stats.levels_list[game_stats.level_index]
+    shelfFile = shelve.open(str(Path('levels/' + folder)) + '/' + level_to_load)
+
+    game_stats.map_operations = True
+    game_stats.active_name_field = False
+    game_stats.pov_pos = [0, 0]
+    game_stats.edit_instrument = "select"
+    game_stats.selected_tile = []
+
+    nullify_level_editor_variables()
+
+    game_stats.new_level_name = shelfFile["new_level_named"]
+    game_stats.LE_year = shelfFile["new_level_year"]
+    game_stats.LE_month = shelfFile["new_level_month"]
+    game_stats.level_map = shelfFile["new_level_map"]
+
+    game_stats.editor_powers = shelfFile["new_level_powers"]
+    game_stats.editor_cities = shelfFile["new_level_cities"]
+    game_stats.editor_armies = shelfFile["new_level_armies"]
+
+    game_stats.LE_cities_id_counter = shelfFile["new_level_LE_cities_id_counter"]
+    game_stats.LE_army_id_counter = shelfFile["new_level_LE_army_id_counter"]
+    game_stats.LE_hero_id_counter = shelfFile["new_level_LE_hero_id_counter"]
+    game_stats.LE_population_id_counter = shelfFile["new_level_LE_population_id_counter"]
+    game_stats.LE_faction_id_counter = shelfFile["new_level_LE_faction_id_counter"]
+
+    shelfFile.close()
+
+    max_x = 0
+    max_y = 0
+    for tile in game_stats.level_map:
+        if tile.posxy[0] > max_x:
+            max_x = tile.posxy[0]
+        if tile.posxy[1] > max_y:
+            max_y = tile.posxy[1]
+    game_stats.new_level_width = int(max_x)
+    game_stats.new_level_height = int(max_y)

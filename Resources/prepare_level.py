@@ -337,7 +337,7 @@ def prepare_AI_army_roles():
 
             if medium_armies > 0:
                 # Upscale army_size even if rank lower recommended value
-                print(str(realm.name) + ": Upscale army_size even if rank lower recommended value")
+                print(str(realm.name) + ": Upscale army_size even if rank is lower than recommended value")
                 for army in game_obj.game_armies:
                     if army.owner == realm.name:
                         if medium_armies > 0:
@@ -379,6 +379,8 @@ def prepare_population_reserves():
         elif tile.lot is not None:
             if tile.lot.obj_typ == "Facility":
                 for population in tile.lot.residency:
+                    print("Facility: posxy - " + str(tile.lot.posxy) + ", obj_name - " + str(tile.lot.obj_name))
+                    print("Facility: alignment - " + str(tile.lot.alignment))
                     place_group = faction_classes.fac_groups_for_pop[tile.lot.alignment]
                     pop_group = place_group[tile.lot.obj_name]
                     for pop_type in pop_group:

@@ -13,9 +13,39 @@ from Surfaces.sf_skirmish_menu import *
 from Surfaces.sf_settings import *
 from Surfaces.sf_battle import *
 from Surfaces.sf_credits import *
-
+from Surfaces.sf_load_level_into_editor import *
 
 from Resources import game_stats
+
+m1_button_action_list = {"Entrance Menu": entrance_menu_surface_m1,
+                         "Skirmish": skirmish_menu_surface_m1,
+                         "Game Board": game_board_surface_m1,
+                         "Create Level": create_level_surface_m1,
+                         "Level Editor": level_editor_surface_m1,
+                         "Settings": settings_surface_m1,
+                         "Battle": battle_surface_m1,
+                         "Credits": credits_surface_m1,
+                         "Load Level Into Editor": load_level_edit_surface_m1}
+
+m3_button_action_list = {"Entrance Menu": entrance_menu_surface_m3,
+                         "Skirmish": skirmish_menu_surface_m3,
+                         "Game Board": game_board_surface_m3,
+                         "Create Level": create_level_surface_m3,
+                         "Level Editor": level_editor_surface_m3,
+                         "Settings": settings_surface_m3,
+                         "Battle": battle_surface_m3,
+                         "Credits": credits_surface_m3,
+                         "Load Level Into Editor": load_level_edit_surface_m3}
+
+key_action_list = {"Entrance Menu": entrance_menu_keys,
+                   "Skirmish": skirmish_menu_keys,
+                   "Game Board": game_board_keys,
+                   "Create Level": create_level_keys,
+                   "Level Editor": level_editor_keys,
+                   "Settings": settings_keys,
+                   "Battle": battle_keys,
+                   "Credits": credits_keys,
+                   "Load Level Into Editor": load_level_edit_surface_keys}
 
 
 # all events happen below
@@ -89,42 +119,42 @@ def control_input():
 # perform appropriate action
 def mouse_handler1(position):  # for first mouse button
     # print("Mouse 1: current_screen is " + str(game_stats.current_screen))
-    button_action_list = {"Entrance Menu": entrance_menu_surface_m1,
-                          "Skirmish": skirmish_menu_surface_m1,
-                          "Game Board": game_board_surface_m1,
-                          "Create Level": create_level_surface_m1,
-                          "Level Editor": level_editor_surface_m1,
-                          "Settings": settings_surface_m1,
-                          "Battle": battle_surface_m1,
-                          "Credits": credits_surface_m1}
+    # button_action_list = {"Entrance Menu": entrance_menu_surface_m1,
+    #                       "Skirmish": skirmish_menu_surface_m1,
+    #                       "Game Board": game_board_surface_m1,
+    #                       "Create Level": create_level_surface_m1,
+    #                       "Level Editor": level_editor_surface_m1,
+    #                       "Settings": settings_surface_m1,
+    #                       "Battle": battle_surface_m1,
+    #                       "Credits": credits_surface_m1}
 
-    button_action_list[game_stats.current_screen](position)
+    m1_button_action_list[game_stats.current_screen](position)
 
 
 def mouse_handler3(position):  # for third (right) mouse button
     # print("Mouse 3: current_screen is " + str(game_stats.current_screen))
-    button_action_list = {"Entrance Menu": entrance_menu_surface_m3,
-                          "Skirmish": skirmish_menu_surface_m3,
-                          "Game Board": game_board_surface_m3,
-                          "Create Level": create_level_surface_m3,
-                          "Level Editor": level_editor_surface_m3,
-                          "Settings": settings_surface_m3,
-                          "Battle": battle_surface_m3,
-                          "Credits": credits_surface_m3}
+    # button_action_list = {"Entrance Menu": entrance_menu_surface_m3,
+    #                       "Skirmish": skirmish_menu_surface_m3,
+    #                       "Game Board": game_board_surface_m3,
+    #                       "Create Level": create_level_surface_m3,
+    #                       "Level Editor": level_editor_surface_m3,
+    #                       "Settings": settings_surface_m3,
+    #                       "Battle": battle_surface_m3,
+    #                       "Credits": credits_surface_m3}
 
-    button_action_list[game_stats.current_screen](position)
+    m3_button_action_list[game_stats.current_screen](position)
 
 
 def key_handler(key_action):  # for keyboard
     # print("Keyboard: current_screen is " + str(game_stats.current_screen))
     # print("Key action is " + str(key_action))
-    key_action_list = {"Entrance Menu": entrance_menu_keys,
-                       "Skirmish": skirmish_menu_keys,
-                       "Game Board": game_board_keys,
-                       "Create Level": create_level_keys,
-                       "Level Editor": level_editor_keys,
-                       "Settings": settings_keys,
-                       "Battle": battle_keys,
-                       "Credits": credits_keys}
+    # key_action_list = {"Entrance Menu": entrance_menu_keys,
+    #                    "Skirmish": skirmish_menu_keys,
+    #                    "Game Board": game_board_keys,
+    #                    "Create Level": create_level_keys,
+    #                    "Level Editor": level_editor_keys,
+    #                    "Settings": settings_keys,
+    #                    "Battle": battle_keys,
+    #                    "Credits": credits_keys}
 
     key_action_list[game_stats.current_screen](key_action)

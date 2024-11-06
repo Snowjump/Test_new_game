@@ -125,10 +125,12 @@ create_army_lower_panel_zone = [[202, 634 + yVar, 300, 655 + yVar]]
 population_lower_panel_zone = []
 
 objects_forest_panel_zone = [[1044, 164, 1150, 186],
-                             [1160, 164, 1266, 186]]
+                             [1160, 164, 1266, 186],
+                             [1044, 194, 1150, 216]]
 
 objects_trees_panel_zone = [[1044, 164, 1150, 186],
-                            [1160, 164, 1266, 186]]
+                            [1160, 164, 1266, 186],
+                            [1044, 194, 1150, 216]]
 
 realm_leader_panel_zone = [[621, 628 + yVar, 640, 647 + yVar],
                            [621, 775 + yVar, 640, 794 + yVar],
@@ -407,10 +409,10 @@ def level_editor_surface_m1(position):
 
                     # Objects
                     # Forest
-                    if game_stats.brush in ["Obj - Oak forest", "Obj - Birch forest"]:
+                    if game_stats.brush in ["Obj - Oak forest", "Obj - Birch forest", "Obj - Pine forest"]:
                         put_obstacle_forest(x2, y2)
 
-                    elif game_stats.brush in ["Obj - Oak trees", "Obj - Birch trees"]:
+                    elif game_stats.brush in ["Obj - Oak trees", "Obj - Birch trees", "Obj - Pine trees"]:
                         put_obstacle_trees(x2, y2)
 
         elif game_stats.edit_instrument == "put exploration object":
@@ -441,7 +443,7 @@ def level_editor_surface_m1(position):
                     # Exploration objects
                     elif game_stats.brush in exploration_catalog.groups_cat[game_stats.object_category]:
                         if game_stats.level_map[TileNum].lot is None:
-                            print("Success")
+                            print("Successful placement of exploration object:")
                             details = exploration_catalog.details_cat[game_stats.object_category][game_stats.brush]
                             game_stats.level_map[TileNum].lot = game_classes.Map_Object([x2, y2],
                                                                                         int(TileNum),
@@ -458,6 +460,7 @@ def level_editor_surface_m1(position):
                                 fill_lair_with_army(game_stats.level_map[TileNum].lot)
                             # print('img/' + game_stats.level_map[
                             #     TileNum].lot.img_path + "oak_summer" + '.png')
+                            print(str(details[3]))
 
                             # Update visuals
                             update_gf_level_editor.add_exploration_sprites(TileNum)
@@ -1489,6 +1492,11 @@ def forest_birch_but():
     print("game_stats.brush = Obj - Birch forest")
 
 
+def forest_pine_but():
+    game_stats.brush = "Obj - Pine forest"
+    print("game_stats.brush = Obj - Pine forest")
+
+
 def trees_oak_but():
     game_stats.brush = "Obj - Oak trees"
     print("game_stats.brush = Obj - Oak trees")
@@ -1497,6 +1505,11 @@ def trees_oak_but():
 def trees_birch_but():
     game_stats.brush = "Obj - Birch trees"
     print("game_stats.brush = Obj - Birch trees")
+
+
+def trees_pine_but():
+    game_stats.brush = "Obj - Pine trees"
+    print("game_stats.brush = Obj - Pine trees")
 
 
 def put_obstacle_forest(x2, y2):
@@ -2146,10 +2159,12 @@ create_city_lower_panel_funs = {1: delete_city_but,
 create_army_lower_panel_funs = {1: delete_unit_but}
 
 obj_forest_panel_funs = {1: forest_oak_but,
-                         2: forest_birch_but}
+                         2: forest_birch_but,
+                         3: forest_pine_but}
 
 obj_trees_panel_funs = {1: trees_oak_but,
-                        2: trees_birch_but}
+                        2: trees_birch_but,
+                        3: trees_pine_but}
 
 exploration_panel_funs = {1: remove_object_but,
                           2: previous_object_group_but,
@@ -2211,5 +2226,7 @@ left_panel_click_zone = {"building menu left panel": [1, 80, 639, 430]}
 
 objects_names = {"Obj - Oak forest" : "Oak",
                  "Obj - Birch forest" : "Birch",
+                 "Obj - Pine forest" : "Pine",
                  "Obj - Oak trees" : "Oak",
-                 "Obj - Birch trees" : "Birch"}
+                 "Obj - Birch trees" : "Birch",
+                 "Obj - Pine trees" : "Pine"}

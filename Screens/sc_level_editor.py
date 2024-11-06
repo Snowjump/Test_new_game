@@ -36,8 +36,8 @@ def draw_rect_alpha(surface, color, rect):
 
 def draw_tiles(screen):
     if len(game_stats.level_map) > 0:
-        for x in range(0, 27):
-            for y in range(0, math.ceil(game_stats.game_window_height / 48)):
+        for x in range(0, 28):
+            for y in range(0, math.ceil(game_stats.game_window_height / 48) + 1):
                 num_x = x + game_stats.pov_pos[0]
                 num_y = y + game_stats.pov_pos[1]
                 if 0 < num_x <= game_stats.new_level_width and 0 < num_y <= game_stats.new_level_height:
@@ -104,8 +104,8 @@ def draw_tiles(screen):
                                         [[(x - 1) * 48 + 1, (y - 1) * 48 + 1], [(x - 1) * 48 + 48, (y - 1) * 48 + 1],
                                          [(x - 1) * 48 + 48, (y - 1) * 48 + 48], [(x - 1) * 48 + 1, (y - 1) * 48 + 48]], 1)
 
-        for x in range(0, 27):
-            for y in range(0, math.ceil(game_stats.game_window_height / 48)):
+        for x in range(0, 28):
+            for y in range(0, math.ceil(game_stats.game_window_height / 48) + 1):
                 num_x = x + game_stats.pov_pos[0]
                 num_y = y + game_stats.pov_pos[1]
                 if 0 < num_x <= game_stats.new_level_width and 0 < num_y <= game_stats.new_level_height:
@@ -1294,7 +1294,7 @@ def objects_panel(screen):
             color1 = LineMainMenuColor1
         pygame.draw.polygon(screen, color1, [[1044, 164], [1150, 164], [1150, 186], [1044, 186]], 3)
         text_panel1 = font20.render("Oak", True, DarkText)
-        screen.blit(text_panel1, [1075, 164])
+        screen.blit(text_panel1, [1081, 164])
 
         # Button - Birch forest
         pygame.draw.polygon(screen, FillButton,
@@ -1307,6 +1307,22 @@ def objects_panel(screen):
         text_panel1 = font20.render("Birch", True, DarkText)
         screen.blit(text_panel1, [1192, 164])
 
+        # Button - Pine forest
+        a = 1
+        x = 1044
+        y = 164 + 30 * a
+        w = 106
+        h = 22
+        pygame.draw.polygon(screen, FillButton,
+                            [[x, y], [x + w, y], [x + w, y + h], [x, y + h]])
+        if game_stats.brush == "Obj - Pine forest":
+            color1 = HighlightOption
+        else:
+            color1 = LineMainMenuColor1
+        pygame.draw.polygon(screen, color1, [[x, y], [x + w, y], [x + w, y + h], [x, y + h]], 3)
+        text_panel1 = font20.render("Pine", True, DarkText)
+        screen.blit(text_panel1, [x + 36, y])
+
     # If category is "Trees"
     elif game_stats.object_category == "Trees":
         # Button - Oak trees
@@ -1318,7 +1334,7 @@ def objects_panel(screen):
             color1 = LineMainMenuColor1
         pygame.draw.polygon(screen, color1, [[1044, 164], [1150, 164], [1150, 186], [1044, 186]], 3)
         text_panel1 = font20.render("Oak", True, DarkText)
-        screen.blit(text_panel1, [1079, 164])
+        screen.blit(text_panel1, [1081, 164])
 
         # Button - Birch forest
         pygame.draw.polygon(screen, FillButton,
@@ -1330,6 +1346,22 @@ def objects_panel(screen):
         pygame.draw.polygon(screen, color1, [[1160, 164], [1266, 164], [1266, 186], [1160, 186]], 3)
         text_panel1 = font20.render("Birch", True, DarkText)
         screen.blit(text_panel1, [1192, 164])
+
+        # Button - Pine forest
+        a = 1
+        x = 1044
+        y = 164 + 30 * a
+        w = 106
+        h = 22
+        pygame.draw.polygon(screen, FillButton,
+                            [[x, y], [x + w, y], [x + w, y + h], [x, y + h]])
+        if game_stats.brush == "Obj - Pine trees":
+            color1 = HighlightOption
+        else:
+            color1 = LineMainMenuColor1
+        pygame.draw.polygon(screen, color1, [[x, y], [x + w, y], [x + w, y + h], [x, y + h]], 3)
+        text_panel1 = font20.render("Pine", True, DarkText)
+        screen.blit(text_panel1, [x + 36, y])
 
 
 def facility_panel(screen):

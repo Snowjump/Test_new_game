@@ -19,11 +19,21 @@ birch_seasons = {"Early Winter": "birch_early_spring",
                  "Summer": "birch_summer",
                  "Autumn": "birch_autumn"}
 
+# 3 - Pine
+pine_seasons = {"Early Winter": "pine_winter",
+                "Winter": "pine_winter",
+                "Melting Spring": "pine_spring",
+                "Spring": "pine_spring",
+                "Summer": "pine_summer",
+                "Autumn": "pine_autumn"}
+
 # Dictionary catalog
 
 object_calendar = {"Oak": oak_seasons,
-                   "Birch": birch_seasons}
+                   "Birch": birch_seasons,
+                   "Pine": pine_seasons}
 
 
 object_variations = {"Oak": 1,
-                     "Birch": 3}
+                     "Birch": 3,
+                     "Pine": 3}

@@ -255,8 +255,29 @@ def create_level_screen(screen):
 
     pygame.draw.polygon(screen, BorderNewGameColor, [[250, 458], [550, 458], [550, 490], [250, 490]], 3)
 
+    # New level
+    x_pos = 670
+    y_pos = 131
+    text_NewGame2 = font26.render("New level", True, TitleText)
+
+    pygame.draw.polygon(screen, HighlightBorder, [[x_pos, y_pos], [x_pos + 160, y_pos],
+                                                  [x_pos + 160, y_pos + 32], [x_pos, y_pos + 32]], 3)
+
+    screen.blit(text_NewGame2, [x_pos + 24, y_pos + 2])
+
+    # Load level
+    y_pos += 55
+    text_NewGame2 = font26.render("Load level", True, TitleText)
+
+    pygame.draw.polygon(screen, BorderNewGameColor, [[x_pos, y_pos], [x_pos + 160, y_pos],
+                                                  [x_pos + 160, y_pos + 32], [x_pos, y_pos + 32]], 3)
+
+    screen.blit(text_NewGame2, [x_pos + 22, y_pos + 2])
+
     # Art picture
     picture_img = game_stats.gf_menus_art["Arts/storm_in_the_ocean"]
     picture_img = pygame.transform.scale(picture_img,
                                          (306, 546))
     screen.blit(picture_img, (901, 61))
+
+

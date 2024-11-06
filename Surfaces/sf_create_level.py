@@ -1,7 +1,7 @@
 ## Among Myth and Wonder
 ## sf_create_level
 
-import sys, pygame
+import sys, pygame, glob
 
 from Resources import game_stats
 from Resources import game_start
@@ -20,7 +20,8 @@ button_zone = [[250, 513, 550, 545],  # return_to_main_menu_but
                [250, 458, 550, 490],  # start_editor_but
                [370, 131, 440, 163],
                [450, 131, 482, 163],
-               [490, 131, 522, 163]]
+               [490, 131, 522, 163],
+               [670, 186, 830, 218]]  # load level
 
 
 def create_level_keys(key_action):
@@ -65,7 +66,7 @@ def create_level_surface_m1(position):
 
 
 def create_level_surface_m3(position):
-    print("Success")
+    print("create_level_surface_m3()")
 
 
 def return_to_main_menu_but():
@@ -246,6 +247,27 @@ def cancel_starting_month_but():
     click_sound.play()
 
 
+def load_level_but():
+    print("load_level_but()")
+    game_stats.active_width_field = False
+    game_stats.active_height_field = False
+    game_stats.active_name_field = False
+    game_stats.active_starting_month_field = False
+
+    game_stats.level_index = 0
+    game_stats.levels_list = glob.glob("Levels/Skirmish/*.dat")
+    game_stats.levels_list = [w.replace(w, w[16:-4]) for w in game_stats.levels_list]
+
+    game_stats.current_screen = "Load Level Into Editor"
+    print(game_stats.current_screen)
+    game_stats.screen_to_draw = "load_level_edit_screen"
+
+    game_stats.record_text = False
+
+    click_sound = pygame.mixer.Sound("Sound/Interface/Abstract1.ogg")
+    click_sound.play()
+
+
 button_funs = {1 : return_to_main_menu_but,
                2 : width_field_enter,
                3 : approve_width_but,
@@ -259,4 +281,5 @@ button_funs = {1 : return_to_main_menu_but,
                11 : start_editor_but,
                12 : starting_month_field_enter,
                13 : approve_starting_month_but,
-               14 : cancel_starting_month_but}
+               14 : cancel_starting_month_but,
+               15 : load_level_but}
