@@ -1605,13 +1605,15 @@ def close_settlement_panel_but():
     game_stats.building_row_index = 0
 
     # Update visuals
-    update_gf_game_board.remove_regiment_sprites()
+    # update_gf_game_board.remove_regiment_sprites()
     update_gf_game_board.remove_hero_sprites()
     img_list = ["Icons/building_icon", "Icons/recruiting_icon", "Icons/heroes_icon",
                 "Icons/economy_icon", "Icons/factions_icon", "Icons/duration_icon", "Icons/paper_3_square_48",
                 "Icons/good_loyalty_icon", "Icons/bad_loyalty_icon"]
     update_gf_game_board.remove_settlement_misc_sprites(img_list)
     game_stats.gf_building_dict = {}
+    # print("sf_game_board - close_settlement_panel_but()")
+    graphics_basic.remove_specific_objects(["Info panel settlement"])
 
     click_sound = pygame.mixer.Sound("Sound/Interface/Abstract2.ogg")
     click_sound.play()

@@ -33,6 +33,7 @@ class Settlement_Info_Panel(graphics_classes.Panel):
         # print("tile_obj.army_id - " + str(tile_obj.army_id))
 
         if tile_obj.army_id:
+            # print("panel - " + self.name)
             # print("tile_obj.army_id - " + str(tile_obj.army_id))
             army = common_selects.select_army_by_id(tile_obj.army_id)
             self.draw_army_info(screen, yVar, army)
@@ -140,6 +141,8 @@ class Settlement_Info_Panel(graphics_classes.Panel):
         # Units
         if len(army.units) > 0:
             number = 0
+            # print("info_panel_settlement - game_stats.gf_regiment_dict:")
+            # print(str(game_stats.gf_regiment_dict))
             for unit in army.units:
                 x_pos = 430 + math.floor(number % 10) * 52
                 y_pos = 654 + yVar + math.floor(number / 10) * 57

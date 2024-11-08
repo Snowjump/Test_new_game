@@ -1370,6 +1370,7 @@ def game_board_screen(screen):
     # Calendar
     for obj in graphics_obj.game_board_objects:
         obj.draw_panel(screen)
+        # print(obj.name)
 
     # # Left ribbon menu
     # pygame.draw.polygon(screen, MainMenuColorDark1, [[0, 0], [31, 0], [31, 119], [0, 119]])
