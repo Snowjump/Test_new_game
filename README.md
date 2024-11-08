@@ -7,6 +7,14 @@ This project gives me a wonderful opportunity to fulfill my preferences in turn-
 
 For now working title for this videogame will be 'Among Myth and Wonder'
 
+## Screenshots
+
+![pic_01](https://github.com/user-attachments/assets/057c607c-d20c-45fd-87b8-b39fe32801d3)
+
+![pic_02](https://github.com/user-attachments/assets/ccf500e6-c7d2-478d-8e01-520e7a30b836)
+
+![pic_03](https://github.com/user-attachments/assets/f682c789-aa1f-4264-afe5-4e4eb58a7ad0)
+
 
 # Personal milestones
 Created level editor
