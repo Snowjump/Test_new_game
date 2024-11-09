@@ -99,7 +99,7 @@ def draw_polygon_alpha(surface, color, points):
 
 
 def draw_tiles(screen):
-    if len(game_obj.game_map) > 0:
+    if game_obj.game_map:
         # Transferred this step to game_basic.prepare_known_map
         # # First step is to find player's realm and copy its discovered map
         # map_to_display = []
@@ -1351,19 +1351,19 @@ def game_board_screen(screen):
 
     ## Buttons
 
-    # Exit
-    pygame.draw.polygon(screen, FillButton, [[1150, 10], [1250, 10], [1250, 32], [1150, 32]])
-    pygame.draw.polygon(screen, BorderNewGameColor, [[1150, 10], [1250, 10], [1250, 32], [1150, 32]], 3)
+    # # Exit
+    # pygame.draw.polygon(screen, FillButton, [[1150, 10], [1250, 10], [1250, 32], [1150, 32]])
+    # pygame.draw.polygon(screen, BorderNewGameColor, [[1150, 10], [1250, 10], [1250, 32], [1150, 32]], 3)
+    #
+    # text_NewGame1 = font20.render("Exit", True, TitleText)
+    # screen.blit(text_NewGame1, [1180, 10])
 
-    text_NewGame1 = font20.render("Exit", True, TitleText)
-    screen.blit(text_NewGame1, [1180, 10])
-
-    # Save
-    pygame.draw.polygon(screen, FillButton, [[1040, 10], [1140, 10], [1140, 32], [1040, 32]])
-    pygame.draw.polygon(screen, BorderNewGameColor, [[1040, 10], [1140, 10], [1140, 32], [1040, 32]], 3)
-
-    text_NewGame1 = font20.render("Save", True, TitleText)
-    screen.blit(text_NewGame1, [1070, 10])
+    # # Save
+    # pygame.draw.polygon(screen, FillButton, [[1040, 10], [1140, 10], [1140, 32], [1040, 32]])
+    # pygame.draw.polygon(screen, BorderNewGameColor, [[1040, 10], [1140, 10], [1140, 32], [1040, 32]], 3)
+    #
+    # text_NewGame1 = font20.render("Save", True, TitleText)
+    # screen.blit(text_NewGame1, [1070, 10])
 
     # Top ribbon
     # Next turn - hourglass icon

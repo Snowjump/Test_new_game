@@ -28,7 +28,6 @@ class Settlement_Info_Panel(graphics_classes.Panel):
         x -= int(game_stats.pov_pos[0])
         y -= int(game_stats.pov_pos[1])
         self.draw_border_line(screen, x, y)
-        self.draw_panel_background(screen, yVar)
         # print("tile_num - " + str(tile_num) + "; x - " + str(x) + ", y - " + str(y))
         # print("tile_obj.army_id - " + str(tile_obj.army_id))
 
@@ -36,6 +35,7 @@ class Settlement_Info_Panel(graphics_classes.Panel):
             # print("panel - " + self.name)
             # print("tile_obj.army_id - " + str(tile_obj.army_id))
             army = common_selects.select_army_by_id(tile_obj.army_id)
+            self.draw_panel_background(screen, yVar)
             self.draw_army_info(screen, yVar, army)
             self.draw_select_army_button(screen, yVar, army)
             self.draw_hero_info(screen, yVar, army)

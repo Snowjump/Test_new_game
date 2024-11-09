@@ -1,5 +1,5 @@
 ## Among Myth and Wonder
-    ## graphics_basic
+## graphics_basic
 
 from Content.production_catalog import *
 
@@ -11,8 +11,10 @@ from Resources import graphics_classes
 
 from Content import production_methods
 
-from Screens.Game_Board_Windows import panel_resource_ribbon
+from Screens.Game_Board_Windows import panel_exit_to_menu
+from Screens.Game_Board_Windows import panel_save_game
 from Screens.Game_Board_Windows import panel_calendar
+from Screens.Game_Board_Windows import panel_resource_ribbon
 from Screens.Game_Board_Windows import panel_left_ribbon_menu
 from Screens.Game_Board_Windows import info_panel_army
 from Screens.Game_Board_Windows import info_panel_settlement
@@ -20,8 +22,10 @@ from Screens.Game_Board_Windows import info_panel_tile_obj
 
 
 def init_game_board_graphics():
-    prepare_resource_ribbon()
+    prepare_exit_to_menu()
+    prepare_save_game()
     prepare_calendar()
+    prepare_resource_ribbon()
     prepare_left_ribbon_menu()
 
 
@@ -47,6 +51,16 @@ def remove_selected_objects():
                      "Info panel settlement",
                      "Info panel tile object"]
     remove_specific_objects(list_of_names)
+
+
+def prepare_exit_to_menu():
+    new_object = panel_exit_to_menu.Exit_To_Menu_Panel("Exit to menu")
+    refresh_graphics_object(new_object)
+
+
+def prepare_save_game():
+    new_object = panel_save_game.Save_Game_Panel("Save game")
+    refresh_graphics_object(new_object)
 
 
 def prepare_calendar():

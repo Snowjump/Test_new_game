@@ -49,8 +49,8 @@ from Content import diplomatic_messages_det
 
 yVar = game_stats.game_window_height - 800
 
-button_zone = [[1150, 10, 1250, 32],
-               [1040, 10, 1140, 32],
+button_zone = [[1240, 5, 1258, 37],
+               [1205, 5, 1233, 37],
                [1005, 5, 1030, 54],
                [3, 3, 27, 27],
                [3, 28, 27, 47],
@@ -906,85 +906,90 @@ def game_board_surface_m3(position):
         x = int(x) + int(game_stats.pov_pos[0])
         y = int(y) + int(game_stats.pov_pos[1])
         print("RC: Coordinates - x " + str(x) + " y " + str(y))
-        game_stats.selected_tile = [int(x), int(y)]
+        realm = common_selects.select_realm_by_name(game_stats.player_power)
+        if (0 < x <= game_stats.cur_level_width) and (0 < y <= game_stats.cur_level_height)\
+                and [x, y] in realm.known_map\
+                and game_stats.game_board_panel != "settlement panel":
+            game_stats.selected_tile = [int(x), int(y)]
 
-        # Index of selected tile in map list
-        x2 = int(game_stats.selected_tile[0])
-        y2 = int(game_stats.selected_tile[1])
-        TileNum = (y2 - 1) * game_stats.cur_level_width + x2 - 1
-        print("RC: TileNum is " + str(TileNum))
+            # Index of selected tile in map list
+            x2 = int(game_stats.selected_tile[0])
+            y2 = int(game_stats.selected_tile[1])
+            TileNum = (y2 - 1) * game_stats.cur_level_width + x2 - 1
+            print("RC: TileNum is " + str(TileNum))
 
-        # If player has had selected an army, then it get deselected
-        if game_stats.selected_object == "Army":
-            game_stats.selected_object = ""
-            game_stats.selected_army = -1
-            game_stats.selected_second_army = -1
-            game_stats.details_panel_mode = ""
-            game_stats.game_board_panel = ""
-            game_stats.first_army_exchange_list = []
-            game_stats.second_army_exchange_list = []
+            # If player has had selected an army, then it get deselected
+            if game_stats.selected_object == "Army":
+                game_stats.selected_object = ""
+                game_stats.selected_army = -1
+                game_stats.selected_second_army = -1
+                game_stats.details_panel_mode = ""
+                game_stats.game_board_panel = ""
+                game_stats.first_army_exchange_list = []
+                game_stats.second_army_exchange_list = []
 
-            graphics_basic.remove_selected_objects()
+                graphics_basic.remove_selected_objects()
 
-            # Update visuals
-            update_gf_game_board.remove_regiment_sprites()
-            update_gf_game_board.remove_hero_sprites()
+                # Update visuals
+                update_gf_game_board.remove_regiment_sprites()
+                update_gf_game_board.remove_hero_sprites()
 
-        # Or player has had selected a settlement, then it get deselected
-        elif game_stats.selected_object == "Settlement":
-            game_stats.selected_object = ""
-            game_stats.selected_settlement = -1
-            game_stats.details_panel_mode = ""
+            # Or player has had selected a settlement, then it get deselected
+            elif game_stats.selected_object == "Settlement":
+                game_stats.selected_object = ""
+                game_stats.selected_settlement = -1
+                game_stats.details_panel_mode = ""
 
-            graphics_basic.remove_selected_objects()
+                graphics_basic.remove_selected_objects()
 
-        # If no army selected, then pop up window will appear with information about selected tile
-        # NOTE: maybe I need to rebuild this if segment
-        elif not game_stats.info_tile or game_stats.info_tile != [int(x), int(y)]:
-            graphics_basic.remove_selected_objects()
-            game_stats.selected_object = "Tile"
-            game_stats.info_tile = [int(x), int(y)]
-            game_stats.right_click_pos = [int(position[0]), int(position[1])]
-            game_stats.i_p_index = 0
+            # If no army selected, then pop up window will appear with information about selected tile
+            # NOTE: maybe I need to rebuild this if segment
+            elif not game_stats.info_tile or game_stats.info_tile != [int(x), int(y)]:
+                print("Selected tile")
+                graphics_basic.remove_selected_objects()
+                game_stats.selected_object = "Tile"
+                game_stats.info_tile = [int(x), int(y)]
+                game_stats.right_click_pos = [int(position[0]), int(position[1])]
+                game_stats.i_p_index = 0
 
-            if game_obj.game_map[TileNum].lot is not None:
-                # print("obj_typ " + str(game_obj.game_map[TileNum].lot))
-                if game_obj.game_map[TileNum].lot == "City":
-                    game_stats.details_panel_mode = "facility lower panel"
-                    game_stats.right_click_city = int(game_obj.game_map[TileNum].city_id)
-                elif game_obj.game_map[TileNum].lot.obj_typ == "Facility":
-                    game_stats.details_panel_mode = "facility lower panel"
+                if game_obj.game_map[TileNum].lot is not None:
+                    # print("obj_typ " + str(game_obj.game_map[TileNum].lot))
+                    if game_obj.game_map[TileNum].lot == "City":
+                        game_stats.details_panel_mode = "facility lower panel"
+                        game_stats.right_click_city = int(game_obj.game_map[TileNum].city_id)
+                    elif game_obj.game_map[TileNum].lot.obj_typ == "Facility":
+                        game_stats.details_panel_mode = "facility lower panel"
 
-            # Check if territory belongs to anyone
-            if game_obj.game_map[TileNum].city_id is None:
-                # It belongs to nobody
+                # Check if territory belongs to anyone
+                if game_obj.game_map[TileNum].city_id is None:
+                    # It belongs to nobody
+                    game_stats.tile_ownership = "Wild lands"
+                    game_stats.tile_flag_colors = []
+                else:
+                    settlement = common_selects.select_settlement_by_id(game_obj.game_map[TileNum].city_id)
+                    if settlement.owner == "Neutral":
+                        # This tile belongs to a nearby neutral settlement
+                        game_stats.tile_ownership = "Neutral lands"
+                    else:
+                        # Someone own this land
+                        game_stats.tile_ownership = str(settlement.owner)
+                        realm = common_selects.select_realm_by_name(settlement.owner)
+                        game_stats.tile_flag_colors = [str(realm.f_color), str(realm.s_color)]
+
+                graphics_basic.prepare_tile_obj_info_panel()
+
+            else:
+                # Right click on the same tile, therefore information screen should be closed
                 game_stats.tile_ownership = "Wild lands"
                 game_stats.tile_flag_colors = []
-            else:
-                settlement = common_selects.select_settlement_by_id(game_obj.game_map[TileNum].city_id)
-                if settlement.owner == "Neutral":
-                    # This tile belongs to a nearby neutral settlement
-                    game_stats.tile_ownership = "Neutral lands"
-                else:
-                    # Someone own this land
-                    game_stats.tile_ownership = str(settlement.owner)
-                    realm = common_selects.select_realm_by_name(settlement.owner)
-                    game_stats.tile_flag_colors = [str(realm.f_color), str(realm.s_color)]
+                game_stats.info_tile = []
+                game_stats.right_click_pos = []
+                game_stats.selected_object = ""
+                game_stats.i_p_index = 0
+                game_stats.details_panel_mode = ""
+                game_stats.right_click_city = -1
 
-            graphics_basic.prepare_tile_obj_info_panel()
-
-        else:
-            # Right click on the same tile, therefore information screen should be closed
-            game_stats.tile_ownership = "Wild lands"
-            game_stats.tile_flag_colors = []
-            game_stats.info_tile = []
-            game_stats.right_click_pos = []
-            game_stats.selected_object = ""
-            game_stats.i_p_index = 0
-            game_stats.details_panel_mode = ""
-            game_stats.right_click_city = -1
-
-            graphics_basic.remove_selected_objects()
+                graphics_basic.remove_selected_objects()
 
 
 def exit_but():
@@ -1000,7 +1005,7 @@ def exit_but():
 
 def save_but():
     ##    level_save.save_game()
-    print("To be done")
+    print("To be done - save_but()")
 
 
 def realm_but():

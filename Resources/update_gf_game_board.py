@@ -67,6 +67,16 @@ def update_misc_sprites():
     misc_img.set_colorkey(WhiteColor)
     game_stats.gf_misc_img_dict["Icons/grey_background_559_30"] = misc_img
 
+    # Icon - door icon for exit to menu from launched game
+    misc_img = pygame.image.load('img/Icons/exit_to_menu.png').convert_alpha()
+    misc_img.set_colorkey(WhiteColor)
+    game_stats.gf_misc_img_dict["Icons/exit_to_menu"] = misc_img
+
+    # Icon - parchment icon for saving the game
+    misc_img = pygame.image.load('img/Icons/parchment_save.png').convert_alpha()
+    misc_img.set_colorkey(WhiteColor)
+    game_stats.gf_misc_img_dict["Icons/parchment_save"] = misc_img
+
     # Icon - hourglass false
     misc_img = pygame.image.load('img/Icons/hourglass_false.png').convert_alpha()
     misc_img.set_colorkey(WhiteColor)
