@@ -1,4 +1,5 @@
-## Miracle battles
+## Among Myth and Wonder
+## ef_structures
 
 from Resources import campaign_effect_classes
 

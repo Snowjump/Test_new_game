@@ -16,7 +16,8 @@ def replenish_objects():
             if TileObj.lot != "City":
                 if TileObj.lot.obj_typ in exploration_catalog.exploration_objects_groups_cat:
                     fac = groups_cat[TileObj.lot.obj_typ]
-                    fac[TileObj.lot.obj_name](TileObj.lot)
+                    if TileObj.lot.obj_name in fac:
+                        fac[TileObj.lot.obj_name](TileObj.lot)
                     # print(TileObj.lot.obj_name + " at " + str(TileObj.posxy) + " - need_replenishment is " +
                     #       str(TileObj.lot.properties.need_replenishment))
 
@@ -100,7 +101,7 @@ bonus_scripts = {"Mythic monolith" : replenish_mythic_monolith,
                  "Scholar's tower" : replenish_scholars_tower,
                  "Stone well" : replenish_stone_well,
                  "Burial mound" : replenish_burial_mound,
-                 "Angler's cabin" : replenish_anglers_cabin
+                 "Angler's cabin" : replenish_anglers_cabin,
                  }
 
 

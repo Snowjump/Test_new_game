@@ -9,6 +9,7 @@ from Resources import game_classes
 from Resources import artifact_classes
 from Resources import game_obj
 from Resources import game_basic
+from Resources import common_selects
 
 from Content import artifact_imgs_cat
 from Content import artifact_catalog
@@ -20,52 +21,44 @@ resource_names = ["Florins",
 
 
 def mythic_monolith_close():
-    for army in game_obj.game_armies:
-        if army.army_id == game_stats.selected_army:
-            # army.hero.experience += 1000
-            game_basic.hero_next_level(army.hero, 1000)
-            break
+    army = common_selects.select_army_by_id(game_stats.selected_army)
+    # army.hero.experience += 1000
+    game_basic.hero_next_level(army.hero, 1000)
 
     game_stats.game_board_panel = ""
     game_stats.event_panel_det = None
 
 
 def stone_circle_close():
-    for army in game_obj.game_armies:
-        if army.army_id == game_stats.selected_army:
-            army.hero.magic_power += 1
-            break
+    army = common_selects.select_army_by_id(game_stats.selected_army)
+    army.hero.magic_power += 1
 
     game_stats.game_board_panel = ""
     game_stats.event_panel_det = None
 
 
 def scholars_tower_close():
-    for army in game_obj.game_armies:
-        if army.army_id == game_stats.selected_army:
-            army.hero.knowledge += 1
-            army.hero.max_mana_reserve += 10
-            army.hero.mana_reserve += 10
-            break
+    army = common_selects.select_army_by_id(game_stats.selected_army)
+    army.hero.knowledge += 1
+    army.hero.max_mana_reserve += 10
+    army.hero.mana_reserve += 10
 
     game_stats.game_board_panel = ""
     game_stats.event_panel_det = None
 
 
 def stone_well_close():
-    for army in game_obj.game_armies:
-        if army.army_id == game_stats.selected_army:
-            max_mana = int(10 * army.hero.knowledge)
-            mana_reserve = int(army.hero.mana_reserve)
+    army = common_selects.select_army_by_id(game_stats.selected_army)
+    max_mana = int(10 * army.hero.knowledge)
+    mana_reserve = int(army.hero.mana_reserve)
 
-            mana_value = 0
-            if mana_reserve + (max_mana / 2) > max_mana:
-                mana_value = int(max_mana - mana_reserve)
-            else:
-                mana_value = int(max_mana / 2)
+    mana_value = 0
+    if mana_reserve + (max_mana / 2) > max_mana:
+        mana_value = int(max_mana - mana_reserve)
+    else:
+        mana_value = int(max_mana / 2)
 
-            army.hero.mana_reserve += int(mana_value)
-            break
+    army.hero.mana_reserve += int(mana_value)
 
     game_stats.game_board_panel = ""
     game_stats.event_panel_det = None
@@ -119,6 +112,20 @@ def anglers_cabin_obtain_artifact():
 
 
 def anglers_cabin_close():
+    game_stats.game_board_panel = ""
+    game_stats.event_panel_det = None
+
+
+def champions_tent_close():
+    army = common_selects.select_army_by_id(game_stats.selected_army)
+    pack = game_classes.Attribute_Package([game_classes.Battle_Attribute(
+        "melee cavalry",
+        "defence",
+        1)])
+    army.hero.attributes_list.append(pack)
+    if army.hero.hero_class == "Knight":
+        game_basic.hero_next_level(army.hero, 500)
+
     game_stats.game_board_panel = ""
     game_stats.event_panel_det = None
 
@@ -257,6 +264,16 @@ def anglers_cabin_event(obj, army):
                                                                  [[561, 436, 620, 456],
                                                                   [661, 436, 720, 456]],
                                                                  [481, 101, 800, 400],
+                                                                 None)
+
+
+def champions_tent_event(obj, army):
+    if army.hero.hero_id not in obj.properties.hero_list:
+        obj.properties.hero_list.append(int(army.hero.hero_id))
+        game_stats.game_board_panel = "champion's tent event panel"
+        game_stats.event_panel_det = game_classes.Object_Surface({1: champions_tent_close},
+                                                                 [[611, 421, 670, 441]],
+                                                                 [481, 101, 800, 445],
                                                                  None)
 
 
@@ -414,6 +431,7 @@ event_scripts = {  # Bonus
     "stone well script": stone_well_event,
     "burial mound script" : burial_mound_event,
     "angler's cabin script" : anglers_cabin_event,
+    "champion's tent script" : champions_tent_event,
     # Lair
     "runaway serfs refuge script": runaway_serfs_refuge_event,
     "treasure tower script": treasure_tower_event,

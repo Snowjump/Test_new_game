@@ -1,4 +1,5 @@
 ## Among Myth and Wonder
+## mythic_monolith_win
 
 import pygame.draw, pygame.font
 

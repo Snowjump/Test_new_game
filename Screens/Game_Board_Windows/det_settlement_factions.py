@@ -1,4 +1,5 @@
 ## Among Myth and Wonder
+## det_settlement_factions
 
 import pygame.draw
 import pygame.font
@@ -97,11 +98,11 @@ def draw_factions(screen, settlement):
             icon_img = game_stats.gf_misc_img_dict["Icons/bad_loyalty_icon"]
             screen.blit(icon_img, (5, y_base + y_shift * y_points))
 
-        text_panel1 = arial_font16.render(str(faction.loyalty), True, DarkText)
+        text_panel1 = arial_font14.render(str(faction.loyalty), True, DarkText)
         screen.blit(text_panel1, [23, y_base + y_shift * y_points])
 
         # Faction title
-        text_panel1 = arial_font16.render(faction.title_name, True, DarkText)
+        text_panel1 = arial_font14.render(faction.title_name, True, DarkText)
         screen.blit(text_panel1, [37, y_base + y_shift * y_points])
 
         y_points += 1
@@ -137,7 +138,7 @@ def draw_factions(screen, settlement):
 
     # Culture
     icon_img = game_stats.gf_misc_img_dict["Icons/masks"]
-    screen.blit(icon_img, (248, y_base + 1  ))
+    screen.blit(icon_img, (248, y_base + 1))
 
     text_panel = tnr_font20.render("Culture", True, DarkText)
     screen.blit(text_panel, [275, y_base])
@@ -147,7 +148,7 @@ def draw_factions(screen, settlement):
     y_points = 0
     for culture in settlement.control:
         # Faction title
-        text_panel1 = arial_font16.render(str(culture[1]) + " " + culture[0], True, DarkText)
+        text_panel1 = arial_font14.render(str(culture[1]) + " " + culture[0], True, DarkText)
         screen.blit(text_panel1, [248, y_base + y_shift * y_points])
 
         y_points += 1

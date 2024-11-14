@@ -23,12 +23,15 @@ def select_settlement_by_id(given_settlement_id):
     return selected_settlement
 
 
-def select_army_by_id(given_army_id):
+def select_army_by_id(given_army_id, report=None):
     selected_army = None
     for army in game_obj.game_armies:
         if army.army_id == given_army_id:
             selected_army = army
             break
+
+    if report:
+        print("select_army_by_id: army " + str(selected_army.army_id))
 
     return selected_army
 

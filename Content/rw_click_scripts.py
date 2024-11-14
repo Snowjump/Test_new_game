@@ -1,4 +1,5 @@
-## Miracle battles
+## Among Myth and Wonder
+## rw_click_scripts
 
 import math
 import random

@@ -43,6 +43,7 @@ from Screens.Panels.Bonus_panels import scholars_tower_win
 from Screens.Panels.Bonus_panels import stone_well_win
 from Screens.Panels.Bonus_panels import burial_mound_win
 from Screens.Panels.Bonus_panels import anglers_cabin_win
+from Screens.Panels.Bonus_panels import champions_tent_win
 from Screens.Panels.Lair_panels import runaway_serfs_refuge_win
 from Screens.Panels.Lair_panels import treasure_tower_win
 from Screens.Panels.Lair_panels import lair_of_grey_dragons_win
@@ -1467,6 +1468,7 @@ draw_panel_ext = {  # Bonus
     "stone well event panel": stone_well_win.stone_well_draw_panel,
     "burial mound event panel": burial_mound_win.burial_mound_draw_panel,
     "angler's cabin event panel": anglers_cabin_win.anglers_cabin_draw_panel,
+    "champion's tent event panel": champions_tent_win.champions_tent_draw_panel,
     # Lair
     "runaway serfs refuge event panel": runaway_serfs_refuge_win.runaway_serfs_refuge_draw_panel,
     "treasure tower event panel": treasure_tower_win.treasure_tower_draw_panel,

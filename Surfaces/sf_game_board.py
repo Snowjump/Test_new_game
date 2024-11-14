@@ -7,7 +7,6 @@ import random
 import sys
 import copy
 
-from Content import building_drafts
 from Resources import game_basic
 from Resources import graphics_basic
 from Resources import game_classes
