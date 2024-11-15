@@ -6,6 +6,8 @@ import pygame.draw, pygame.font
 from Resources import game_stats
 from Resources import common_selects
 
+from Screens.Interface_Elements import buttons
+
 MainMenuColor = [0x9F, 0x97, 0x97]
 FillButton = [0xD8, 0xBD, 0xA2]
 LineMainMenuColor1 = [0x60, 0x60, 0x60]
@@ -66,15 +68,18 @@ def champions_tent_draw_panel(screen):
     text_panel1 = tnr_font18.render(optional_text, True, DarkText)
     screen.blit(text_panel1, [500, 150 + y_shift * y_points + 4])
 
-    x = 611
-    y = 421
-    x_p = 59
-    y_p = 20
-    x_w = 10
-    y_w = 2
-    pygame.draw.polygon(screen, FillButton,
-                        [[x, y], [x + x_p, y], [x + x_p, y + y_p], [x, y + y_p]])
-    pygame.draw.polygon(screen, LineMainMenuColor1, [[x, y], [x + x_p, y], [x + x_p, y + y_p], [x, y + y_p]], 2)
-
-    text_panel1 = arial_font16.render("Close", True, DarkText)
-    screen.blit(text_panel1, [x + x_w, y + y_w])
+    text = "Close"
+    buttons.element_button(screen, text, "arial_font14", "DarkText", "FillButton", "LineMainMenuColor1",
+                           611, 421, 59, 20, 12, 2, 2)
+    # x = 611
+    # y = 421
+    # x_p = 59
+    # y_p = 20
+    # x_w = 10
+    # y_w = 2
+    # pygame.draw.polygon(screen, FillButton,
+    #                     [[x, y], [x + x_p, y], [x + x_p, y + y_p], [x, y + y_p]])
+    # pygame.draw.polygon(screen, LineMainMenuColor1, [[x, y], [x + x_p, y], [x + x_p, y + y_p], [x, y + y_p]], 2)
+    #
+    # text_panel1 = arial_font16.render("Close", True, DarkText)
+    # screen.blit(text_panel1, [x + x_w, y + y_w])

@@ -748,6 +748,10 @@ def game_board_surface_m1(position):
                 else:
                     game_stats.first_army_exchange_list.remove(number)
 
+    if not game_stats.button_pressed and game_stats.game_board_panel:
+        game_stats.button_pressed = True
+        print("game_board_surface_m1: click outside of opened windows")
+
     # Click on game map
     if not game_stats.button_pressed:
         game_stats.selected_tile = []
@@ -756,7 +760,7 @@ def game_board_surface_m1(position):
         y = math.ceil((position[1] + 1) / 48)
         x = int(x) + int(game_stats.pov_pos[0])
         y = int(y) + int(game_stats.pov_pos[1])
-        print("Coordinates - x " + str(x) + " y " + str(y))
+        print("game_board_surface_m1: Coordinates - x " + str(x) + " y " + str(y))
         game_stats.selected_tile = [int(x), int(y)]
 
         # Index of selected tile in map list
@@ -895,6 +899,10 @@ def game_board_surface_m3(position):
         square = [200, 600 + yVar, 1080, 800 + yVar]
         if square[0] < position[0] < square[2] and square[1] < position[1] < square[3]:
             game_stats.button_pressed = True
+
+    if not game_stats.button_pressed and game_stats.game_board_panel:
+        game_stats.button_pressed = True
+        print("Clicked outside of opened windows")
 
     # Click on game map
     if not game_stats.button_pressed:
