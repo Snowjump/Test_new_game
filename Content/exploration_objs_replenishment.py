@@ -21,6 +21,12 @@ def replenish_objects():
                     # print(TileObj.lot.obj_name + " at " + str(TileObj.posxy) + " - need_replenishment is " +
                     #       str(TileObj.lot.properties.need_replenishment))
 
+                    else:
+                        if TileObj.lot.properties.need_replenishment:
+                            TileObj.lot.properties.time_left_before_replenishment -= 1
+                            if TileObj.lot.properties.time_left_before_replenishment == 0:
+                                TileObj.lot.properties.need_replenishment = False
+
 
 def replenish_mythic_monolith(lot):
     pass

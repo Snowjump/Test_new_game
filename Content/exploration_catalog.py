@@ -8,7 +8,8 @@ bonus_objects = ["Mythic monolith",
                  "Stone well",
                  "Burial mound",
                  "Angler's cabin",
-                 "Champion's tent"]
+                 "Champion's tent",
+                 "Leshy's hut"]
 
 
 lair_objects = ["Runaway serfs refuge",
@@ -57,7 +58,13 @@ bonus_details = {"Mythic monolith" : ["Exploration/Bonus/",
                                       [[14, 13]],
                                       "champions_tent",
                                       "champion's tent script",
-                                      0]
+                                      0],
+                 "Leshy's hut" : ["Exploration/Bonus/",
+                                  "Bonus",
+                                  [[10, 18]],
+                                  "leshy_hut",
+                                  "leshy's hut script",
+                                  0]
                  }
 
 

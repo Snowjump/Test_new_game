@@ -1,25 +1,14 @@
 ## Among Myth and Wonder
+## rw_new_regiment_information
 
 import pygame.draw
 import pygame.font
 
+from Screens.colors_catalog import *
+from Screens.fonts_catalog import *
+
 from Resources import game_stats
-
-MainMenuColor = [0x9F, 0x97, 0x97]
-
-TitleText = [0xFF, 0xFF, 0x99]
-DarkText = [0x11, 0x11, 0x11]
-
-LineMainMenuColor1 = [0x60, 0x60, 0x60]
-
-CancelFieldColor = [0xFF, 0x00, 0x00]
-CancelElementsColor = [0x99, 0x00, 0x00]
-
-RockTunel = [0x89, 0x89, 0x89]
-
-
-tnr_font20 = pygame.font.SysFont('timesnewroman', 20)
-arial_font16 = pygame.font.SysFont('arial', 16)
+from Screens.Interface_Elements import buttons
 
 
 def new_regiment_info(screen):
@@ -80,16 +69,11 @@ def new_regiment_info(screen):
     screen.blit(text_panel, [646, ybase - 20])
 
     # Buttons - previous and next attack
+    buttons.element_arrow_button(screen, "Left", "RockTunel", "LineMainMenuColor1", "LineMainMenuColor1",
+                                 646, ybase, 19, 19, 2, 2)
 
-    pygame.draw.polygon(screen, RockTunel, [[646, ybase], [665, ybase], [665, ybase + 19], [646, ybase + 19]])
-    pygame.draw.polygon(screen, LineMainMenuColor1, [[646, ybase], [665, ybase], [665, ybase + 19], [646, ybase + 19]],
-                        2)
-    pygame.draw.lines(screen, LineMainMenuColor1, False, [(662, ybase + 2), (650, ybase + 9), (662, ybase + 15)], 2)
-
-    pygame.draw.polygon(screen, RockTunel, [[786, ybase], [805, ybase], [805, ybase + 19], [786, ybase + 19]])
-    pygame.draw.polygon(screen, LineMainMenuColor1, [[786, ybase], [805, ybase], [805, ybase + 19], [786, ybase + 19]],
-                        2)
-    pygame.draw.lines(screen, LineMainMenuColor1, False, [(789, ybase + 2), (801, ybase + 9), (789, ybase + 15)], 2)
+    buttons.element_arrow_button(screen, "Right", "RockTunel", "LineMainMenuColor1", "LineMainMenuColor1",
+                                 786, ybase, 19, 19, 2, 2)
 
     # Attack name
     text_panel = arial_font16.render(str(a.attack_name), True, TitleText)
@@ -145,18 +129,11 @@ def new_regiment_info(screen):
     ybase = 345
 
     # Buttons - previous and next skill
+    buttons.element_arrow_button(screen, "Left", "RockTunel", "LineMainMenuColor1", "LineMainMenuColor1",
+                                 1020, ybase, 19, 19, 2, 2)
 
-    pygame.draw.polygon(screen, RockTunel, [[1020, ybase], [1039, ybase], [1039, ybase + 19], [1020, ybase + 19]])
-    pygame.draw.polygon(screen, LineMainMenuColor1,
-                        [[1020, ybase], [1039, ybase], [1039, ybase + 19], [1020, ybase + 19]],
-                        2)
-    pygame.draw.lines(screen, LineMainMenuColor1, False, [(1036, ybase + 2), (1024, ybase + 9), (1036, ybase + 15)], 2)
-
-    pygame.draw.polygon(screen, RockTunel, [[1160, ybase], [1179, ybase], [1179, ybase + 19], [1160, ybase + 19]])
-    pygame.draw.polygon(screen, LineMainMenuColor1,
-                        [[1160, ybase], [1179, ybase], [1179, ybase + 19], [1160, ybase + 19]],
-                        2)
-    pygame.draw.lines(screen, LineMainMenuColor1, False, [(1163, ybase + 2), (1175, ybase + 9), (1163, ybase + 15)], 2)
+    buttons.element_arrow_button(screen, "Right", "RockTunel", "LineMainMenuColor1", "LineMainMenuColor1",
+                                 1200, ybase, 19, 19, 2, 2)
 
     # Skills
     text_panel = arial_font16.render("Skills:", True, TitleText)
@@ -182,3 +159,6 @@ def new_regiment_info(screen):
                 text_panel = arial_font16.render(str(tag), True, TitleText)
                 screen.blit(text_panel, [1020, ybase + 60 + y_add * 20])
                 y_add += 1
+
+            # text_panel = arial_font16.render(str(type(s.skill_tags)), True, TitleText)
+            # screen.blit(text_panel, [1020, ybase + 60 + y_add * 20])

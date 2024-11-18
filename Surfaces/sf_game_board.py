@@ -1956,7 +1956,7 @@ def settlement_regiment_information():
             value_text = str(s.quality)
         else:
             value_text = ""
-        game_stats.rw_skill_info = game_classes.Skill_Info_Card(s.name, s.application, value_text, str(s.skill_tags))
+        game_stats.rw_skill_info = game_classes.Skill_Info_Card(s.name, s.application, value_text, s.skill_tags)
 
 
 def hire_regiment():

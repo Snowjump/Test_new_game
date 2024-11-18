@@ -1,4 +1,5 @@
 ## Among Myth and Wonder
+## anglers_cabin_win
 
 import pygame.draw, pygame.font
 
@@ -6,19 +7,24 @@ from Resources import game_stats
 from Resources import game_obj
 from Content import artifact_imgs_cat
 
-WhiteColor = [255, 255, 255]
+from Screens.colors_catalog import *
+from Screens.fonts_catalog import *
 
-MainMenuColor = [0x9F, 0x97, 0x97]
-FillButton = [0xD8, 0xBD, 0xA2]
-LineMainMenuColor1 = [0x60, 0x60, 0x60]
+from Screens.Interface_Elements import buttons
 
-DarkText = [0x11, 0x11, 0x11]
-
-
-tnr_font14 = pygame.font.SysFont('timesnewroman', 14)
-tnr_font18 = pygame.font.SysFont('timesnewroman', 18)
-arial_font16 = pygame.font.SysFont('arial', 16)
-arial_font14 = pygame.font.SysFont('arial', 14)
+# WhiteColor = [255, 255, 255]
+#
+# MainMenuColor = [0x9F, 0x97, 0x97]
+# FillButton = [0xD8, 0xBD, 0xA2]
+# LineMainMenuColor1 = [0x60, 0x60, 0x60]
+#
+# DarkText = [0x11, 0x11, 0x11]
+#
+#
+# tnr_font14 = pygame.font.SysFont('timesnewroman', 14)
+# tnr_font18 = pygame.font.SysFont('timesnewroman', 18)
+# arial_font16 = pygame.font.SysFont('arial', 16)
+# arial_font14 = pygame.font.SysFont('arial', 14)
 
 
 def anglers_cabin_draw_panel(screen):
@@ -92,16 +98,24 @@ def anglers_cabin_draw_panel(screen):
     text_panel1 = arial_font14.render(str(lot.properties.storage[0][0]), True, DarkText)
     screen.blit(text_panel1, [544, 191 + y_shift * y_points])
 
-    pygame.draw.polygon(screen, FillButton,
-                        [[561, 436], [620, 436], [620, 456], [561, 456]])
-    pygame.draw.polygon(screen, LineMainMenuColor1, [[561, 436], [620, 436], [620, 456], [561, 456]], 2)
+    text = "Purchase"
+    buttons.element_button(screen, text, "arial_font14", "DarkText", "FillButton", "LineMainMenuColor1",
+                           561, 436, 59, 20, 6, 2, 2)
 
-    text_panel1 = arial_font16.render("Purchase", True, DarkText)
-    screen.blit(text_panel1, [564, 437])
+    # pygame.draw.polygon(screen, FillButton,
+    #                     [[561, 436], [620, 436], [620, 456], [561, 456]])
+    # pygame.draw.polygon(screen, LineMainMenuColor1, [[561, 436], [620, 436], [620, 456], [561, 456]], 2)
+    #
+    # text_panel1 = arial_font16.render("Purchase", True, DarkText)
+    # screen.blit(text_panel1, [564, 437])
 
-    pygame.draw.polygon(screen, FillButton,
-                        [[661, 436], [720, 436], [720, 456], [661, 456]])
-    pygame.draw.polygon(screen, LineMainMenuColor1, [[661, 436], [720, 436], [720, 456], [661, 456]], 2)
+    text = "Close"
+    buttons.element_button(screen, text, "arial_font14", "DarkText", "FillButton", "LineMainMenuColor1",
+                           661, 436, 59, 20, 12, 2, 2)
 
-    text_panel1 = arial_font16.render("Close", True, DarkText)
-    screen.blit(text_panel1, [674, 437])
+    # pygame.draw.polygon(screen, FillButton,
+    #                     [[661, 436], [720, 436], [720, 456], [661, 456]])
+    # pygame.draw.polygon(screen, LineMainMenuColor1, [[661, 436], [720, 436], [720, 456], [661, 456]], 2)
+    #
+    # text_panel1 = arial_font16.render("Close", True, DarkText)
+    # screen.blit(text_panel1, [674, 437])

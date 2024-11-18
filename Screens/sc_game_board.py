@@ -44,6 +44,7 @@ from Screens.Panels.Bonus_panels import stone_well_win
 from Screens.Panels.Bonus_panels import burial_mound_win
 from Screens.Panels.Bonus_panels import anglers_cabin_win
 from Screens.Panels.Bonus_panels import champions_tent_win
+from Screens.Panels.Bonus_panels import leshys_hut_win
 from Screens.Panels.Lair_panels import runaway_serfs_refuge_win
 from Screens.Panels.Lair_panels import treasure_tower_win
 from Screens.Panels.Lair_panels import lair_of_grey_dragons_win
@@ -191,7 +192,7 @@ def draw_tiles(screen):
                         #                      [(x - 1) * 48 + 1, (y - 1) * 48 + 48]],
                         #                     1)
 
-                        terrain_img = game_stats.gf_terrain_dict["Terrains/border_48_48_200"]
+                        terrain_img = game_stats.gf_terrain_dict["Terrains/border_48_48_250"]
                         screen.blit(terrain_img, ((x - 1) * 48, (y - 1) * 48))
 
                     # Draw undiscovered tiles as dark purple tiles
@@ -1469,6 +1470,8 @@ draw_panel_ext = {  # Bonus
     "burial mound event panel": burial_mound_win.burial_mound_draw_panel,
     "angler's cabin event panel": anglers_cabin_win.anglers_cabin_draw_panel,
     "champion's tent event panel": champions_tent_win.champions_tent_draw_panel,
+    "leshy's hut event panel": leshys_hut_win.leshys_hut_draw_panel,
+    "leshy's hut dice results event panel": leshys_hut_win.leshys_hut_dice_result_draw_panel,
     # Lair
     "runaway serfs refuge event panel": runaway_serfs_refuge_win.runaway_serfs_refuge_draw_panel,
     "treasure tower event panel": treasure_tower_win.treasure_tower_draw_panel,

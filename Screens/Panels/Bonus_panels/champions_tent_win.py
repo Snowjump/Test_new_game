@@ -3,21 +3,24 @@
 
 import pygame.draw, pygame.font
 
+from Screens.colors_catalog import *
+from Screens.fonts_catalog import *
+
 from Resources import game_stats
 from Resources import common_selects
 
 from Screens.Interface_Elements import buttons
 
-MainMenuColor = [0x9F, 0x97, 0x97]
-FillButton = [0xD8, 0xBD, 0xA2]
-LineMainMenuColor1 = [0x60, 0x60, 0x60]
+# MainMenuColor = [0x9F, 0x97, 0x97]
+# FillButton = [0xD8, 0xBD, 0xA2]
+# LineMainMenuColor1 = [0x60, 0x60, 0x60]
+#
+# DarkText = [0x11, 0x11, 0x11]
 
-DarkText = [0x11, 0x11, 0x11]
 
-
-tnr_font14 = pygame.font.SysFont('timesnewroman', 14)
-tnr_font18 = pygame.font.SysFont('timesnewroman', 18)
-arial_font16 = pygame.font.SysFont('arial', 16)
+# tnr_font14 = pygame.font.SysFont('timesnewroman', 14)
+# tnr_font18 = pygame.font.SysFont('timesnewroman', 18)
+# arial_font16 = pygame.font.SysFont('arial', 16)
 
 
 def champions_tent_draw_panel(screen):

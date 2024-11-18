@@ -1,8 +1,10 @@
 ## Among Myth and Wonder
 ## exploration_scripts
+## game_basic
 
 import pygame
 import random
+import math
 
 from Resources import game_stats
 from Resources import game_classes
@@ -10,6 +12,7 @@ from Resources import artifact_classes
 from Resources import game_obj
 from Resources import game_basic
 from Resources import common_selects
+from Resources import graphics_basic
 
 from Content import artifact_imgs_cat
 from Content import artifact_catalog
@@ -91,16 +94,18 @@ def anglers_cabin_obtain_artifact():
     the_army, the_realm = give_army_and_realm()
     lot = game_obj.game_map[the_army.location].lot
 
-    enough_money = False
-    if len(the_realm.coffers) > 0:
-        for res in the_realm.coffers:
-            if res[0] == "Florins":
-                if res[1] >= 3000:
-                    res[1] -= 3000
-                    enough_money = True
-                break
+    # enough_money = False
+    # if len(the_realm.coffers) > 0:
+    #     for res in the_realm.coffers:
+    #         if res[0] == "Florins":
+    #             if res[1] >= 3000:
+    #                 res[1] -= 3000
+    #                 enough_money = True
+    #             break
+    price = [["Florins", 3000]]
 
-    if enough_money:
+    if check_funds(price, the_realm.coffers):
+        payment(price, the_realm)
         spread_reward(the_army, the_realm, lot.properties.storage)
 
         lot.properties.storage = []
@@ -125,6 +130,70 @@ def champions_tent_close():
     army.hero.attributes_list.append(pack)
     if army.hero.hero_class == "Knight":
         game_basic.hero_next_level(army.hero, 500)
+
+    game_stats.game_board_panel = ""
+    game_stats.event_panel_det = None
+
+
+def leshys_hut_play_dice():
+    game_stats.game_board_panel = "leshy's hut dice results event panel"
+    game_stats.event_panel_det = game_classes.Object_Surface({1: leshys_hut_close},
+                                                             [[611, 421, 670, 441]],
+                                                             [481, 101, 800, 445],
+                                                             None)
+
+    # result = int(random.randint(1, 6))
+    result = 1
+    army = common_selects.select_army_by_id(game_stats.selected_army)
+    lot = game_obj.game_map[army.location].lot
+    lot.properties.storage.append(result)
+
+
+def leshys_hut_leave():
+    # If player rejects to play dice with Leshy
+    game_stats.game_board_panel = ""
+    game_stats.event_panel_det = None
+
+
+def leshys_hut_close():
+    # After the game of dice, player could leave Leshy's hut
+    the_army, the_realm = give_army_and_realm()
+
+    lot = game_obj.game_map[the_army.location].lot
+
+    if lot.properties.storage[0] == 6:
+        # Magic power
+        the_army.hero.magic_power += 1
+    elif lot.properties.storage[0] == 5:
+        # Food and wood
+        print("leshys_hut_close() - Food and wood reward number 5")
+        reward = [["Food", 500], ["Wood", 1000]]
+        spread_reward(the_army, the_realm, reward)
+    elif lot.properties.storage[0] == 4:
+        # Additional movement points
+        for unit in the_army.units:
+            unit.movement_points += 800
+    elif lot.properties.storage[0] == 3:
+        # Drain mana
+        the_army.hero.mana_reserve = 0
+    elif lot.properties.storage[0] == 2:
+        # Lose money
+        price = [["Florins", 1500]]
+        payment(price, the_realm)
+    elif lot.properties.storage[0] == 1:
+        # Lose regiments
+        units_to_destroy = math.ceil(len(the_army.units)/8)
+        index_list = []
+        units_numbered_list = []
+        for i in range(0, len(the_army.units)):
+            units_numbered_list.append(i)
+        for i in range(1, units_to_destroy + 1):
+            index_list.append(units_numbered_list.pop(random.choice(units_numbered_list)))
+        game_basic.disband_unit(the_army, index_list)
+
+    lot.properties.need_replenishment = True
+    lot.properties.time_left_before_replenishment = int(random.randint(15, 25))
+    lot.properties.storage = []
 
     game_stats.game_board_panel = ""
     game_stats.event_panel_det = None
@@ -277,6 +346,17 @@ def champions_tent_event(obj, army):
                                                                  None)
 
 
+def leshys_hut_event(obj, army):
+    if not obj.properties.need_replenishment:
+        game_stats.game_board_panel = "leshy's hut event panel"
+        game_stats.event_panel_det = game_classes.Object_Surface({1: leshys_hut_play_dice,
+                                                                  2: leshys_hut_leave},
+                                                                 [[561, 321, 620, 341],
+                                                                  [661, 321, 720, 341]],
+                                                                 [481, 101, 800, 345],
+                                                                 None)
+
+
 # Lair
 def runaway_serfs_refuge_event(obj, army):
     print("army_id - " + str(obj.properties.army_id))
@@ -367,14 +447,17 @@ def spread_reward(army, realm, script_rewards):
                                     bonus_quantity += int(effect.quantity)
             if len(realm.coffers) > 0:
                 for res in realm.coffers:
+                    # print("Coffers: " + str(res))
                     if res[0] == reward[0]:
-
                         res[1] += reward[1] + int(bonus_quantity)
                         found = True
                         break
 
             if not found:
                 realm.coffers.append([str(reward[0]), int(reward[1]) + int(bonus_quantity)])
+
+            if realm.name == game_stats.player_power:
+                graphics_basic.prepare_resource_ribbon()
 
         # Artifacts
         elif reward[0] in artifact_imgs_cat.imgs_catalog:
@@ -413,6 +496,44 @@ def spread_reward(army, realm, script_rewards):
                                                                            details[4]))
 
 
+def check_funds(resources, coffers):
+    enough_to_pay = False
+
+    all_resources_present = True
+    for price in resources:
+        for res in coffers:
+            if res[0] == price[0]:
+                if res[1] < price[1]:
+                    all_resources_present = False
+                    break
+
+    if all_resources_present:
+        enough_to_pay = True
+
+        # # Pay the price
+        #
+        # for price in resources:
+        #     for res in coffers:
+        #         if res[0] == price[0]:
+        #             res[1] -= price[1]
+
+    return enough_to_pay
+
+
+def payment(resources, realm):
+    for price in resources:
+        print("payment() - " + str(price))
+        for res in realm.coffers:
+            if res[0] == price[0]:
+                if res[1] - price[1] > 0:
+                    res[1] -= price[1]
+                else:
+                    res[1] = 0
+
+    if realm.name == game_stats.player_power:
+        graphics_basic.prepare_resource_ribbon()
+
+
 def update_max_mana_reserve(hero):
     total_knowledge = int(hero.knowledge)
     for artifact in hero.inventory:
@@ -432,6 +553,7 @@ event_scripts = {  # Bonus
     "burial mound script" : burial_mound_event,
     "angler's cabin script" : anglers_cabin_event,
     "champion's tent script" : champions_tent_event,
+    "leshy's hut script" : leshys_hut_event,
     # Lair
     "runaway serfs refuge script": runaway_serfs_refuge_event,
     "treasure tower script": treasure_tower_event,

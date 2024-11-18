@@ -2,16 +2,21 @@
 
 import pygame.draw, pygame.font
 
-MainMenuColor = [0x9F, 0x97, 0x97]
-FillButton = [0xD8, 0xBD, 0xA2]
-LineMainMenuColor1 = [0x60, 0x60, 0x60]
+from Screens.colors_catalog import *
+from Screens.fonts_catalog import *
 
-DarkText = [0x11, 0x11, 0x11]
+from Screens.Interface_Elements import buttons
 
-
-tnr_font14 = pygame.font.SysFont('timesnewroman', 14)
-tnr_font18 = pygame.font.SysFont('timesnewroman', 18)
-arial_font16 = pygame.font.SysFont('arial', 16)
+# MainMenuColor = [0x9F, 0x97, 0x97]
+# FillButton = [0xD8, 0xBD, 0xA2]
+# LineMainMenuColor1 = [0x60, 0x60, 0x60]
+#
+# DarkText = [0x11, 0x11, 0x11]
+#
+#
+# tnr_font14 = pygame.font.SysFont('timesnewroman', 14)
+# tnr_font18 = pygame.font.SysFont('timesnewroman', 18)
+# arial_font16 = pygame.font.SysFont('arial', 16)
 
 
 def stone_circle_draw_panel(screen):
@@ -50,9 +55,13 @@ def stone_circle_draw_panel(screen):
     text_panel1 = tnr_font18.render("Magic power +1", True, DarkText)
     screen.blit(text_panel1, [500, 150 + y_shift * y_points])
 
-    pygame.draw.polygon(screen, FillButton,
-                        [[611, 406], [670, 406], [670, 426], [611, 426]])
-    pygame.draw.polygon(screen, LineMainMenuColor1, [[611, 406], [670, 406], [670, 426], [611, 426]], 2)
+    text = "Close"
+    buttons.element_button(screen, text, "arial_font14", "DarkText", "FillButton", "LineMainMenuColor1",
+                           611, 406, 59, 20, 12, 2, 2)
 
-    text_panel1 = arial_font16.render("Close", True, DarkText)
-    screen.blit(text_panel1, [626, 407])
+    # pygame.draw.polygon(screen, FillButton,
+    #                     [[611, 406], [670, 406], [670, 426], [611, 426]])
+    # pygame.draw.polygon(screen, LineMainMenuColor1, [[611, 406], [670, 406], [670, 426], [611, 426]], 2)
+    #
+    # text_panel1 = arial_font16.render("Close", True, DarkText)
+    # screen.blit(text_panel1, [626, 407])

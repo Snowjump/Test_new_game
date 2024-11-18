@@ -219,6 +219,8 @@ class Settlement_Info_Panel(graphics_classes.Panel):
 
         # # Movement points bar
         xVar = int(movement_points_left / least_max_movement_points * 80)
+        if movement_points_left > least_max_movement_points:
+            xVar = 80
         pygame.draw.polygon(screen, ApproveFieldColor,
                             [[203, 684 + yVar], [203 + xVar, 684 + yVar], [203 + xVar, 706 + yVar], [203, 706 + yVar]])
         pygame.draw.polygon(screen, ApproveElementsColor,

@@ -1,22 +1,28 @@
 ## Among Myth and Wonder
+## stone_well_win
 
 import pygame.draw, pygame.font
 
-from Resources import game_obj
+from Screens.colors_catalog import *
+from Screens.fonts_catalog import *
+
 from Resources import game_stats
+from Resources import common_selects
 
-WhiteColor = [255, 255, 255]
+from Screens.Interface_Elements import buttons
 
-MainMenuColor = [0x9F, 0x97, 0x97]
-FillButton = [0xD8, 0xBD, 0xA2]
-LineMainMenuColor1 = [0x60, 0x60, 0x60]
-
-DarkText = [0x11, 0x11, 0x11]
-
-
-tnr_font14 = pygame.font.SysFont('timesnewroman', 14)
-tnr_font18 = pygame.font.SysFont('timesnewroman', 18)
-arial_font16 = pygame.font.SysFont('arial', 16)
+# WhiteColor = [255, 255, 255]
+#
+# MainMenuColor = [0x9F, 0x97, 0x97]
+# FillButton = [0xD8, 0xBD, 0xA2]
+# LineMainMenuColor1 = [0x60, 0x60, 0x60]
+#
+# DarkText = [0x11, 0x11, 0x11]
+#
+#
+# tnr_font14 = pygame.font.SysFont('timesnewroman', 14)
+# tnr_font18 = pygame.font.SysFont('timesnewroman', 18)
+# arial_font16 = pygame.font.SysFont('arial', 16)
 
 
 def stone_well_draw_panel(screen):
@@ -48,13 +54,12 @@ def stone_well_draw_panel(screen):
 
         y_points += 1
 
-    max_mana = 0
-    mana_reserve = 0
-    for army in game_obj.game_armies:
-        if army.army_id == game_stats.selected_army:
-            max_mana = int(10 * army.hero.knowledge)
-            mana_reserve = int(army.hero.mana_reserve)
-            break
+    # max_mana = 0
+    # mana_reserve = 0
+    army = common_selects.select_army_by_id(game_stats.selected_army)
+    max_mana = int(10 * army.hero.knowledge)
+    mana_reserve = int(army.hero.mana_reserve)
+
 
     mana_value = 0
     if mana_reserve + (max_mana / 2) > max_mana:
@@ -71,9 +76,13 @@ def stone_well_draw_panel(screen):
     ability_img.set_colorkey(WhiteColor)
     screen.blit(ability_img, [500, 150 + y_shift * y_points])
 
-    pygame.draw.polygon(screen, FillButton,
-                        [[611, 376], [670, 376], [670, 396], [611, 396]])
-    pygame.draw.polygon(screen, LineMainMenuColor1, [[611, 376], [670, 376], [670, 396], [611, 396]], 2)
+    text = "Close"
+    buttons.element_button(screen, text, "arial_font14", "DarkText", "FillButton", "LineMainMenuColor1",
+                           611, 376, 59, 20, 12, 2, 2)
 
-    text_panel1 = arial_font16.render("Close", True, DarkText)
-    screen.blit(text_panel1, [626, 377])
+    # pygame.draw.polygon(screen, FillButton,
+    #                     [[611, 376], [670, 376], [670, 396], [611, 396]])
+    # pygame.draw.polygon(screen, LineMainMenuColor1, [[611, 376], [670, 376], [670, 396], [611, 396]], 2)
+    #
+    # text_panel1 = arial_font16.render("Close", True, DarkText)
+    # screen.blit(text_panel1, [626, 377])

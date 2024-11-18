@@ -2045,6 +2045,17 @@ def military_upkeep():
             # TODO: remove empty army
 
 
+def disband_unit(army, index_list):
+    print("disband_unit()")
+    print("Given index_list: " + str(index_list))
+    index_list.sort(reverse=True)
+    print("Sorted index_list: " + str(index_list))
+    for num in index_list:
+        del army.units[num]
+    if len(army.units) <= 0:
+        remove_army([army.army_id])
+
+
 def remove_army(id_list):
     print("remove_army()")
     print("1. id_list: " + str(id_list))

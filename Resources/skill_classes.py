@@ -1,4 +1,5 @@
-## Miracle battles
+## Among Myth and Wonder
+## skill_classes
 
 
 class Battle_Skill:
@@ -8,7 +9,7 @@ class Battle_Skill:
         self.quantity = quantity
         self.method = method
         self.quality = quality
-        self.skill_tags = skill_tags  # List of tags, should be empty list [], if none tags are assigned
+        self.skill_tags = skill_tags  # List of tags, should be an empty list [], if none tags are assigned
         self.keep_details = []  # Some skills need to keep track of what happened
 
 
