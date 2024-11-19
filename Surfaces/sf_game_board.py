@@ -1540,7 +1540,7 @@ def cancel_building_battering_ram():
 
 def select_settlement():
     print("select_settlement()")
-    settlement = common_selects.select_settlement_by_id(game_stats.selected_settlement)
+    settlement = common_selects.select_settlement_by_id(game_stats.selected_settlement, True)
 
     if settlement.owner == game_stats.player_power and settlement.siege:
         # Player's settlement is under siege
@@ -1649,9 +1649,6 @@ def next_turn_but():
 
 
 def select_stationed_army_but():
-    TileObj = None
-    TileNum = None
-
     settlement = common_selects.select_settlement_by_id(game_stats.selected_settlement)
     x2 = int(settlement.posxy[0])
     y2 = int(settlement.posxy[1])
@@ -1680,6 +1677,7 @@ def select_stationed_army_but():
             game_stats.right_window = ""
             game_stats.rw_object = None
 
+            graphics_basic.remove_specific_objects(["Info panel settlement"])
             graphics_basic.prepare_army_panel()
 
             # Update visuals

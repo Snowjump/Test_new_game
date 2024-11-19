@@ -142,8 +142,8 @@ def leshys_hut_play_dice():
                                                              [481, 101, 800, 445],
                                                              None)
 
-    # result = int(random.randint(1, 6))
-    result = 1
+    result = int(random.randint(1, 6))
+    # result = 1
     army = common_selects.select_army_by_id(game_stats.selected_army)
     lot = game_obj.game_map[army.location].lot
     lot.properties.storage.append(result)

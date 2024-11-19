@@ -13,12 +13,16 @@ def copy_nested_list(original):
     return copied_list
 
 
-def select_settlement_by_id(given_settlement_id):
+def select_settlement_by_id(given_settlement_id, report=None):
     selected_settlement = None
     for settlement in game_obj.game_cities:
         if settlement.city_id == given_settlement_id:
             selected_settlement = settlement
             break
+
+    if report:
+        print("select_settlement_by_id: given_settlement_id - " + str(given_settlement_id) + "; name - "
+              + selected_settlement.name)
 
     return selected_settlement
 

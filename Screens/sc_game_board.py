@@ -58,22 +58,6 @@ from Screens.Panels.Quest_result_panels import slay_the_grey_dragon_result_win
 
 pygame.init()
 
-# MaleGender = [0x08, 0x57, 0xA5]
-# FemaleGender = [0xFA, 0x40, 0x40]
-
-# MonolithTunel = [0x24, 0x27, 0x3D]
-
-# # Construction icons
-# TunelIcon = (102, 255, 178, 120)
-# CaveIcon = (143, 163, 199, 120)
-# DraftIcon = (255, 128, 0, 160)
-
-# MatterColors = {"Rock": RockColor,
-#                 "Monolith": MonolithColor}
-
-# TunelColors = {"Rock": RockTunel,
-#                "Monolith": MonolithTunel}
-
 # Fonts
 font26 = pygame.font.SysFont('timesnewroman', 26)
 font20 = pygame.font.SysFont('timesnewroman', 20)
@@ -589,11 +573,8 @@ def begin_battle_panel(screen):
 
 
 def settlement_blockade_panel(screen):
-    the_settlement = None
-    for city in game_obj.game_cities:
-        if city.city_id == game_stats.selected_settlement:
-            the_settlement = city
-            break
+    the_settlement = common_selects.select_settlement_by_id(game_stats.selected_settlement)
+
     pygame.draw.polygon(screen, Board1, [[121, 70], [1159, 70], [1159, 500], [121, 500]])
 
     pygame.draw.polygon(screen, Board2, [[128, 336], [637, 336], [637, 490], [128, 490]])

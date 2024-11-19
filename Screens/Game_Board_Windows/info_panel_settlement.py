@@ -6,6 +6,7 @@ import math
 
 from Screens.colors_catalog import *
 from Screens.fonts_catalog import *
+from Screens.Interface_Elements import buttons
 
 from Resources import graphics_classes
 from Resources import game_stats
@@ -75,54 +76,45 @@ class Settlement_Info_Panel(graphics_classes.Panel):
 
     def draw_select_army_button(self, screen, yVar, army):
         # Select army button
-        border_color = HighlightOption
+        border_color = "HighlightOption"
         if len(army.units) < 5:
-            text_panel1 = tnr_font14.render("Less than", True, DarkText)
-            screen.blit(text_panel1, [312, 709 + yVar])
-            text_panel1 = tnr_font14.render("5 regiments", True, DarkText)
-            screen.blit(text_panel1, [312, 725 + yVar])
-            border_color = LineMainMenuColor1
-        pygame.draw.polygon(screen, border_color,
-                            [[303, 684 + yVar], [393, 684 + yVar], [393, 706 + yVar], [303, 706 + yVar]], 3)
-        text_panel1 = tnr_font16.render("Select army", True, DarkText)
-        screen.blit(text_panel1, [312, 686 + yVar])
+            text_panel1 = arial_font12.render("Less than 5 regiments", True, DarkText)
+            screen.blit(text_panel1, [288, 709 + yVar])
+            # text_panel1 = arial_font12.render("5 regiments", True, DarkText)
+            # screen.blit(text_panel1, [312, 725 + yVar])
+            border_color = "LineMainMenuColor1"
+        buttons.element_button(screen, "Select army", "tnr_font16", "DarkText", None, border_color, 303, 684 + yVar,
+                               90, 22, 9, 2, 3)
 
     def draw_hero_info(self, screen, yVar, army):
         # Hero
         if army.hero is not None:
             # Name
             text_panel = tnr_font18.render(army.hero.name, True, TitleText)
-            screen.blit(text_panel, [203, 707 + yVar])
+            screen.blit(text_panel, [288, 721 + yVar])
 
             # Class
             text_panel = tnr_font16.render(army.hero.hero_class, True, DarkText)
-            screen.blit(text_panel, [253, 726 + yVar])
+            screen.blit(text_panel, [288, 741 + yVar])
 
             # Level
             text_panel = tnr_font16.render("Level " + str(army.hero.level), True, DarkText)
-            screen.blit(text_panel, [253, 746 + yVar])
+            screen.blit(text_panel, [288, 761 + yVar])
 
             # Hero image
             img = army.hero.img
             source = army.hero.img_source
-            # Previous code
-            # army_img = pygame.image.load('img/Heroes/' + str(source) + "/" + str(img) + '.png')
-            # army_img.set_colorkey(WhiteColor)
             x_offset = army.hero.x_offset
             y_offset = army.hero.y_offset
             side = "_l"
             if army.right_side:
                 side = "_r"
-            # New code
             army_img = game_stats.gf_hero_dict[source + "/" + img + side]
-            screen.blit(army_img, (203 + x_offset, 726 + yVar + y_offset))
+            screen.blit(army_img, (203 + x_offset, 718 + yVar + y_offset))
 
             # Open hero window
-            border_color = HighlightOption
-            pygame.draw.polygon(screen, border_color,
-                                [[203, 776 + yVar], [253, 776 + yVar], [253, 794 + yVar], [203, 794 + yVar]], 2)
-            text_panel1 = tnr_font16.render("Hero", True, DarkText)
-            screen.blit(text_panel1, [213, 777 + yVar])
+            buttons.element_button(screen, "Hero", "tnr_font16", "DarkText", None, "HighlightOption", 203, 776 + yVar,
+                                   50, 18, 10, 1, 2)
 
             # New attribute or skill points are available
             if army.hero.new_attribute_points > 0 or army.hero.new_skill_points > 0:

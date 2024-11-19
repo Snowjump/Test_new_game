@@ -31,6 +31,7 @@ def init_game_board_graphics():
 
 def refresh_graphics_object(new_object):
     for obj in graphics_obj.game_board_objects:
+        # print(obj.name)
         if obj.name == new_object.name:
             graphics_obj.game_board_objects.remove(obj)
             break

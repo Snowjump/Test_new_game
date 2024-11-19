@@ -4,12 +4,14 @@
 from Screens.colors_catalog import *
 from Screens.fonts_catalog import *
 
-font_dic = {"arial_font14" : arial_font14}
+font_dic = {"tnr_font16" : tnr_font16,
+            "arial_font14" : arial_font14}
 
 color_dic = {"LineMainMenuColor1" : LineMainMenuColor1,
              "DarkText" : DarkText,
              "FillButton" : FillButton,
-             "RockTunel" : RockTunel}
+             "RockTunel" : RockTunel,
+             "HighlightOption" : HighlightOption}
 
 
 def element_button(screen, text, text_font, text_color, field_color, border_color, x, y, x_p, y_p, x_w, y_w,
@@ -22,9 +24,18 @@ def element_button(screen, text, text_font, text_color, field_color, border_colo
     # y_p - button length
     # x_w - x-axis distance between border of a button and a text
     # y_w - y-axis distance between border of a button and a text
+    # print("border_color - " + str(border_color))
+    # print("x - " + str(x))
+    # print("y - " + str(y))
+    # print("x_p - " + str(x_p))
+    # print("y_p - " + str(y_p))
+    # print("x_w - " + str(x_w))
+    # print("y_w - " + str(y_w))
+    # print("border_thickness - " + str(border_thickness))
 
     # Button's field
-    pygame.draw.polygon(screen, color_dic[field_color], [[x, y], [x + x_p, y], [x + x_p, y + y_p], [x, y + y_p]])
+    if field_color:
+        pygame.draw.polygon(screen, color_dic[field_color], [[x, y], [x + x_p, y], [x + x_p, y + y_p], [x, y + y_p]])
 
     # Button's border
     pygame.draw.polygon(screen, color_dic[border_color], [[x, y], [x + x_p, y], [x + x_p, y + y_p], [x, y + y_p]],

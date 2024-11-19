@@ -1,31 +1,18 @@
-## det_settlement_heroes
 ## Among Myth and Wonder
+## det_settlement_heroes
 
 import pygame.draw
 import pygame.font
+
+from Screens.colors_catalog import *
+from Screens.fonts_catalog import *
+
+from Screens.Interface_Elements import buttons
 
 from Resources import game_stats
 from Resources import game_obj
 from Content import new_heroes_catalog
 from Content import starting_skills
-
-WhiteColor = [255, 255, 255]
-
-TitleText = [0xFF, 0xFF, 0x99]
-DarkText = [0x11, 0x11, 0x11]
-
-LineMainMenuColor1 = [0x60, 0x60, 0x60]
-FillButton = [0xD8, 0xBD, 0xA2]
-FieldColor = [0xA0, 0xA0, 0xA0]
-HighlightOption = [0x00, 0xCC, 0xCC]
-RockTunel = [0x89, 0x89, 0x89]
-
-tnr_font26 = pygame.font.SysFont('timesnewroman', 26)
-tnr_font20 = pygame.font.SysFont('timesnewroman', 20)
-arial_font20 = pygame.font.SysFont('arial', 20)
-arial_font16 = pygame.font.SysFont('arial', 16)
-arial_font14 = pygame.font.SysFont('arial', 14)
-arial_font13 = pygame.font.SysFont('arial', 13)
 
 
 def draw_heroes(screen, settlement):
@@ -72,10 +59,6 @@ def draw_heroes(screen, settlement):
         screen.blit(back_img, [3, 141 + y_shift * y_points])
 
         hero_info = new_heroes_catalog.heroes_img_dict_by_alignment[settlement.alignment][hero]
-        # Previous code
-        # hero_img = pygame.image.load(
-        #     'img/Heroes/' + str(hero_info[1]) + "/" + str(hero_info[0]) + '.png')
-        # hero_img.set_colorkey(WhiteColor)
         hero_img = game_stats.gf_hero_dict[hero_info[1] + "/" + hero_info[0] + "_r"]
         screen.blit(hero_img, [3 + (hero_info[2]), 141 + y_shift * y_points + (hero_info[3])])
 
@@ -87,27 +70,25 @@ def draw_heroes(screen, settlement):
 
     if game_stats.hero_for_hire is not None:
         # Button - skill tree
-        pygame.draw.polygon(screen, FillButton,
-                            [[286, 112], [396, 112], [396, 132], [286, 132]])
-        pygame.draw.polygon(screen, LineMainMenuColor1, [[286, 112], [396, 112], [396, 132], [286, 132]], 2)
+        buttons.element_button(screen, "Skill tree", "arial_font14", "DarkText", "FillButton", "LineMainMenuColor1",
+                               286, 112, 110, 20, 28, 3, 2)
 
-        text_panel1 = arial_font14.render("Skill tree", True, DarkText)
-        screen.blit(text_panel1, [314, 115])
-
-        # Button - hire hero
-
-        color1 = LineMainMenuColor1
+        # Bottom - hire hero
+        color1 = "LineMainMenuColor1"
         pygame.draw.polygon(screen, FillButton,
                             [[406, 112], [516, 112], [516, 132], [406, 132]])
         # if units_length > 4 and no_hero_in_army and game_stats.enough_resources_to_pay:
         if no_hero_in_army and game_stats.enough_resources_to_pay:
-            color1 = HighlightOption
-        else:
-            color1 = LineMainMenuColor1
-        pygame.draw.polygon(screen, color1, [[406, 112], [516, 112], [516, 132], [406, 132]], 2)
+            color1 = "HighlightOption"
 
-        text_panel1 = arial_font14.render("Hire hero", True, DarkText)
-        screen.blit(text_panel1, [433, 115])
+        buttons.element_button(screen, "Hire hero", "arial_font14", "DarkText", "FillButton", color1,
+                               406, 112, 110, 20, 27, 3, 2)
+
+        # Price
+        icon_img = game_stats.gf_misc_img_dict["resource_florins"]
+        screen.blit(icon_img, (430, 136))
+        text_line = arial_font14.render("2000", True, DarkText)
+        screen.blit(text_line, (430 + 22, 135))
 
         # Hero class
         text = str(game_stats.hero_for_hire[0])
@@ -181,11 +162,8 @@ def draw_heroes(screen, settlement):
                 game_stats.first_starting_skill]
 
             # Next first skill
-            pygame.draw.polygon(screen, RockTunel, [[615, 196], [634, 196], [634, 196 + 18], [615, 196 + 18]])
-            pygame.draw.polygon(screen, LineMainMenuColor1,
-                                [[615, 196], [634, 196], [634, 196 + 18], [615, 196 + 18]],
-                                1)
-            pygame.draw.lines(screen, LineMainMenuColor1, False, [(618, 196 + 2), (631, 196 + 9), (618, 196 + 15)], 2)
+            buttons.element_arrow_button(screen, "Right", "RockTunel", "LineMainMenuColor1", "LineMainMenuColor1",
+                                         615, 196, 19, 18, 2, 2)
 
         else:
             text = starting_skills.locked_first_skill_by_class[game_stats.hero_for_hire[0]]
