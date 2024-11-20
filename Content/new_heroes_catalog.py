@@ -1,4 +1,4 @@
-## Miracle battles
+## Among Myth and Wonder
 ## new_heroes_catalog
 
 from Resources import game_classes

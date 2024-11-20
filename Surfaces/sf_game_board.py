@@ -388,18 +388,15 @@ def game_board_surface_m1(position):
                 y_axis = math.ceil(y_axis / 52)
                 print(str(y_axis))
 
-                the_settlement = None
-                alignment = None
-                for city in game_obj.game_cities:
-                    if city.city_id == game_stats.selected_settlement:
-                        the_settlement = city
-                        alignment = the_settlement.alignment
+                the_settlement = common_selects.select_settlement_by_id(game_stats.selected_settlement)
+                alignment = the_settlement.alignment
 
                 if y_axis <= len(new_heroes_catalog.heroes_classes_dict_by_alignment[alignment]):
                     hero_class = new_heroes_catalog.heroes_classes_dict_by_alignment[alignment][y_axis - 1]
                     game_stats.hero_for_hire = new_heroes_catalog.basic_heroes_dict_by_alignment[alignment][hero_class]
                     game_stats.enough_resources_to_pay = game_basic.enough_resources_to_hire_hero(game_stats.hero_for_hire)
                     game_basic.form_starting_skills_pool(hero_class, "Player")
+                    game_stats.skill_tree_level_index = 1
 
         elif game_stats.game_board_panel == "settlement panel" and game_stats.settlement_area == "Economy":
             button_numb = 0
@@ -2021,9 +2018,9 @@ def skill_tree_level_prev():
 
 def skill_tree_level_next():
     print("Skill tree level - " + str(game_stats.skill_tree_level_index))
-    cutoff = 5
+    cutoff = 8
     if game_stats.right_window == "Hero window":
-        cutoff = 6
+        cutoff = 9
     if game_stats.skill_tree_level_index == cutoff:
         pass
     else:

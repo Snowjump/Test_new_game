@@ -1,4 +1,5 @@
-## Miracle battles
+## Among Myth and Wonder
+## study_abilities_catalog
 
 
 abilities_cat = {"Basic devine magic" : ["Haste", "Healing", "Devine protection", "Bless"],

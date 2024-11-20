@@ -10,6 +10,8 @@ font_dic = {"tnr_font16" : tnr_font16,
 color_dic = {"LineMainMenuColor1" : LineMainMenuColor1,
              "DarkText" : DarkText,
              "FillButton" : FillButton,
+             "CancelFieldColor" : CancelFieldColor,
+             "CancelElementsColor" : CancelElementsColor,
              "RockTunel" : RockTunel,
              "HighlightOption" : HighlightOption}
 
@@ -77,3 +79,29 @@ def element_arrow_button(screen, direction, field_color, border_color, line_colo
 
     pygame.draw.lines(screen, color_dic[line_color], False, [point_1, point_2, point_3],
                       line_thickness)
+
+
+def element_close_button(screen, field_color, border_color, line_color, x, y, x_p, y_p, border_thickness,
+                         line_thickness):
+    # Basic button with a border and a diagonal cross consisting of two lines
+
+    # x - x-axis coordinate
+    # y - y-axis coordinate
+    # x_p - button width
+    # y_p - button length
+
+    # Button's field
+    pygame.draw.polygon(screen, color_dic[field_color], [[x, y], [x + x_p, y], [x + x_p, y + y_p], [x, y + y_p]])
+
+    # Button's border
+    pygame.draw.polygon(screen, color_dic[border_color], [[x, y], [x + x_p, y], [x + x_p, y + y_p], [x, y + y_p]],
+                        border_thickness)
+
+    # Diagonal cross lines
+    point_1 = (x + 3, y + 3)
+    point_2 = (x + x_p - 3, y + y_p - 3)
+    point_3 = (x + 3, y + y_p - 3)
+    point_4 = (x + x_p - 3, y + 3)
+
+    pygame.draw.line(screen, color_dic[line_color], point_1, point_2, line_thickness)
+    pygame.draw.line(screen, color_dic[line_color], point_3, point_4, line_thickness)

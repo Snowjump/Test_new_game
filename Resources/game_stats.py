@@ -1,10 +1,10 @@
-## game_stats
 ## Among Myth and Wonder
+## game_stats
 
 # Software versioning
 version_major = 0
 version_minor = 1
-version_micro = 14
+version_micro = 15
 
 time_counted = 0
 fps = 0.0

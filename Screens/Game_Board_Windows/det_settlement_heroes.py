@@ -135,8 +135,8 @@ def draw_heroes(screen, settlement):
                 for att in pack.attribute_list:
 
                     text = str(att.tag.capitalize()) + ": " + str(att.stat) + " +" + str(att.value)
-                    text_panel1 = arial_font13.render(text, True, DarkText)
-                    screen.blit(text_panel1, [286, 238 + y_shift2 * y_points2 + att_num * y_shift2])
+                    text_panel1 = arial_font12.render(text, True, DarkText)
+                    screen.blit(text_panel1, [286, 239 + y_shift2 * y_points2 + att_num * y_shift2])
 
                     att_num += 1
 
@@ -163,12 +163,12 @@ def draw_heroes(screen, settlement):
 
             # Next first skill
             buttons.element_arrow_button(screen, "Right", "RockTunel", "LineMainMenuColor1", "LineMainMenuColor1",
-                                         615, 196, 19, 18, 2, 2)
+                                         615, 196, 19, 18, 1, 2)
 
         else:
             text = starting_skills.locked_first_skill_by_class[game_stats.hero_for_hire[0]]
-        text_panel1 = arial_font13.render(text, True, DarkText)
-        screen.blit(text_panel1, [458, 198])
+        text_panel1 = arial_font12.render(text, True, DarkText)
+        screen.blit(text_panel1, [458, 199])
 
         # Second skill
         pygame.draw.polygon(screen, FieldColor,
@@ -178,12 +178,14 @@ def draw_heroes(screen, settlement):
                              [456, 234]])
 
         text = starting_skills.starting_skills_by_class[game_stats.hero_for_hire[0]][game_stats.second_starting_skill]
-        text_panel1 = arial_font13.render(text, True, DarkText)
-        screen.blit(text_panel1, [458, 218])
+        text_panel1 = arial_font12.render(text, True, DarkText)
+        screen.blit(text_panel1, [458, 219])
 
         # Next second skill
-        pygame.draw.polygon(screen, RockTunel, [[615, 216], [634, 216], [634, 216 + 18], [615, 216 + 18]])
-        pygame.draw.polygon(screen, LineMainMenuColor1,
-                            [[615, 216], [634, 216], [634, 216 + 18], [615, 216 + 18]],
-                            1)
-        pygame.draw.lines(screen, LineMainMenuColor1, False, [(618, 216 + 2), (631, 216 + 9), (618, 216 + 15)], 2)
+        buttons.element_arrow_button(screen, "Right", "RockTunel", "LineMainMenuColor1", "LineMainMenuColor1",
+                                     615, 216, 19, 18, 1, 2)
+        # pygame.draw.polygon(screen, RockTunel, [[615, 216], [634, 216], [634, 216 + 18], [615, 216 + 18]])
+        # pygame.draw.polygon(screen, LineMainMenuColor1,
+        #                     [[615, 216], [634, 216], [634, 216 + 18], [615, 216 + 18]],
+        #                     1)
+        # pygame.draw.lines(screen, LineMainMenuColor1, False, [(618, 216 + 2), (631, 216 + 9), (618, 216 + 15)], 2)
