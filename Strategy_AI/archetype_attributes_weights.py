@@ -1,39 +1,51 @@
-## Miracle battles
+## Among Myth and Wonder
 ## archetype_attributes_weights
 
 random_tag_weights = {"melee infantry": 1,
                       "melee cavalry": 1,
                       "ranged infantry": 1,
+                      "hybrid infantry": 1,
+                      "monster": 1,
                       "caster": 1,
                       "hero": 1}
 
 cavalry_focus_tag_weights = {"melee infantry": 4,
                              "melee cavalry": 10,
                              "ranged infantry": 4,
+                             "hybrid infantry": 4,
+                             "monster": 6,
                              "caster": 2,
                              "hero": 3}
 
 mixed_troops_tag_weights = {"melee infantry": 7,
                             "melee cavalry": 5,
                             "ranged infantry": 7,
+                            "hybrid infantry": 8,
+                            "monster": 5,
                             "caster": 2,
                             "hero": 3}
 
 ranged_troops_tag_weights = {"melee infantry": 4,
                              "melee cavalry": 4,
                              "ranged infantry": 10,
+                             "hybrid infantry": 8,
+                             "monster": 4,
                              "caster": 2,
                              "hero": 3}
 
 balanced_magic_focus_tag_weights = {"melee infantry": 3,
                                     "melee cavalry": 3,
                                     "ranged infantry": 3,
+                                    "hybrid infantry": 3,
+                                    "monster": 3,
                                     "caster": 5,
                                     "hero": 8}
 
 magic_power_focus_tag_weights = {"melee infantry": 3,
                                  "melee cavalry": 3,
                                  "ranged infantry": 3,
+                                 "hybrid infantry": 3,
+                                 "monster": 3,
                                  "caster": 5,
                                  "hero": 10}
 

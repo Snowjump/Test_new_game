@@ -251,7 +251,9 @@ def assemble_adventure_destinations(realm, role, army, settlement, friendly_citi
 exploration_objects_group_1 = ["Mythic monolith",
                                "Stone circle",
                                "Scholar's tower",
-                               "Stone well"]
+                               "Stone well",
+                               "Champion's tent",
+                               "Leshy's hut"]
 
 exploration_objects_group_2 = ["Burial mound",
                                "Angler's cabin"]

@@ -15,6 +15,7 @@ from Resources import game_road_img
 from Resources import game_basic
 from Resources import algo_circle_range
 from Resources import algo_square_range
+from Resources import common_selects
 
 from Content import objects_img_catalog
 from Content import terrain_catalog
@@ -1023,35 +1024,42 @@ def draw_control_zone():
         if game_stats.level_map[TileNum].lot != "City":
             if game_stats.edit_instrument == "draw control zone":
                 if game_stats.level_map[TileNum].city_id is None:
+                    print("Scenario 1 - put neutral facility into control zone")
                     game_stats.level_map[TileNum].city_id = game_stats.last_city_id
                     focus1 = int(game_stats.level_map[TileNum].city_id)
+                    print("focus1 - " + str(game_stats.level_map[TileNum].city_id))
                     update_property(TileNum, focus1, None)
 
-                    for settlement in game_stats.editor_cities:
-                        if settlement.city_id == game_stats.last_city_id:
-                            settlement.control_zone.append(int(TileNum))
-                            break
+                    settlement = common_selects.select_settlement_by_id(game_stats.last_city_id,
+                                                                        location="editor_cities")
+                    settlement.control_zone.append(int(TileNum))
+
                 elif game_stats.level_map[TileNum].city_id != game_stats.last_city_id:
+                    print("Scenario 2")
                     focus2 = int(game_stats.level_map[TileNum].city_id)
                     game_stats.level_map[TileNum].city_id = game_stats.last_city_id
                     focus1 = int(game_stats.last_city_id)
                     update_property(TileNum, focus1, focus2)
 
-                    for settlement in game_stats.editor_cities:
-                        if settlement.city_id == game_stats.last_city_id:
-                            settlement.control_zone.append(int(TileNum))
-                            break
+                    settlement = common_selects.select_settlement_by_id(game_stats.last_city_id,
+                                                                        location="editor_cities")
+                    settlement.control_zone.append(int(TileNum))
 
             elif game_stats.edit_instrument == "remove control zone":
                 if game_stats.level_map[TileNum].city_id == game_stats.last_city_id:
+                    print("Scenario 3 - remove control zone")
                     focus1 = int(game_stats.level_map[TileNum].city_id)
                     game_stats.level_map[TileNum].city_id = None
                     update_property(TileNum, focus1, None)
 
-                    for settlement in game_stats.editor_cities:
-                        if settlement.city_id == game_stats.last_city_id:
-                            settlement.control_zone.remove(int(TileNum))
-                            break
+                    settlement = common_selects.select_settlement_by_id(game_stats.last_city_id, report=True,
+                                                                        location="editor_cities")
+                    settlement.control_zone.remove(int(TileNum))
+
+                    # for settlement in game_stats.editor_cities:
+                    #     if settlement.city_id == game_stats.last_city_id:
+                    #         settlement.control_zone.remove(int(TileNum))
+                    #         break
 
 
 def close_building_menu_left_panel_but():
@@ -1792,7 +1800,7 @@ def update_property(TileNum, focus1, focus2):
                     number = facility_catalog.LE_facility_list.index(game_stats.level_map[TileNum].lot.obj_name)
                     game_stats.level_map[TileNum].lot.img_name = facility_catalog.LE_facility_img_name_list_neutral[
                         number]
-                    game_stats.level_map[TileNum].alignment = "Neutral"
+                    game_stats.level_map[TileNum].lot.alignment = "Neutral"
                     # Settlement
                     for city in game_stats.editor_cities:
                         if city.city_id == focus1:
@@ -1813,47 +1821,45 @@ def update_property(TileNum, focus1, focus2):
                     # Population
                     game_stats.level_map[TileNum].lot.residency = []
                 elif focus2 is None:
-                    print("Add neutral facility")
-                    for city in game_stats.editor_cities:
-                        if city.city_id == focus1:
-                            # Facility
-                            alin = str(city.alignment)
-                            number = facility_catalog.LE_facility_list.index(game_stats.level_map[TileNum].lot.obj_name)
-                            game_stats.level_map[TileNum].lot.img_path = facility_catalog.facility_path_cat[alin]
-                            game_stats.level_map[TileNum].lot.img_name = facility_catalog.facility_img_name_cat[alin][
-                                number]
-                            game_stats.level_map[TileNum].alignment = str(alin)
+                    print("update_property() - Add neutral facility")
+                    city = common_selects.select_settlement_by_id(game_stats.last_city_id, location="editor_cities")
+                    # Facility
+                    alin = str(city.alignment)
+                    number = facility_catalog.LE_facility_list.index(game_stats.level_map[TileNum].lot.obj_name)
+                    game_stats.level_map[TileNum].lot.img_path = facility_catalog.facility_path_cat[alin]
+                    game_stats.level_map[TileNum].lot.img_name = facility_catalog.facility_img_name_cat[alin][
+                        number]
+                    game_stats.level_map[TileNum].lot.alignment = str(alin)
 
-                            # Settlement
-                            city.property.append(int(TileNum))
+                    # Settlement
+                    city.property.append(int(TileNum))
 
-                            # Population
-                            game_stats.level_map[TileNum].lot.residency = []
-                            facil = game_stats.level_map[TileNum].lot.obj_name
+                    # Population
+                    game_stats.level_map[TileNum].lot.residency = []
+                    facil = game_stats.level_map[TileNum].lot.obj_name
 
-                            for pops in faction_classes.fac_groups_for_pop[alin][facil]:
-                                game_stats.LE_population_id_counter += 1
-                                population_id = int(game_stats.LE_population_id_counter)
-                                name = str(pops[0])
-                                reserve = []
-                                for res in pops[1]:
-                                    reserve.append([str(res[0]), int(res[1])])
-                                game_stats.level_map[TileNum].lot.residency.append(
-                                    faction_classes.Population(int(population_id), str(name)))
+                    for pops in faction_classes.fac_groups_for_pop[alin][facil]:
+                        game_stats.LE_population_id_counter += 1
+                        population_id = int(game_stats.LE_population_id_counter)
+                        name = str(pops[0])
+                        reserve = []
+                        for res in pops[1]:
+                            reserve.append([str(res[0]), int(res[1])])
+                        game_stats.level_map[TileNum].lot.residency.append(
+                            faction_classes.Population(int(population_id), str(name)))
 
-                                # Add population ID to representing faction
-                                required_faction = faction_classes.pop_membership[name]
-                                print(name + " - " + required_faction)
-                                for faction in city.factions:
-                                    if faction.name == required_faction:
-                                        faction.members.append([int(population_id), str(name), int(TileNum),
-                                                                str(game_stats.level_map[TileNum].lot.thematic_name)])
-                                        print("Found faction - " + faction.name)
-                                        break
+                        # Add population ID to representing faction
+                        required_faction = faction_classes.pop_membership[name]
+                        print(name + " - " + required_faction)
+                        for faction in city.factions:
+                            if faction.name == required_faction:
+                                faction.members.append([int(population_id), str(name), int(TileNum),
+                                                        str(game_stats.level_map[TileNum].lot.thematic_name)])
+                                print("Found faction - " + faction.name)
+                                break
 
-                            # game_stats.level_map[TileNum].lot.residency =
-                            # faction_classes.fac_groups_for_pop[alin][facil]
-                            break
+                    # game_stats.level_map[TileNum].lot.residency =
+                    # faction_classes.fac_groups_for_pop[alin][facil]
 
                 else:
                     for city in game_stats.editor_cities:
@@ -1883,7 +1889,7 @@ def update_property(TileNum, focus1, focus2):
                                 number]
                             game_stats.level_map[TileNum].lot.img_name = facility_catalog.facility_img_name_cat[alin][
                                 number]
-                            game_stats.level_map[TileNum].alignment = str(alin)
+                            game_stats.level_map[TileNum].lot.alignment = str(alin)
 
                             # Population
                             game_stats.level_map[TileNum].lot.residency = []

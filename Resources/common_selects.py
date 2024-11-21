@@ -2,6 +2,7 @@
 ## common_selects
 
 from Resources import game_obj
+from Resources import game_stats
 
 
 def copy_nested_list(original):
@@ -13,14 +14,17 @@ def copy_nested_list(original):
     return copied_list
 
 
-def select_settlement_by_id(given_settlement_id, report=None):
+def select_settlement_by_id(given_settlement_id, report=None, location="game_cities"):
+    settlements_location = {"game_cities": game_obj.game_cities,
+                            "editor_cities": game_stats.editor_cities}
     selected_settlement = None
-    for settlement in game_obj.game_cities:
+    for settlement in settlements_location[location]:
         if settlement.city_id == given_settlement_id:
             selected_settlement = settlement
             break
 
     if report:
+        # print(location + " - " + str(settlements_location[location]))
         print("select_settlement_by_id: given_settlement_id - " + str(given_settlement_id) + "; name - "
               + selected_settlement.name)
 

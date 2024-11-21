@@ -173,48 +173,42 @@ def check_lair_object(map_obj, army, tile, tile_list, own_army_sum_rank):
     # Lair objects with opportunity to fight for a prize
     if map_obj.properties.army_id is not None:
         print("obj.properties.army_id - " + str(map_obj.properties.army_id))
-        for target in game_obj.game_armies:
-            if target.army_id == map_obj.properties.army_id:
-                if power_ranking.rank_ratio_calculation(own_army_sum_rank, target, 120):
-                    print("Ready to attack lair")
-                    distance = math.sqrt(((army.posxy[0] - tile[0]) ** 2) + ((army.posxy[1] - tile[1]) ** 2))
-                    distance = math.floor(distance * 100) / 100
-                    tile_list.append(["Lair", list(tile), distance])
-                break
+        target = common_selects.select_army_by_id(map_obj.properties.army_id)
+        if power_ranking.rank_ratio_calculation(own_army_sum_rank, target, 120):
+            print("Ready to attack lair")
+            distance = math.sqrt(((army.posxy[0] - tile[0]) ** 2) + ((army.posxy[1] - tile[1]) ** 2))
+            distance = math.floor(distance * 100) / 100
+            tile_list.append(["Lair", list(tile), distance])
 
 
 def check_hostile_armies(army, tile, tile_list, rank_sum, TileNum, at_war_list):
     if game_obj.game_map[TileNum].army_id is not None:
         # There is an army
         print("Tile.army_id - " + str(game_obj.game_map[TileNum].army_id))
-        for target in game_obj.game_armies:
-            if target.army_id == game_obj.game_map[TileNum].army_id:
-                if target.action == "Stand":
-                    # Targeting standing armies
-                    if target.owner == "Neutral":
-                        # Targeting neutral armies
-                        if power_ranking.rank_ratio_calculation(rank_sum, target, 120):
-                            print("Ready to attack neutral army")
-                            distance = math.sqrt(((army.posxy[0] - tile[0]) ** 2) + ((army.posxy[1] - tile[1]) ** 2))
-                            distance = math.floor(distance * 100) / 100
-                            tile_list.append(["Enemy army", list(tile), distance])
+        target = common_selects.select_army_by_id(game_obj.game_map[TileNum].army_id)
+        if target.action == "Stand":
+            # Targeting standing armies
+            if target.owner == "Neutral":
+                # Targeting neutral armies
+                if power_ranking.rank_ratio_calculation(rank_sum, target, 120):
+                    print("Ready to attack neutral army")
+                    distance = math.sqrt(((army.posxy[0] - tile[0]) ** 2) + ((army.posxy[1] - tile[1]) ** 2))
+                    distance = math.floor(distance * 100) / 100
+                    tile_list.append(["Enemy army", list(tile), distance])
 
-                    elif target.owner in at_war_list:
-                        # Targeting armies from realms who are at war with this realm
-                        # Standard border is 120
-                        power_border = 120
-                        # But for human player factions increase to 145, since humans are better at battling
-                        for power in game_obj.game_powers:
-                            if power.name == target.owner:
-                                if not power.AI_player:
-                                    power_border = 145
-                                break
-                        if power_ranking.rank_ratio_calculation(rank_sum, target, power_border):
-                            print("Ready to attack " + str(target.owner) + " army")
-                            distance = math.sqrt(((army.posxy[0] - tile[0]) ** 2) + ((army.posxy[1] - tile[1]) ** 2))
-                            distance = math.floor(distance * 100) / 100
-                            tile_list.append(["Enemy army", list(tile), distance])
-                break
+            elif target.owner in at_war_list:
+                # Targeting armies from realms who are at war with this realm
+                # Standard border is 120
+                power_border = 120
+                # But for human player factions increase to 145, since humans are better at battling
+                power = common_selects.select_realm_by_name(target.owner)
+                if not power.AI_player:
+                    power_border = 145
+                if power_ranking.rank_ratio_calculation(rank_sum, target, power_border):
+                    print("Ready to attack " + str(target.owner) + " army")
+                    distance = math.sqrt(((army.posxy[0] - tile[0]) ** 2) + ((army.posxy[1] - tile[1]) ** 2))
+                    distance = math.floor(distance * 100) / 100
+                    tile_list.append(["Enemy army", list(tile), distance])
 
 
 army_rank_dic = {1 : 35,
@@ -224,7 +218,9 @@ army_rank_dic = {1 : 35,
 exploration_objects_group_1 = ["Mythic monolith",
                                "Stone circle",
                                "Scholar's tower",
-                               "Stone well"]
+                               "Stone well",
+                               "Champion's tent",
+                               "Leshy's hut"]
 
 exploration_objects_group_2 = ["Burial mound",
                                "Angler's cabin"]

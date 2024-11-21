@@ -1,4 +1,4 @@
-## Miracle battles
+## Among Myth and Wonder
 ## AI_exploration_cond
 
 # Some exploration objects requires to met specific conditions to make sense for hero to visit this place

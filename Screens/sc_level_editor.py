@@ -616,32 +616,57 @@ def population_lower_panel(screen):
     pygame.draw.polygon(screen, MainMenuColor,
                         [[400, 600 + yVar], [880, 600 + yVar], [880, 800 + yVar], [400, 800 + yVar]])
 
+    obj = game_stats.lot_information
+
+    # Facility
+    x = 410
+    text_panel = font20.render("Facility", True, TitleText)
+    screen.blit(text_panel, [x, 604 + yVar])
+
+    # Facility name
+    text_panel = font20.render(obj.obj_name, True, DarkText)
+    screen.blit(text_panel, [x, 634 + yVar])
+
+    # Facility thematic name
+    text_panel = font20.render(obj.thematic_name, True, DarkText)
+    screen.blit(text_panel, [x, 664 + yVar])
+
+    # Facility object type
+    text_panel = font20.render(obj.obj_typ, True, DarkText)
+    screen.blit(text_panel, [x, 694 + yVar])
+
+    # Facility alignment
+    text_panel = font20.render(obj.alignment, True, DarkText)
+    screen.blit(text_panel, [x, 724 + yVar])
+
     # Population
+    x += 150
     text_panel = font20.render("Population", True, TitleText)
-    screen.blit(text_panel, [410, 604 + yVar])
+    screen.blit(text_panel, [x, 604 + yVar])
 
     yPos = 0
-    for pops in game_stats.lot_information.residency:
+    for pops in obj.residency:
         # Population's name
         # print(pops)
         text_panel = font20.render(pops.name, True, DarkText)
-        screen.blit(text_panel, [410, 634 + yVar + yPos])
+        screen.blit(text_panel, [x, 634 + yVar + yPos])
 
         yPos += 30
 
     # White line
-    pygame.draw.lines(screen, WhiteBorder, False, [(410, 656 + yVar + 30 * game_stats.population_l_p_index),
-                                                   (500, 656 + yVar + 30 * game_stats.population_l_p_index)], 1)
+    pygame.draw.lines(screen, WhiteBorder, False, [(x, 656 + yVar + 30 * game_stats.population_l_p_index),
+                                                   (x + 90, 656 + yVar + 30 * game_stats.population_l_p_index)], 1)
 
     # Property
+    x += 120
     text_panel = font20.render("Property:", True, TitleText)
-    screen.blit(text_panel, [530, 604 + yVar])
+    screen.blit(text_panel, [x, 604 + yVar])
 
     yPos = 0
-    if len(game_stats.lot_information.residency) > 0:
-        for resource in game_stats.lot_information.residency[game_stats.population_l_p_index].reserve:
+    if obj.residency:
+        for resource in obj.residency[game_stats.population_l_p_index].reserve:
             text_panel = font20.render(resource[0] + " - " + str(resource[1]), True, DarkText)
-            screen.blit(text_panel, [530, 634 + yVar + yPos])
+            screen.blit(text_panel, [x, 634 + yVar + yPos])
 
             yPos += 30
 
@@ -1391,18 +1416,16 @@ def facility_panel(screen):
     text_panel1 = font20.render("Remove facility", True, DarkText)
     screen.blit(text_panel1, [1050, 74])
 
-    # Delimeter line
+    # Delimiter line
     pygame.draw.lines(screen, WhiteBorder, False, [(1044, 99), (1266, 99)], 2)
 
     # List of facilities
     facility_count = 0
     facility_list = list(facility_catalog.LE_facility_list)
     if len(facility_list) > 0:
-        number = 1
+        number = len(facility_list)
         if len(facility_list) >= 8:
             number = 8
-        else:
-            number = len(facility_list)
 
         for position in range(1, number + 1):
             facility_name = facility_list[position - 1 + game_stats.facility_short_index]

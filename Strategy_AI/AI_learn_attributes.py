@@ -1,4 +1,4 @@
-## Miracle battles
+## Among Myth and Wonder
 ## AI_learn_attributes
 
 import random

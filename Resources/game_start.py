@@ -92,3 +92,5 @@ def load_level_into_editor():
             max_y = tile.posxy[1]
     game_stats.new_level_width = int(max_x)
     game_stats.new_level_height = int(max_y)
+
+    # print("game_stats.editor_cities - " + str(game_stats.editor_cities))

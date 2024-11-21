@@ -1,11 +1,14 @@
-## Miracle battles
+## Among Myth and Wonder
 ## AI_exploration_scripts
 
 import random
+import math
 
 from Resources import game_obj
 from Resources import game_basic
+from Resources import game_classes
 from Resources import game_autobattle
+from Resources import common_selects
 
 from Content import exploration_scripts
 
@@ -37,11 +40,9 @@ def stone_well_event(obj, army):
         max_mana = int(10 * army.hero.knowledge)
         mana_reserve = int(army.hero.mana_reserve)
 
-        mana_value = 0
+        mana_value = int(max_mana / 2)
         if mana_reserve + (max_mana / 2) > max_mana:
             mana_value = int(max_mana - mana_reserve)
-        else:
-            mana_value = int(max_mana / 2)
 
         army.hero.mana_reserve += int(mana_value)
 
@@ -53,11 +54,7 @@ def burial_mound_event(obj, army):
                                    "Ancient elven sceptre", "Broken javelin"])]
         script_rewards = [artefact]
 
-        the_realm = None
-        for realm in game_obj.game_powers:
-            if realm.name == army.owner:
-                the_realm = realm
-                break
+        the_realm = common_selects.select_realm_by_name(army.owner)
 
         exploration_scripts.spread_reward(army, the_realm, script_rewards)
 
@@ -87,25 +84,74 @@ def anglers_cabin_event(obj, army):
                     break
 
         if buy_artifact:
-            for realm in game_obj.game_powers:
-                if realm.name == army.owner:
-                    for res in realm.coffers:
-                        if res[0] == "Florins":
-                            # print("Florins - " + str(res[1]) + "; " + str(artifact_name) + " - " +
-                            #       str(artifact_catalog.artifact_data[artifact_name][2]))
-                            if res[1] <= 3000:
-                                res[1] -= 3000
+            realm = common_selects.select_realm_by_name(army.owner)
+            for res in realm.coffers:
+                if res[0] == "Florins":
+                    # print("Florins - " + str(res[1]) + "; " + str(artifact_name) + " - " +
+                    #       str(artifact_catalog.artifact_data[artifact_name][2]))
+                    if res[1] <= 3000:
+                        res[1] -= 3000
 
-                                exploration_scripts.spread_reward(army, realm, obj.properties.storage)
+                        exploration_scripts.spread_reward(army, realm, obj.properties.storage)
 
-                                obj.properties.storage = []
-                                obj.properties.need_replenishment = True
-                                obj.properties.time_left_before_replenishment = int(
-                                    obj.properties.waiting_time_for_replenishment)
+                        obj.properties.storage = []
+                        obj.properties.need_replenishment = True
+                        obj.properties.time_left_before_replenishment = int(
+                            obj.properties.waiting_time_for_replenishment)
 
-                                break
+                        break
 
-                    break
+
+def champions_tent_event(obj, army):
+    if army.hero.hero_id not in obj.properties.hero_list:
+        obj.properties.hero_list.append(int(army.hero.hero_id))
+        pack = game_classes.Attribute_Package([game_classes.Battle_Attribute(
+            "melee cavalry",
+            "defence",
+            1)])
+        army.hero.attributes_list.append(pack)
+
+        if army.hero.hero_class == "Knight":
+            game_basic.hero_next_level(army.hero, 500)
+
+
+def leshys_hut_event(obj, army):
+    result = int(random.randint(1, 6))
+
+    if result == 6:
+        # Magic power
+        army.hero.magic_power += 1
+    elif result == 5:
+        # Food and wood
+        # print("leshys_hut_close() - Food and wood reward number 5")
+        reward = [["Food", 500], ["Wood", 1000]]
+        realm = common_selects.select_realm_by_name(army.owner)
+        exploration_scripts.spread_reward(army, realm, reward)
+    elif result == 4:
+        # Additional movement points
+        for unit in army.units:
+            unit.movement_points += 800
+    elif result == 3:
+        # Drain mana
+        army.hero.mana_reserve = 0
+    elif result == 2:
+        # Lose money
+        price = [["Florins", 1500]]
+        realm = common_selects.select_realm_by_name(army.owner)
+        exploration_scripts.payment(price, realm)
+    elif result == 1:
+        # Lose regiments
+        units_to_destroy = math.ceil(len(army.units)/8)
+        index_list = []
+        units_numbered_list = []
+        for i in range(0, len(army.units)):
+            units_numbered_list.append(i)
+        for i in range(1, units_to_destroy + 1):
+            index_list.append(units_numbered_list.pop(random.choice(units_numbered_list)))
+        game_basic.disband_unit(army, index_list)
+
+    obj.properties.need_replenishment = True
+    obj.properties.time_left_before_replenishment = int(random.randint(15, 25))
 
 
 # Lair
@@ -164,6 +210,8 @@ event_scripts = {  # Bonus
     "stone well script": stone_well_event,
     "burial mound script" : burial_mound_event,
     "angler's cabin script" : anglers_cabin_event,
+    "champion's tent script" : champions_tent_event,
+    "leshy's hut script" : leshys_hut_event,
     # Lair
     "runaway serfs refuge script": runaway_serfs_refuge_event,
     "treasure tower script": treasure_tower_event,
