@@ -18,6 +18,7 @@ from Resources import battle_abilities_regiment
 from Resources import update_gf_game_board
 from Resources import update_gf_battle
 from Resources import game_pathfinding
+from Resources import common_selects
 
 from Content import ability_catalog
 from Content import ability_desc_cat_hero
@@ -93,19 +94,16 @@ def battle_keys(key_action):
 
 
 def battle_surface_m1(position):
-    for battle in game_obj.game_battles:
-        if battle.attacker_realm == game_stats.player_power or \
-                battle.defender_realm == game_stats.player_power:
-            b = battle
+    b = common_selects.select_battle_by_realm_name(game_stats.player_power)
 
+    player_army_id = int(b.defender_id)
+    opponent_army_id = int(b.attacker_id)
     if b.attacker_realm == game_stats.player_power:
-        player_id = int(b.attacker_id)
-    else:
-        player_id = int(b.defender_id)
+        player_army_id = int(b.attacker_id)
+        opponent_army_id = int(b.defender_id)
 
-    for army in game_obj.game_armies:
-        if army.army_id == player_id:
-            a = army
+    player_army = common_selects.select_army_by_id(player_army_id)
+    opponent_army = common_selects.select_army_by_id(opponent_army_id)
 
     b.button_pressed = False
 
@@ -445,28 +443,28 @@ def battle_surface_m1(position):
                     elif b.cursor_function == "Execute ability":
                         print("Execute ability")
                         print(b.selected_ability)
+                        correct_target = False
                         for action in ability_catalog.ability_cat[b.selected_ability].action:
-                            hero = None
                             the_unit = None
-                            for army in game_obj.game_armies:
-                                if army.army_id == b.queue[0].army_id:
-                                    hero = army.hero
-                                    if b.queue[0].obj_type == "Regiment":
-                                        the_unit = army.units[b.queue[0].number]
-                                    break
+                            army = common_selects.select_army_by_id(b.queue[0].army_id)
+                            if b.queue[0].obj_type == "Regiment":
+                                the_unit = army.units[b.queue[0].number]
 
                             if b.queue[0].obj_type == "Regiment":
-                                battle_abilities_regiment.script_cat[action.script](b, TileNum, hero, the_unit)
+                                correct_target = battle_abilities_regiment.script_cat[action.script](b, TileNum,
+                                                                                                     player_army,
+                                                                                                     opponent_army,
+                                                                                                     the_unit)
                             elif b.queue[0].obj_type == "Hero":
-                                battle_abilities_hero.script_cat[action.script](b, TileNum, hero)
-                            # b.list_of_schools = []
-                            # b.list_of_abilities = []
-                            # b.ability_index = 0
-                            # b.school_index = 0
-                            # b.selected_school = None
-                            # b.selected_ability = None
-                        b.ready_to_act = False
-                        game_battle.action_order(b, "Pass", None)
+                                correct_target = battle_abilities_hero.script_cat[action.script](b, TileNum,
+                                                                                                 player_army,
+                                                                                                 opponent_army)
+                            if not correct_target:
+                                break  # Selected wrong regiment for ability
+
+                        if correct_target:
+                            b.ready_to_act = False
+                            game_battle.action_order(b, "Pass", None)
 
 
 def battle_surface_m3(position):
@@ -858,12 +856,7 @@ def waiting_index_right():
 
 
 def start_battle_but():
-    b = None
-    for battle in game_obj.game_battles:
-        if battle.attacker_realm == game_stats.player_power or \
-                battle.defender_realm == game_stats.player_power:
-            b = battle
-            break
+    b = common_selects.select_battle_by_realm_name(game_stats.player_power)
 
     if len(b.waiting_list) == 0:
         b.stage = "Fighting"

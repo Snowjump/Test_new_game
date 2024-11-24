@@ -1,4 +1,4 @@
-## Miracle battles
+## Among Myth and Wonder
 ## ability_catalog
 
 from Resources import ability_classes

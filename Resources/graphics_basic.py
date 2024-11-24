@@ -22,6 +22,7 @@ from Screens.Game_Board_Windows import info_panel_tile_obj
 
 
 def init_game_board_graphics():
+    graphics_obj.game_board_objects = []
     prepare_exit_to_menu()
     prepare_save_game()
     prepare_calendar()

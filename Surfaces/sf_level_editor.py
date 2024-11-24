@@ -282,7 +282,7 @@ def level_editor_surface_m1(position):
                 delete_selected_unit(position)
 
         elif game_stats.lower_panel == "population lower panel":
-            if position[1] >= 634 + yVar and 410 <= position[0] < 500:
+            if position[1] >= 634 + yVar and 560 <= position[0] < 650:
                 index_number = math.floor((position[1] - (634 + yVar)) / 30)
                 if index_number < len(game_stats.lot_information.residency):
                     game_stats.population_l_p_index = int(index_number)
@@ -294,22 +294,21 @@ def level_editor_surface_m1(position):
                     x = int(game_stats.selected_tile[0])
                     y = int(game_stats.selected_tile[1])
                     TileNum = (y - 1) * game_stats.new_level_width + x - 1
-                    for city in game_stats.editor_cities:
-                        if city.city_id == game_stats.level_map[TileNum].city_id:
-                            if index_number < len(city.residency):
-                                game_stats.population_l_p_index = int(index_number)
-                            break
+                    city = common_selects.select_settlement_by_id(game_stats.level_map[TileNum].city_id,
+                                                                  location="editor_cities")
+                    if index_number < len(city.residency):
+                        game_stats.population_l_p_index = int(index_number)
+
             elif game_stats.settlement_option_view == "Factions":
                 if position[1] >= 664 + yVar and 360 <= position[0] < 620:
                     index_number = math.floor((position[1] - (664 + yVar)) / 30)
                     x = int(game_stats.selected_tile[0])
                     y = int(game_stats.selected_tile[1])
                     TileNum = (y - 1) * game_stats.new_level_width + x - 1
-                    for city in game_stats.editor_cities:
-                        if city.city_id == game_stats.level_map[TileNum].city_id:
-                            if index_number < len(city.factions):
-                                game_stats.faction_l_p_index = int(index_number)
-                            break
+                    city = common_selects.select_settlement_by_id(game_stats.level_map[TileNum].city_id,
+                                                                  location="editor_cities")
+                    if index_number < len(city.factions):
+                        game_stats.faction_l_p_index = int(index_number)
 
     # Left panel
     if game_stats.level_editor_left_panel != "":

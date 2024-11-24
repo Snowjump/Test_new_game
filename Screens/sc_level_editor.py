@@ -1403,11 +1403,11 @@ def facility_panel(screen):
                         [[(x2 - 1) * 48 + 1, (y2 - 1) * 48 + 1], [(x2 - 1) * 48 + 48, (y2 - 1) * 48 + 1],
                          [(x2 - 1) * 48 + 48, (y2 - 1) * 48 + 48], [(x2 - 1) * 48 + 1, (y2 - 1) * 48 + 48]], 1)
 
-    if len(game_stats.selected_tile) > 0:
-        # Index of selected tile in map list
-        x = int(game_stats.selected_tile[0])
-        y = int(game_stats.selected_tile[1])
-        TileNum = (y - 1) * game_stats.new_level_width + x - 1
+    # if len(game_stats.selected_tile) > 0:
+    #     # Index of selected tile in map list
+    #     x = int(game_stats.selected_tile[0])
+    #     y = int(game_stats.selected_tile[1])
+    #     TileNum = (y - 1) * game_stats.new_level_width + x - 1
 
     # Remove facility button
     pygame.draw.polygon(screen, CancelFieldColor,

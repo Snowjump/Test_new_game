@@ -72,3 +72,14 @@ def select_treasury_by_realm_name(realm_name):
             break
 
     return selected_treasury
+
+
+def select_battle_by_realm_name(realm_name):
+    selected_battle = None
+
+    for battle in game_obj.game_battles:
+        if battle.attacker_realm == realm_name or battle.defender_realm == realm_name:
+            selected_battle = battle
+            break
+
+    return selected_battle
