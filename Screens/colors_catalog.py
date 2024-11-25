@@ -2,6 +2,14 @@
 ## colors_catalog
 
 WhiteColor = [255, 255, 255]
+GreenGrid = [178, 255, 102, 70]
+RedColor = [255, 0, 0]
+BlueColor = [0, 0, 255, 65]
+DeepBlueColor = [0, 0, 255, 255]
+GreenColor = [0, 255, 0, 65]
+DeepGreenColor = [0, 255, 0, 255]
+PinkColor = [255, 0, 255, 65]
+DeepPinkColor = [255, 0, 255, 255]
 
 MainMenuColor = [0x9F, 0x97, 0x97]
 MainMenuColorDark1 = [0x8D, 0x87, 0x87]
@@ -32,6 +40,8 @@ MapLimitColor = [0x83, 0x62, 0x42]  # DEB887
 TileBorder = [11, 11, 11, 200]  # 0x0B, 0x0B, 0x0B
 WhiteBorder = [249, 238, 227, 200]
 LimeBorder = [51, 255, 51, 200]
+TileCover = [25, 0, 51, 120]
+LightYellow = [255, 255, 255, 160]
 OwnControlZone = [51, 255, 255, 100]
 DiffControlZone = [255, 255, 102, 100]
 

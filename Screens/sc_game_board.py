@@ -58,16 +58,6 @@ from Screens.Panels.Quest_result_panels import slay_the_grey_dragon_result_win
 
 pygame.init()
 
-# Fonts
-font26 = pygame.font.SysFont('timesnewroman', 26)
-font20 = pygame.font.SysFont('timesnewroman', 20)
-font16 = pygame.font.SysFont('timesnewroman', 16)
-font14 = pygame.font.SysFont('timesnewroman', 14)
-font12 = pygame.font.SysFont('timesnewroman', 10)
-font8 = pygame.font.SysFont('arial', 8)
-
-# arial_font16 = pygame.font.SysFont('arial', 16)
-# arial_font14 = pygame.font.SysFont('arial', 14)
 
 def draw_rect_alpha(surface, color, rect):
     shape_surf = pygame.Surface(pygame.Rect(rect).size, pygame.SRCALPHA)
@@ -227,7 +217,7 @@ def draw_tiles(screen):
 
                                 # Name
                                 indent = int(len(city.name) * 2)
-                                text_panel1 = font12.render(city.name, True, TitleText)
+                                text_panel1 = tnr_font10.render(city.name, True, TitleText)
                                 screen.blit(text_panel1, ((x - 1) * 48 + 24 - indent, (y - 1) * 48 + 50))
 
                                 # Flag
@@ -427,7 +417,7 @@ def terrain_panel(screen, TileNum, xy_pos):
 
     # Natural feature
     if game_obj.game_map[TileNum - 1].natural_feature is not None:
-        text_panel = font20.render(game_obj.game_map[TileNum - 1].natural_feature.name, True, TitleText)
+        text_panel = tnr_font20.render(game_obj.game_map[TileNum - 1].natural_feature.name, True, TitleText)
         screen.blit(text_panel, [210, 694 + yVar])
 
 
@@ -438,12 +428,12 @@ def building_panel(screen, TileNum, xy_pos):
 
     # No building in selected tile
     if game_obj.game_map[TileNum - 1].lot is None:
-        text_panel = font20.render("No buildings", True, TitleText)
+        text_panel = tnr_font20.render("No buildings", True, TitleText)
         screen.blit(text_panel, [210, 604 + yVar])
     else:
         # Construction site exist in selected tile
         if game_obj.game_map[TileNum - 1].lot.structure_type == "con_site":
-            text_panel = font20.render(game_obj.game_map[TileNum - 1].lot.name + " is under construction", True,
+            text_panel = tnr_font20.render(game_obj.game_map[TileNum - 1].lot.name + " is under construction", True,
                                        TitleText)
             screen.blit(text_panel, [210, 604 + yVar])
 
@@ -460,19 +450,19 @@ def begin_battle_panel(screen):
         if game_stats.defender_realm == "Neutral":
             end_part = "neutral army"
         title_text = game_stats.attacker_realm + " attack on " + end_part
-        text_panel1 = font20.render(title_text, True, TitleText)
+        text_panel1 = tnr_font20.render(title_text, True, TitleText)
         screen.blit(text_panel1, [550 - len(title_text), 103])
 
     # Button - play battle
     pygame.draw.polygon(screen, FillButton, [[590, 138], [690, 138], [690, 160], [590, 160]])
     pygame.draw.polygon(screen, LineMainMenuColor1, [[590, 138], [690, 138], [690, 160], [590, 160]], 3)
-    text_panel5 = font20.render("Play battle", True, DarkText)
+    text_panel5 = tnr_font20.render("Play battle", True, DarkText)
     screen.blit(text_panel5, [595, 138])
 
     # Button - autobattle
     pygame.draw.polygon(screen, FillButton, [[590, 168], [690, 168], [690, 190], [590, 190]])
     pygame.draw.polygon(screen, LineMainMenuColor1, [[590, 168], [690, 168], [690, 190], [590, 190]], 3)
-    text_panel5 = font20.render("Autobattle", True, DarkText)
+    text_panel5 = tnr_font20.render("Autobattle", True, DarkText)
     screen.blit(text_panel5, [597, 168])
 
     # Display units
@@ -584,7 +574,7 @@ def settlement_blockade_panel(screen):
 
     # Battle title
     title_text = "Blockade of " + game_stats.blockaded_settlement_name
-    text_panel1 = font20.render(title_text, True, TitleText)
+    text_panel1 = tnr_font20.render(title_text, True, TitleText)
     screen.blit(text_panel1, [575 - len(title_text), 73])
 
     # Close settlement siege window
@@ -595,7 +585,7 @@ def settlement_blockade_panel(screen):
         pygame.draw.line(screen, CancelElementsColor, [1138, 91], [1151, 78], 2)
 
     # Siege duration
-    text_panel5 = font16.render("Siege duration:", True, DarkText)
+    text_panel5 = tnr_font16.render("Siege duration:", True, DarkText)
     screen.blit(text_panel5, [128, 95])
 
     duration_img = game_stats.gf_misc_img_dict["Icons/duration_icon"]
@@ -606,7 +596,7 @@ def settlement_blockade_panel(screen):
         duration_text = "1 turn"
     else:
         duration_text = str(the_settlement.siege.time_passed) + " turns"
-    text_panel5 = font16.render(duration_text, True, DarkText)
+    text_panel5 = tnr_font16.render(duration_text, True, DarkText)
     screen.blit(text_panel5, [143, 112])
 
     y_base = 139
@@ -628,7 +618,7 @@ def settlement_blockade_panel(screen):
         color1 = CancelElementsColor
     pygame.draw.polygon(screen, color1, [[128, y_base + y_shift * y_num], [238, y_base + y_shift * y_num],
                                          [238, y_base + y_shift * y_num + 22], [128, y_base + y_shift * y_num + 22]], 3)
-    text_panel5 = font20.render(text, True, DarkText)
+    text_panel5 = tnr_font20.render(text, True, DarkText)
     screen.blit(text_panel5, [133 + x, y_base + y_shift * y_num])
     y_num += 1
 
@@ -638,7 +628,7 @@ def settlement_blockade_panel(screen):
                                              [128, y_base + y_shift * y_num + 22]])
     pygame.draw.polygon(screen, color1, [[128, y_base + y_shift * y_num], [238, y_base + y_shift * y_num],
                                          [238, y_base + y_shift * y_num + 22], [128, y_base + y_shift * y_num + 22]], 3)
-    text_panel5 = font20.render("Autobattle", True, DarkText)
+    text_panel5 = tnr_font20.render("Autobattle", True, DarkText)
     screen.blit(text_panel5, [139, y_base + y_shift * y_num])
     y_num += 1
 
@@ -650,7 +640,7 @@ def settlement_blockade_panel(screen):
         pygame.draw.polygon(screen, LineMainMenuColor1,
                             [[128, y_base + y_shift * y_num], [238, y_base + y_shift * y_num],
                              [238, y_base + y_shift * y_num + 22], [128, y_base + y_shift * y_num + 22]], 3)
-        text_panel5 = font20.render("Encircle", True, DarkText)
+        text_panel5 = tnr_font20.render("Encircle", True, DarkText)
         screen.blit(text_panel5, [151, y_base + y_shift * y_num])
         y_num += 1
 
@@ -662,11 +652,11 @@ def settlement_blockade_panel(screen):
         pygame.draw.polygon(screen, LineMainMenuColor1,
                             [[128, y_base + y_shift * y_num], [238, y_base + y_shift * y_num],
                              [238, y_base + y_shift * y_num + 22], [128, y_base + y_shift * y_num + 22]], 3)
-        text_panel5 = font20.render("Retreat", True, DarkText)
+        text_panel5 = tnr_font20.render("Retreat", True, DarkText)
         screen.blit(text_panel5, [155, y_base + y_shift * y_num])
 
         # Display defensive structures
-        text_panel5 = font20.render("Defences", True, DarkText)
+        text_panel5 = tnr_font20.render("Defences", True, DarkText)
         screen.blit(text_panel5, [322, 95])
 
     # Defenders supplies
@@ -684,7 +674,7 @@ def settlement_blockade_panel(screen):
         supplies_msg = "1 turn"
     else:
         supplies_msg = str(the_settlement.siege.supplies) + " turns"
-    text_panel5 = font16.render(supplies_msg, True, DarkText)
+    text_panel5 = tnr_font16.render(supplies_msg, True, DarkText)
     screen.blit(text_panel5, [256 + 3, 164])
 
     num = 0
@@ -727,13 +717,13 @@ def settlement_blockade_panel(screen):
                 screen.blit(gate_img, (256 + 5, 187))
 
                 # Gate message
-                text_panel5 = font16.render(gate_msg, True, DarkText)
+                text_panel5 = tnr_font16.render(gate_msg, True, DarkText)
                 screen.blit(text_panel5, [256 + 25 - (len(gate_msg) * 4), 228])
 
         if total_wal_sections > 0:
             # Number message
             number_msg = str(unbroken_wall_sections) + "/" + str(total_wal_sections)
-            text_panel5 = font16.render(number_msg, True, DarkText)
+            text_panel5 = tnr_font16.render(number_msg, True, DarkText)
             screen.blit(text_panel5, [326 + num * 52 + 25 - (len(number_msg) * 4), 164])
 
     y_base = 95
@@ -741,7 +731,7 @@ def settlement_blockade_panel(screen):
     circle_radius = 9
 
     # Display siege engines
-    text_panel5 = font20.render("Siege engines", True, DarkText)
+    text_panel5 = tnr_font20.render("Siege engines", True, DarkText)
     screen.blit(text_panel5, [662, y_base])
 
     y_base += 28
@@ -760,7 +750,7 @@ def settlement_blockade_panel(screen):
 
     # Ordered trebuchets
     if the_settlement.siege.trebuchets_ordered > 0:
-        text_panel = font20.render(str(the_settlement.siege.trebuchets_ordered), True, DarkText)
+        text_panel = tnr_font20.render(str(the_settlement.siege.trebuchets_ordered), True, DarkText)
         screen.blit(text_panel, [725, y_base + y_shift * 0])
 
     if game_stats.besieged_by_human:
@@ -780,7 +770,7 @@ def settlement_blockade_panel(screen):
     # Amount
     text_line = str(the_settlement.siege.trebuchets_ready) + "/" + \
                 str(the_settlement.siege.trebuchets_max_quantity)
-    text_panel = font20.render(text_line, True, DarkText)
+    text_panel = tnr_font20.render(text_line, True, DarkText)
     screen.blit(text_panel, [752, y_base + y_shift * 0 + 10])
 
     # Siege towers
@@ -798,7 +788,7 @@ def settlement_blockade_panel(screen):
 
     # Ordered siege towers
     if the_settlement.siege.siege_towers_ordered > 0:
-        text_panel = font20.render(str(the_settlement.siege.siege_towers_ordered), True, DarkText)
+        text_panel = tnr_font20.render(str(the_settlement.siege.siege_towers_ordered), True, DarkText)
         screen.blit(text_panel, [725, y_base + y_shift * 1])
 
     if game_stats.besieged_by_human:
@@ -818,7 +808,7 @@ def settlement_blockade_panel(screen):
     # Amount
     text_line = str(the_settlement.siege.siege_towers_ready) + "/" + \
                 str(the_settlement.siege.siege_towers_max_quantity)
-    text_panel = font20.render(text_line, True, DarkText)
+    text_panel = tnr_font20.render(text_line, True, DarkText)
     screen.blit(text_panel, [752, y_base + y_shift * 1 + 10])
 
     # Battering rams
@@ -836,7 +826,7 @@ def settlement_blockade_panel(screen):
 
     # Ordered battering rams
     if the_settlement.siege.battering_rams_ordered > 0:
-        text_panel = font20.render(str(the_settlement.siege.battering_rams_ordered), True, DarkText)
+        text_panel = tnr_font20.render(str(the_settlement.siege.battering_rams_ordered), True, DarkText)
         screen.blit(text_panel, [725, y_base + y_shift * 2])
 
     if game_stats.besieged_by_human:
@@ -856,18 +846,18 @@ def settlement_blockade_panel(screen):
     # Amount
     text_line = str(the_settlement.siege.battering_rams_ready) + "/" + \
                 str(the_settlement.siege.battering_rams_max_quantity)
-    text_panel = font20.render(text_line, True, DarkText)
+    text_panel = tnr_font20.render(text_line, True, DarkText)
     screen.blit(text_panel, [752, y_base + y_shift * 2 + 10])
 
     # Siege log
-    text_panel5 = font20.render("Events log", True, DarkText)
+    text_panel5 = tnr_font20.render("Events log", True, DarkText)
     screen.blit(text_panel5, [935, 95])
 
     y_base = 123
     y_shift = 16
     y_num = 0
     for text_log in the_settlement.siege.siege_log:
-        text_panel = font16.render(text_log, True, DarkText)
+        text_panel = tnr_font16.render(text_log, True, DarkText)
         screen.blit(text_panel, [821, y_base + y_shift * y_num])
         y_num += 1
 
@@ -875,7 +865,7 @@ def settlement_blockade_panel(screen):
     for army in game_obj.game_armies:
         if army.army_id == game_stats.attacker_army_id:  # Attacker
             if army.owner == "Neutral":
-                text_panel = font20.render("Neutral", True, DarkText)
+                text_panel = tnr_font20.render("Neutral", True, DarkText)
                 screen.blit(text_panel, [351, 312])
             else:
                 for power in game_obj.game_powers:
@@ -883,7 +873,7 @@ def settlement_blockade_panel(screen):
                         x_cor = 351
                         y_cor = 312
                         # Country's name
-                        text_panel = font20.render(power.name, True, DarkText)
+                        text_panel = tnr_font20.render(power.name, True, DarkText)
                         screen.blit(text_panel, [x_cor, y_cor])
 
                         # Flag
@@ -914,7 +904,7 @@ def settlement_blockade_panel(screen):
 
         elif army.army_id == game_stats.defender_army_id:  # Defender
             if army.owner == "Neutral":
-                text_panel = font20.render("Neutral", True, DarkText)
+                text_panel = tnr_font20.render("Neutral", True, DarkText)
                 screen.blit(text_panel, [841, 312])
             else:
                 for power in game_obj.game_powers:
@@ -922,7 +912,7 @@ def settlement_blockade_panel(screen):
                         x_cor = 841
                         y_cor = 312
                         # Country's name
-                        text_panel = font20.render(power.name, True, DarkText)
+                        text_panel = tnr_font20.render(power.name, True, DarkText)
                         screen.blit(text_panel, [x_cor, y_cor])
 
                         # Flag
@@ -970,7 +960,7 @@ def settlement_panel(screen):
     icon_img = game_stats.gf_misc_img_dict["Icons/building_icon"]
     screen.blit(icon_img, (11, 88))
 
-    text_panel1 = font16.render("Building", True, DarkText)
+    text_panel1 = tnr_font16.render("Building", True, DarkText)
     screen.blit(text_panel1, [35, 85])
 
     # Recruiting
@@ -986,7 +976,7 @@ def settlement_panel(screen):
     icon_img.set_colorkey(WhiteColor)
     screen.blit(icon_img, (127, 88))
 
-    text_panel1 = font16.render("Recruiting", True, DarkText)
+    text_panel1 = tnr_font16.render("Recruiting", True, DarkText)
     screen.blit(text_panel1, [150, 85])
 
     # Heroes
@@ -1002,7 +992,7 @@ def settlement_panel(screen):
     icon_img.set_colorkey(WhiteColor)
     screen.blit(icon_img, (244, 88))
 
-    text_panel1 = font16.render("Heroes", True, DarkText)
+    text_panel1 = tnr_font16.render("Heroes", True, DarkText)
     screen.blit(text_panel1, [265, 85])
 
     # Economy
@@ -1018,7 +1008,7 @@ def settlement_panel(screen):
     icon_img.set_colorkey(WhiteColor)
     screen.blit(icon_img, (356, 88))
 
-    text_panel1 = font16.render("Economy", True, DarkText)
+    text_panel1 = tnr_font16.render("Economy", True, DarkText)
     screen.blit(text_panel1, [380, 85])
 
     # Factions
@@ -1034,7 +1024,7 @@ def settlement_panel(screen):
     icon_img.set_colorkey(WhiteColor)
     screen.blit(icon_img, (471, 88))
 
-    text_panel1 = font16.render("Factions", True, DarkText)
+    text_panel1 = tnr_font16.render("Factions", True, DarkText)
     screen.blit(text_panel1, [495, 85])
 
     # Close settlement window
@@ -1080,19 +1070,19 @@ def realm_panel(screen):
                         [[x, y + 12], [x + 30, y + 12],
                          [x + 30, y + 22], [x, y + 22]])
 
-    text_panel = font20.render(power.name, True, TitleText)
+    text_panel = tnr_font20.render(power.name, True, TitleText)
     screen.blit(text_panel, [75, 85])
 
     icon_img = game_stats.gf_misc_img_dict["Icons/masks"]
     screen.blit(icon_img, (41, 109))
 
-    text_panel = font20.render(power.alignment, True, TitleText)
+    text_panel = tnr_font20.render(power.alignment, True, TitleText)
     screen.blit(text_panel, [75, 110])
 
     icon_img = game_stats.gf_misc_img_dict["Icons/crown_bigger"]
     screen.blit(icon_img, (39, 134))
 
-    text_panel = font20.render(power.leader.name, True, TitleText)
+    text_panel = tnr_font20.render(power.leader.name, True, TitleText)
     screen.blit(text_panel, [75, 135])
 
     # Traits
@@ -1102,36 +1092,36 @@ def realm_panel(screen):
     y_num = 0
 
     # Speciality trait
-    text_panel = font16.render("Speciality trait", True, TitleText)
+    text_panel = tnr_font16.render("Speciality trait", True, TitleText)
     screen.blit(text_panel, [x_base, y_base + y_shift * y_num])
     y_num += 1
 
     y_num += 1
 
     # Behavior traits
-    text_panel = font16.render("Behavior traits", True, TitleText)
+    text_panel = tnr_font16.render("Behavior traits", True, TitleText)
     screen.blit(text_panel, [x_base, y_base + y_shift * y_num])
     y_num += 1
 
-    text_panel = font16.render(power.leader.behavior_traits[0], True, DarkText)
+    text_panel = tnr_font16.render(power.leader.behavior_traits[0], True, DarkText)
     screen.blit(text_panel, [x_base, y_base + y_shift * y_num])
     y_num += 1
 
     if len(power.leader.behavior_traits) > 1:
-        text_panel = font16.render(power.leader.behavior_traits[1], True, DarkText)
+        text_panel = tnr_font16.render(power.leader.behavior_traits[1], True, DarkText)
         screen.blit(text_panel, [x_base, y_base + y_shift * y_num])
     y_num += 1
 
     # Lifestyle traits
-    text_panel = font16.render("Lifestyle traits", True, TitleText)
+    text_panel = tnr_font16.render("Lifestyle traits", True, TitleText)
     screen.blit(text_panel, [x_base, y_base + y_shift * y_num])
     y_num += 1
 
-    text_panel = font16.render(power.leader.lifestyle_traits[0], True, DarkText)
+    text_panel = tnr_font16.render(power.leader.lifestyle_traits[0], True, DarkText)
     screen.blit(text_panel, [x_base, y_base + y_shift * y_num])
     y_num += 1
 
-    text_panel = font16.render(power.leader.lifestyle_traits[1], True, DarkText)
+    text_panel = tnr_font16.render(power.leader.lifestyle_traits[1], True, DarkText)
     screen.blit(text_panel, [x_base, y_base + y_shift * y_num])
     y_num += 1
 
@@ -1147,13 +1137,13 @@ def army_exchange_panel(screen):
         if army.army_id == game_stats.selected_second_army:
 
             if army.owner == "Neutral":
-                text_panel = font20.render("Neutral", True, TitleText)
+                text_panel = tnr_font20.render("Neutral", True, TitleText)
                 screen.blit(text_panel, [240, 384 + yVar])
             else:
                 for power in game_obj.game_powers:
                     if power.name == army.owner:
                         # Country's name
-                        text_panel = font20.render(power.name, True, TitleText)
+                        text_panel = tnr_font20.render(power.name, True, TitleText)
                         screen.blit(text_panel, [240, 384 + yVar])
 
                         # Flag
@@ -1244,7 +1234,7 @@ def army_exchange_panel(screen):
     pygame.draw.polygon(screen, CancelElementsColor,
                         [[203, 595 + yVar], [290, 595 + yVar], [290, 617 + yVar], [203, 617 + yVar]], 2)
 
-    text_NewGame1 = font20.render("Complete", True, DarkText)
+    text_NewGame1 = tnr_font20.render("Complete", True, DarkText)
     screen.blit(text_NewGame1, [207, 594 + yVar])
 
 
@@ -1271,7 +1261,7 @@ def quest_log_panel(screen):
         color1 = LineMainMenuColor1
     pygame.draw.polygon(screen, color1, [[x1, 85], [x1 + x2, 85], [x1 + x2, 104], [x1, 104]], 2)
 
-    text_panel1 = font16.render("Quest messages", True, DarkText)
+    text_panel1 = tnr_font16.render("Quest messages", True, DarkText)
     screen.blit(text_panel1, [x1 + 19, 85])
 
     # Diplomatic messages
@@ -1284,7 +1274,7 @@ def quest_log_panel(screen):
         color1 = LineMainMenuColor1
     pygame.draw.polygon(screen, color1, [[x1, 85], [x1 + x2, 85], [x1 + x2, 104], [x1, 104]], 2)
 
-    text_panel1 = font16.render("Diplomatic messages", True, DarkText)
+    text_panel1 = tnr_font16.render("Diplomatic messages", True, DarkText)
     screen.blit(text_panel1, [x1 + 4, 85])
 
     # Draw area content
@@ -1333,46 +1323,16 @@ def game_board_screen(screen):
     yVar = game_stats.game_window_height - 800
 
     ## Buttons
-
-    # # Exit
-    # pygame.draw.polygon(screen, FillButton, [[1150, 10], [1250, 10], [1250, 32], [1150, 32]])
-    # pygame.draw.polygon(screen, BorderNewGameColor, [[1150, 10], [1250, 10], [1250, 32], [1150, 32]], 3)
-    #
-    # text_NewGame1 = font20.render("Exit", True, TitleText)
-    # screen.blit(text_NewGame1, [1180, 10])
-
-    # # Save
-    # pygame.draw.polygon(screen, FillButton, [[1040, 10], [1140, 10], [1140, 32], [1040, 32]])
-    # pygame.draw.polygon(screen, BorderNewGameColor, [[1040, 10], [1140, 10], [1140, 32], [1040, 32]], 3)
-    #
-    # text_NewGame1 = font20.render("Save", True, TitleText)
-    # screen.blit(text_NewGame1, [1070, 10])
-
     # Top ribbon
     # Next turn - hourglass icon
     # Calendar
+    # Left ribbon menu
+    # Button - realm
+    # Button - tasks
+    # Button - Diplomacy
     for obj in graphics_obj.game_board_objects:
         obj.draw_panel(screen)
         # print(obj.name)
-
-    # # Left ribbon menu
-    # pygame.draw.polygon(screen, MainMenuColorDark1, [[0, 0], [31, 0], [31, 119], [0, 119]])
-
-    # # Button - realm
-    # icon_img = game_stats.gf_misc_img_dict["Icons/crown"]
-    # screen.blit(icon_img, (4, 4))
-    #
-    # # Button - tasks
-    # if game_stats.new_tasks:
-    #     icon_img = game_stats.gf_misc_img_dict["Icons/new_task_scroll"]
-    #     screen.blit(icon_img, (4, 29))
-    # else:
-    #     icon_img = game_stats.gf_misc_img_dict["Icons/old_task_scroll"]
-    #     screen.blit(icon_img, (4, 29))
-    #
-    # # Button - Diplomacy
-    # icon_img = game_stats.gf_misc_img_dict["Icons/diplomacy"]
-    # screen.blit(icon_img, (4, 54))
 
     # War symbols
     for num in range(0, 4):
@@ -1400,9 +1360,9 @@ def game_board_screen(screen):
 
     # Timer time
     if game_stats.show_time:
-        text_NewGame2 = font20.render(str(math.floor(game_stats.passed_time / 1000)), True, TitleText)
+        text_NewGame2 = tnr_font20.render(str(math.floor(game_stats.passed_time / 1000)), True, TitleText)
         screen.blit(text_NewGame2, [400, 30])
-        text_NewGame2 = font20.render(str(game_stats.display_time), True, TitleText)
+        text_NewGame2 = tnr_font20.render(str(game_stats.display_time), True, TitleText)
         screen.blit(text_NewGame2, [400, 70])
 
     ## Panels
@@ -1420,16 +1380,12 @@ def game_board_screen(screen):
     ## Banners
     # Pause
     if game_stats.pause_status:
-        text_panel = font20.render("Pause", True, TitleText)
+        text_panel = tnr_font20.render("Pause", True, TitleText)
         screen.blit(text_panel, [50, 64])
 
-    # # FPS
-    # clock = pygame.time.Clock()
-    # fps = clock.get_fps()
-    # text_panel = font20.render(str(fps), True, TitleText)
-    # screen.blit(text_panel, [10, 44])
+    # FPS
     if game_stats.fps_status:
-        text_panel = font20.render(str(game_stats.fps), True, TitleText)
+        text_panel = tnr_font20.render(str(game_stats.fps), True, TitleText)
         screen.blit(text_panel, [50, 84])
 
 

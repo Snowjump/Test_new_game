@@ -53,14 +53,14 @@ ability_menu_window_zone = [[1076, 106, 1095, 125],
                             [970, 106, 1070, 125]]
 
 regiment_info_window_zone = [[1254, 85, 1273, 104],
-                             [646, 365, 665, 365 + 19],
-                             [786, 365, 805, 365 + 19],
-                             [1020, 205, 1039, 205 + 19],
-                             [1160, 205, 1179, 205 + 19],
-                             [1020, 365, 1039, 365 + 19],
-                             [1160, 365, 1179, 365 + 19],
-                             [1020, 505, 1039, 505 + 19],
-                             [1160, 505, 1179, 505 + 19]]
+                             [646, 365, 664, 365 + 18],
+                             [786, 365, 804, 365 + 18],
+                             [1020, 205, 1038, 205 + 18],
+                             [1200, 205, 1218, 205 + 18],
+                             [1020, 365, 1038, 365 + 18],
+                             [1200, 365, 1218, 365 + 18],
+                             [1020, 505, 1038, 505 + 18],
+                             [1200, 505, 1218, 505 + 18]]
 
 siege_equipment_menu_window_zone = [[816, 206, 835, 225]]
 
@@ -177,7 +177,6 @@ def battle_surface_m1(position):
 
                     if square[0] < position[0] < square[2] and square[1] < position[1] < square[3]:
                         w_funs[button_numb]()
-
                         break
 
                 if b.battle_window == "Ability menu":
@@ -791,18 +790,16 @@ def next_effect_info():
 
         effect = unit.effects[b.regiment_effects_index]
 
-        time_text = ""
+        time_text = "Time left: " + str(effect.time_left)
         if effect.until_next_turn:
             time_text = "Until next turn"
-        else:
-            time_text = "Time left: " + str(effect.time_left)
         b.effect_info = game_classes.Effect_Info_Card(effect.name, time_text, effect.buffs)
 
 
 def previous_ability_info():
     b, unit = find_battle_and_unit()
 
-    if len(unit.abilities) > 0:
+    if unit.abilities:
         if b.regiment_abilities_index == 0:
             b.regiment_abilities_index = len(unit.abilities) - 1
         else:
@@ -815,7 +812,7 @@ def previous_ability_info():
 def next_ability_info():
     b, unit = find_battle_and_unit()
 
-    if len(unit.abilities) > 0:
+    if unit.abilities:
         if b.regiment_abilities_index == len(unit.abilities) - 1:
             b.regiment_abilities_index = 0
         else:

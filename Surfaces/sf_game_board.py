@@ -71,7 +71,11 @@ building_upgrade_panel_zone = [[1254, 85, 1273, 104]]
 
 building_panel_zone = [[1254, 85, 1273, 104]]
 
-new_regiment_information_panel_zone = [[1254, 85, 1273, 104]]
+new_regiment_information_panel_zone = [[1254, 85, 1273, 104],
+                                       [646, 345, 664, 363],
+                                       [786, 345, 804, 363],
+                                       [1020, 345, 1038, 363],
+                                       [1200, 345, 1218, 363]]
 
 new_hero_skill_tree_panel_zone = [[1254, 85, 1273, 104],
                                   [646, 117, 665, 136],
@@ -1954,6 +1958,94 @@ def settlement_regiment_information():
         game_stats.rw_skill_info = game_classes.Skill_Info_Card(s.name, s.application, value_text, s.skill_tags)
 
 
+def next_attack_info_but():
+    u = game_stats.rw_object
+    a = game_stats.rw_attack_info
+    attack = None
+
+    num = 0
+    for new_attack in u.attacks:
+        if new_attack.name == a.attack_name:
+            if num + 1 == len(u.attacks):
+                attack = u.attacks[0]
+            else:
+                attack = u.attacks[num + 1]
+        num += 1
+
+    game_stats.rw_attack_info = game_classes.Attack_Info_Card(attack.name, attack.attack_type, attack.min_dmg,
+                                                              attack.max_dmg, attack.mastery, attack.effective_range,
+                                                              attack.range_limit, attack.tags)
+
+
+def previous_attack_info_but():
+    u = game_stats.rw_object
+    a = game_stats.rw_attack_info
+    attack = None
+
+    num = 0
+    for new_attack in u.attacks:
+        if new_attack.name == a.attack_name:
+            if num == 0:
+                attack = u.attacks[len(u.attacks) - 1]
+            else:
+                attack = u.attacks[num - 1]
+        num += 1
+
+    game_stats.rw_attack_info = game_classes.Attack_Info_Card(attack.name, attack.attack_type, attack.min_dmg,
+                                                              attack.max_dmg, attack.mastery, attack.effective_range,
+                                                              attack.range_limit, attack.tags)
+
+
+def next_skill_info_but():
+    u = game_stats.rw_object
+    skill = game_stats.rw_skill_info
+    s = None
+    value_text = str(None)
+    if len(u.skills) > 0:
+        num = 0
+        for new_skill in u.skills:
+            if new_skill.name == skill.skill_name:
+                if num + 1 == len(u.skills):
+                    s = u.skills[0]
+                else:
+                    s = u.skills[num + 1]
+            num += 1
+
+        if s:
+            if s.quantity is not None:
+                value_text = str(s.quantity)
+            elif s.quality is not None:
+                value_text = str(s.quality)
+            else:
+                value_text = ""
+            game_stats.rw_skill_info = game_classes.Skill_Info_Card(s.name, s.application, value_text, s.skill_tags)
+
+
+def previous_skill_info_but():
+    u = game_stats.rw_object
+    skill = game_stats.rw_skill_info
+    s = None
+    value_text = str(None)
+    if len(u.skills) > 0:
+        num = 0
+        for new_skill in u.skills:
+            if new_skill.name == skill.skill_name:
+                if num == 0:
+                    s = u.skills[len(u.skills) - 1]
+                else:
+                    s = u.skills[num - 1]
+            num += 1
+
+        if s:
+            if s.quantity is not None:
+                value_text = str(s.quantity)
+            elif s.quality is not None:
+                value_text = str(s.quality)
+            else:
+                value_text = ""
+            game_stats.rw_skill_info = game_classes.Skill_Info_Card(s.name, s.application, value_text, s.skill_tags)
+
+
 def hire_regiment():
     permit_unit_creation = False
     if game_stats.unit_for_hire is not None:
@@ -2979,7 +3071,11 @@ building_upgrade_panel_funs = {1: close_right_panel_but}
 
 building_panel_funs = {1: close_right_panel_but}
 
-new_regiment_information_panel_funs = {1: close_right_panel_but}
+new_regiment_information_panel_funs = {1: close_right_panel_but,
+                                       2: previous_attack_info_but,
+                                       3: next_attack_info_but,
+                                       4: previous_skill_info_but,
+                                       5: next_skill_info_but}
 
 new_hero_skill_tree_panel_funs = {1: close_right_panel_but,
                                   2: skill_tree_level_prev,

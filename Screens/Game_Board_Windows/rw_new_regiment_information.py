@@ -21,10 +21,8 @@ def new_regiment_info(screen):
                         [[642, 80], [1278, 80], [1278, 540], [642, 540]])
 
     # Close settlement window
-    pygame.draw.polygon(screen, CancelFieldColor, [[1254, 85], [1273, 85], [1273, 104], [1254, 104]])
-    pygame.draw.polygon(screen, CancelElementsColor, [[1254, 85], [1273, 85], [1273, 104], [1254, 104]], 2)
-    pygame.draw.line(screen, CancelElementsColor, [1257, 88], [1270, 101], 2)
-    pygame.draw.line(screen, CancelElementsColor, [1257, 101], [1270, 88], 2)
+    buttons.element_close_button(screen, "CancelFieldColor", "CancelElementsColor", "CancelElementsColor",
+                                 1254, 85, 19, 19, 2, 2)
 
     # Regiment's information
     # Regiment's name
@@ -70,10 +68,10 @@ def new_regiment_info(screen):
 
     # Buttons - previous and next attack
     buttons.element_arrow_button(screen, "Left", "RockTunel", "LineMainMenuColor1", "LineMainMenuColor1",
-                                 646, ybase, 19, 19, 2, 2)
+                                 646, ybase, 18, 18, 1, 2)
 
     buttons.element_arrow_button(screen, "Right", "RockTunel", "LineMainMenuColor1", "LineMainMenuColor1",
-                                 786, ybase, 19, 19, 2, 2)
+                                 786, ybase, 18, 18, 1, 2)
 
     # Attack name
     text_panel = arial_font16.render(str(a.attack_name), True, TitleText)
@@ -130,10 +128,10 @@ def new_regiment_info(screen):
 
     # Buttons - previous and next skill
     buttons.element_arrow_button(screen, "Left", "RockTunel", "LineMainMenuColor1", "LineMainMenuColor1",
-                                 1020, ybase, 19, 19, 2, 2)
+                                 1020, ybase, 18, 18, 1, 2)
 
     buttons.element_arrow_button(screen, "Right", "RockTunel", "LineMainMenuColor1", "LineMainMenuColor1",
-                                 1200, ybase, 19, 19, 2, 2)
+                                 1200, ybase, 18, 18, 1, 2)
 
     # Skills
     text_panel = arial_font16.render("Skills:", True, TitleText)

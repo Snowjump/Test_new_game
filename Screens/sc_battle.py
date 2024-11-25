@@ -6,7 +6,9 @@ import pygame.draw
 import pygame.font
 import pygame.mouse
 
-from Content import terrain_catalog
+from Screens.colors_catalog import *
+from Screens.fonts_catalog import *
+
 from Content import objects_img_catalog
 from Content import terrain_seasons
 from Content import ability_catalog
@@ -14,85 +16,14 @@ from Content import siege_warfare_catalog
 
 from Resources import game_obj
 from Resources import game_stats
+from Resources import common_selects
+
 from Screens import anim_battle_effects
 from Screens import anim_battle_unit_action
 
+from Screens.Game_Board_Windows import battle_regiment_information
+
 pygame.init()
-
-WhiteColor = [255, 255, 255]
-RedColor = [255, 0, 0]
-BlueColor = [0, 0, 255, 65]
-DeepBlueColor = [0, 0, 255, 255]
-GreenColor = [0, 255, 0, 65]
-DeepGreenColor = [0, 255, 0, 255]
-PinkColor = [255, 0, 255, 65]
-DeepPinkColor = [255, 0, 255, 255]
-GreenGrid = [178, 255, 102, 70]
-
-MainMenuColor = [0x9F, 0x97, 0x97]
-LineMainMenuColor1 = [0x60, 0x60, 0x60]
-LightBackground = [198, 186, 186]
-Board1 = [0x8A, 0xAA, 0xE5]
-
-TitleText = [0xFF, 0xFF, 0x99]
-DarkText = [0x11, 0x11, 0x11]
-SecondaryText = [0xB8, 0xFF, 0x9A]
-AttentionText = [232, 142, 6]
-
-BorderNewGameColor = [0xDA, 0xAE, 0x83]
-FillButton = [0xD8, 0xBD, 0xA2]
-HighlightBorder = [0xF7, 0x82, 0x0C]
-FieldColor = [0xA0, 0xA0, 0xA0]
-HighlightOption = [0x00, 0xCC, 0xCC]
-HighlightRemoval = [0xFF, 0x1A, 0x1A]
-
-CancelFieldColor = [0xFF, 0x00, 0x00]
-CancelElementsColor = [0x99, 0x00, 0x00]
-
-RockTunel = [0x89, 0x89, 0x89]
-
-FlagpoleColor = (139, 105, 12, 160)
-
-MapLimitColor = [0x83, 0x62, 0x42]  # DEB887
-TileBorder = [11, 11, 11, 200]  # 0x0B, 0x0B, 0x0B
-WhiteBorder = [249, 238, 227, 200]
-TileCover = [25, 0, 51, 120]
-LightYellow = [255, 255, 255, 160]
-LimeBorder = [102, 255, 102, 220]
-
-ScarletColor = [0xFF, 0x24, 0x00]
-CopperColor = [0xE9, 0x75, 0x00]
-NightBlueColor = [0x19, 0x2F, 0xF0]
-MoonColor = [0xD2, 0xD6, 0xFA]
-BullBrownColor = [0x40, 0x21, 0x02]
-BlackHoovesColor = [0x0A, 0x06, 0x02]
-RoyalPurple = [0x8B, 0x00, 0x8B]
-GoldColor = [0xFF, 0xD7, 0x00]
-TribesTide = [0x00, 0x64, 0x00]
-ForestGreen = [0x22, 0x8B, 0x22]
-MaroonColor = [0x80, 0x00, 0x00]
-SlateGray = [0x70, 0x80, 0x90]
-
-FlagColors = {"Scarlet": ScarletColor,
-              "Copper": CopperColor,
-              "NightBlue": NightBlueColor,
-              "Moon": MoonColor,
-              "BullBrown": BullBrownColor,
-              "BlackHooves": BlackHoovesColor,
-              "RoyalPurple": RoyalPurple,
-              "GoldColor": GoldColor,
-              "TribesTide": TribesTide,
-              "ForestGreen": ForestGreen,
-              "MaroonColor": MaroonColor,
-              "SlateGray": SlateGray}
-
-font20 = pygame.font.SysFont('timesnewroman', 20)
-font8 = pygame.font.SysFont('arial', 8)
-font10 = pygame.font.SysFont('arial', 10)
-arial_font14 = pygame.font.SysFont('arial', 14)
-arial_font15 = pygame.font.SysFont('arial', 15)
-arial_font16 = pygame.font.SysFont('arial', 16)
-arial_font20 = pygame.font.SysFont('arial', 20)
 
 
 def draw_rect_alpha(surface, color, rect):
@@ -137,186 +68,145 @@ def draw_lines_alpha(surface, color, closed, points, points2):
 
 
 def draw_tiles(screen):
-    for battle in game_obj.game_battles:
-        if battle.attacker_realm == game_stats.player_power or \
-                battle.defender_realm == game_stats.player_power:
+    battle = common_selects.select_battle_by_realm_name(game_stats.player_power)
 
-            for TileObj in battle.battle_map:
-                x = int(TileObj.posxy[0])
-                y = int(TileObj.posxy[1])
-                x -= int(battle.battle_pov[0])
-                y -= int(battle.battle_pov[1])
+    for TileObj in battle.battle_map:
+        x = int(TileObj.posxy[0])
+        y = int(TileObj.posxy[1])
+        x -= int(battle.battle_pov[0])
+        y -= int(battle.battle_pov[1])
 
-                if 0 < x <= 14 and 0 < y <= 8:
-                    # print("battle.terrain " + battle.terrain)
-                    # print("battle.conditions " + battle.conditions)
-                    # Draw tiles 4 times by 48x48 pixels to form 96x96 squares
+        if 0 < x <= 14 and 0 < y <= 8:
+            # print("battle.terrain " + battle.terrain)
+            # print("battle.conditions " + battle.conditions)
+            # Draw tiles 4 times by 48x48 pixels to form 96x96 squares
+            terrain_img = game_stats.gf_terrain_dict[battle.conditions]
+            screen.blit(terrain_img, ((x - 1) * 96, (y - 1) * 96))
+            screen.blit(terrain_img, ((x - 1) * 96 + 48, (y - 1) * 96))
+            screen.blit(terrain_img, ((x - 1) * 96, (y - 1) * 96 + 48))
+            screen.blit(terrain_img, ((x - 1) * 96 + 48, (y - 1) * 96 + 48))
 
-                    # Previous code
-                    # terrain_img = pygame.image.load('img/Terrains/' + battle.conditions + '.png')
-                    # screen.blit(terrain_img, ((x - 1) * 96 + 1, (y - 1) * 96 + 1))
-                    #
-                    # terrain_img = pygame.image.load('img/Terrains/' + battle.conditions + '.png')
-                    # screen.blit(terrain_img, ((x - 1) * 96 + 49, (y - 1) * 96 + 1))
-                    #
-                    # terrain_img = pygame.image.load('img/Terrains/' + battle.conditions + '.png')
-                    # screen.blit(terrain_img, ((x - 1) * 96 + 1, (y - 1) * 96 + 49))
-                    #
-                    # terrain_img = pygame.image.load('img/Terrains/' + battle.conditions + '.png')
-                    # screen.blit(terrain_img, ((x - 1) * 96 + 49, (y - 1) * 96 + 49))
+            # Border line
+            terrain_img = game_stats.gf_terrain_dict["Terrains/border_96_96_170"]
+            screen.blit(terrain_img, ((x - 1) * 96, (y - 1) * 96))
 
-                    # New code
-                    terrain_img = game_stats.gf_terrain_dict[battle.conditions]
-                    screen.blit(terrain_img, ((x - 1) * 96, (y - 1) * 96))
-                    screen.blit(terrain_img, ((x - 1) * 96 + 48, (y - 1) * 96))
-                    screen.blit(terrain_img, ((x - 1) * 96, (y - 1) * 96 + 48))
-                    screen.blit(terrain_img, ((x - 1) * 96 + 48, (y - 1) * 96 + 48))
+            # Obstacles
+            if TileObj.map_object is not None:
+                if TileObj.map_object.obj_type == "Obstacle":
+                    for item in TileObj.map_object.disposition:
+                        obj_cal = objects_img_catalog.object_calendar[TileObj.map_object.obj_name]
+                        season = terrain_seasons.terrain_calendar[TileObj.terrain][game_stats.game_month]
 
-                    # Border line
-                    # pygame.draw.polygon(screen, TileBorder,
-                    #                     [[(x - 1) * 96, (y - 1) * 96], [(x - 1) * 96 + 95, (y - 1) * 96],
-                    #                      [(x - 1) * 96 + 95, (y - 1) * 96 + 95], [(x - 1) * 96, (y - 1) * 96 + 95]],
-                    #                     1)
+                        obj_img = game_stats.gf_obstacle_dict[obj_cal[season] + "_0" + item[2]]
+                        screen.blit(obj_img, ((x - 1) * 96 + item[0] - obj_img.get_width() / 2,
+                                              (y - 1) * 96 + item[1] - obj_img.get_height() / 2))
 
-                    terrain_img = game_stats.gf_terrain_dict["Terrains/border_96_96_170"]
-                    screen.blit(terrain_img, ((x - 1) * 96, (y - 1) * 96))
+                # Structures
+                elif TileObj.map_object.obj_type == "Structure":
+                    x1 = TileObj.map_object.disposition[0]
+                    y1 = TileObj.map_object.disposition[1]
+                    obj_img = game_stats.gf_obstacle_dict[TileObj.map_object.obj_name]
+                    screen.blit(obj_img, ((x - 1) * 96 + x1, (y - 1) * 96 + y1))
 
-                    # Obstacles
-                    if TileObj.map_object is not None:
-                        if TileObj.map_object.obj_type == "Obstacle":
-                            for item in TileObj.map_object.disposition:
-                                obj_cal = objects_img_catalog.object_calendar[TileObj.map_object.obj_name]
-                                season = terrain_seasons.terrain_calendar[TileObj.terrain][game_stats.game_month]
+            # Highlight selected unit with white border
+            if TileObj.posxy == battle.selected_unit_alt:
+                # print("Success TileObj.posxy - " + str(TileObj.posxy))
+                pygame.draw.polygon(screen, WhiteBorder,
+                                    [[(x - 1) * 96 + 1, (y - 1) * 96 + 1],
+                                     [(x - 1) * 96 + 96, (y - 1) * 96 + 1],
+                                     [(x - 1) * 96 + 96, (y - 1) * 96 + 96],
+                                     [(x - 1) * 96 + 1, (y - 1) * 96 + 96]], 1)
 
-                                obj_img = game_stats.gf_obstacle_dict[obj_cal[season] + "_0" + item[2]]
-                                screen.blit(obj_img, ((x - 1) * 96 + item[0] - obj_img.get_width() / 2,
-                                                      (y - 1) * 96 + item[1] - obj_img.get_height() / 2))
-
-                        # Structures
-                        elif TileObj.map_object.obj_type == "Structure":
-                            x1 = TileObj.map_object.disposition[0]
-                            y1 = TileObj.map_object.disposition[1]
-                            obj_img = game_stats.gf_obstacle_dict[TileObj.map_object.obj_name]
-                            screen.blit(obj_img, ((x - 1) * 96 + x1, (y - 1) * 96 + y1))
-
-                    # Highlight selected unit with white border
-                    if TileObj.posxy == battle.selected_unit_alt:
+            # Highlight active unit with green border for human player
+            if battle.realm_in_control == game_stats.player_power:
+                if battle.queue[0].obj_type == "Regiment" and battle.ready_to_act:
+                    if TileObj.posxy == tuple(battle.queue[0].position):
                         # print("Success TileObj.posxy - " + str(TileObj.posxy))
-                        pygame.draw.polygon(screen, WhiteBorder,
-                                            [[(x - 1) * 96 + 1, (y - 1) * 96 + 1],
-                                             [(x - 1) * 96 + 96, (y - 1) * 96 + 1],
-                                             [(x - 1) * 96 + 96, (y - 1) * 96 + 96],
-                                             [(x - 1) * 96 + 1, (y - 1) * 96 + 96]], 1)
+                        global LimeBorder
+                        LimeBorder = anim_battle_effects.border_blipping(LimeBorder)
 
-                    # Highlight active unit with green border for human player
-                    if battle.realm_in_control == game_stats.player_power:
-                        if battle.queue[0].obj_type == "Regiment" and battle.ready_to_act:
-                            if TileObj.posxy == tuple(battle.queue[0].position):
-                                # print("Success TileObj.posxy - " + str(TileObj.posxy))
-                                global LimeBorder
-                                LimeBorder = anim_battle_effects.border_blipping(LimeBorder)
-                                # pygame.draw.polygon(screen, LimeBorder,
-                                #                     [[(x - 1) * 96 + 1, (y - 1) * 96 + 1],
-                                #                      [(x - 1) * 96 + 96, (y - 1) * 96 + 1],
-                                #                      [(x - 1) * 96 + 96, (y - 1) * 96 + 96],
-                                #                      [(x - 1) * 96 + 1, (y - 1) * 96 + 96]], 1)
+                        points = [(1, 1), (96, 1), (96, 96), (1, 96)]
+                        points2 = [(x - 1) * 96, (y - 1) * 96]
+                        draw_lines_alpha(screen, LimeBorder, True, points, points2)
 
-                                points = [(1, 1), (96, 1), (96, 96), (1, 96)]
-                                points2 = [(x - 1) * 96, (y - 1) * 96]
-                                draw_lines_alpha(screen, LimeBorder, True, points, points2)
+            # Highlight with light green color movement grid
+            if battle.realm_in_control == game_stats.player_power:
+                if battle.movement_grid is not None and battle.ready_to_act:
+                    if [int(TileObj.posxy[0]), int(TileObj.posxy[1])] in battle.movement_grid:
+                        draw_rect_alpha(screen, GreenGrid, ((x - 1) * 96 + 1, (y - 1) * 96 + 1, 96, 96))
 
-                    # Highlight with light green color movement grid
-                    if battle.realm_in_control == game_stats.player_power:
-                        if battle.movement_grid is not None and battle.ready_to_act:
-                            if [int(TileObj.posxy[0]), int(TileObj.posxy[1])] in battle.movement_grid:
-                                draw_rect_alpha(screen, GreenGrid, ((x - 1) * 96 + 1, (y - 1) * 96 + 1, 96, 96))
+    for TileObj in battle.battle_map:
+        x = TileObj.posxy[0]
+        y = TileObj.posxy[1]
+        x -= int(battle.battle_pov[0])
+        y -= int(battle.battle_pov[1])
 
-            for TileObj in battle.battle_map:
-                x = TileObj.posxy[0]
-                y = TileObj.posxy[1]
-                x -= int(battle.battle_pov[0])
-                y -= int(battle.battle_pov[1])
+        if 0 < x <= 14 and 0 < y <= math.ceil(game_stats.game_window_height):
+            # Cover tiles with dark color in preparation stage
+            if battle.stage == "Formation":
+                if battle.cover_map[0] <= TileObj.posxy[0] <= battle.cover_map[2] and \
+                        battle.cover_map[1] <= TileObj.posxy[1] <= battle.cover_map[3]:
 
-                if 0 < x <= 14 and 0 < y <= math.ceil(game_stats.game_window_height):
-                    # Cover tiles with dark color in preparation stage
-                    if battle.stage == "Formation":
-                        if battle.cover_map[0] <= TileObj.posxy[0] <= battle.cover_map[2] and \
-                                battle.cover_map[1] <= TileObj.posxy[1] <= battle.cover_map[3]:
+                    draw_rect_alpha(screen, TileCover,
+                                    ((x - 1) * 96 + 1, (y - 1) * 96 + 1, 96, 96))
 
-                            draw_rect_alpha(screen, TileCover,
-                                            ((x - 1) * 96 + 1, (y - 1) * 96 + 1, 96, 96))
+            # Siege tower docked to the wall
+            if TileObj.siege_tower_deployed:
+                machine_img = game_stats.gf_regiment_dict['img/Creatures/siege_machines/siege_tower_r']
+                screen.blit(machine_img,
+                            ((x - 1) * 96 + 66,
+                             (y - 1) * 96 + 5))
 
-                    # Siege tower docked to the wall
-                    if TileObj.siege_tower_deployed:
-                        machine_img = game_stats.gf_regiment_dict['img/Creatures/siege_machines/siege_tower_r']
-                        screen.blit(machine_img,
-                                    ((x - 1) * 96 + 66,
-                                     (y - 1) * 96 + 5))
+            # Siege machines
+            for equipment in TileObj.siege_machines:
+                side = "_l"
+                if equipment[2]:
+                    side = "_r"
+                machine_position = [(x - 1) * 96 + equipment[1][0], (y - 1) * 96 + equipment[1][1]]
+                machine_img = game_stats.gf_regiment_dict[
+                    siege_warfare_catalog.siege_machine_img[equipment[0]] + side]
+                screen.blit(machine_img,
+                            (machine_position[0],
+                             machine_position[1]))
+            # Units
+            # print("# Units")
+            if TileObj.army_id is not None:
+                # print(str(TileObj.posxy))
+                focus = TileObj.army_id
+                for army in game_obj.game_armies:
+                    if army.army_id == focus:
+                        # Player should see only his army at formation stage
+                        if (army.owner == game_stats.player_power and battle.stage == "Formation") or \
+                                battle.stage != "Formation":
 
-                    # Siege machines
-                    for equipment in TileObj.siege_machines:
-                        side = "_l"
-                        if equipment[2]:
-                            side = "_r"
-                        machine_position = [(x - 1) * 96 + equipment[1][0], (y - 1) * 96 + equipment[1][1]]
-                        machine_img = game_stats.gf_regiment_dict[
-                            siege_warfare_catalog.siege_machine_img[equipment[0]] + side]
-                        screen.blit(machine_img,
-                                    (machine_position[0],
-                                     machine_position[1]))
-                    # Units
-                    # print("# Units")
-                    if TileObj.army_id is not None:
-                        # print(str(TileObj.posxy))
-                        focus = TileObj.army_id
-                        for army in game_obj.game_armies:
-                            if army.army_id == focus:
-                                # Player should see only his army at formation stage
-                                if (army.owner == game_stats.player_power and battle.stage == "Formation") or \
-                                        battle.stage != "Formation":
+                            unit = army.units[TileObj.unit_index]
 
-                                    unit = army.units[TileObj.unit_index]
+                            # Draw direction lines
+                            draw_direction_lines(screen, battle, unit.direction, x, y, unit.position)
 
-                                    # Draw direction lines
-                                    draw_direction_lines(screen, battle, unit.direction, x, y, unit.position)
+                            # Draw creatures
+                            draw_creatures(screen, unit, x, y, army.owner, TileObj.unit_index, battle,
+                                           TileObj.posxy)
 
-                                    # army_img = pygame.image.load(
-                                    #     'img/Creatures/' + str(unit.img_source) + "/" + str(unit.img) + '.png')
-                                    # army_img.set_colorkey(WhiteColor)
-                                    # screen.blit(army_img,
-                                    #             ((x - 1) * 96,
-                                    #              (y - 1) * 96))
+                        break
 
-                                    # Draw creatures
-                                    draw_creatures(screen, unit, x, y, army.owner, TileObj.unit_index, battle,
-                                                   TileObj.posxy)
+            if TileObj.passing_army_id is not None:
+                focus = TileObj.passing_army_id
+                for army in game_obj.game_armies:
+                    if army.army_id == focus:
+                        # Player should see only his army at formation stage
+                        if (army.owner == game_stats.player_power and battle.stage == "Formation") or \
+                                battle.stage != "Formation":
+                            unit = army.units[TileObj.passing_unit_index]
 
-                                break
+                            # Draw direction lines
+                            draw_direction_lines(screen, battle, unit.direction, x, y, unit.position)
 
-                    if TileObj.passing_army_id is not None:
-                        focus = TileObj.passing_army_id
-                        for army in game_obj.game_armies:
-                            if army.army_id == focus:
-                                # Player should see only his army at formation stage
-                                if (army.owner == game_stats.player_power and battle.stage == "Formation") or \
-                                        battle.stage != "Formation":
-                                    unit = army.units[TileObj.passing_unit_index]
+                            # Draw creatures
+                            draw_creatures(screen, unit, x, y, army.owner, TileObj.passing_unit_index, battle,
+                                           TileObj.posxy)
 
-                                    # Draw direction lines
-                                    draw_direction_lines(screen, battle, unit.direction, x, y, unit.position)
-
-                                    # army_img = pygame.image.load(
-                                    #     'img/Creatures/' + str(unit.img_source) + "/" + str(unit.img) + '.png')
-                                    # army_img.set_colorkey(WhiteColor)
-                                    # screen.blit(army_img,
-                                    #             ((x - 1) * 96,
-                                    #              (y - 1) * 96))
-
-                                    # Draw creatures
-                                    draw_creatures(screen, unit, x, y, army.owner, TileObj.passing_unit_index, battle,
-                                                   TileObj.posxy)
-
-                                break
+                        break
 
 
 def draw_direction_lines(screen, b, direction, x, y, check_position):
@@ -1214,8 +1104,8 @@ def draw_waiting_list(screen, b):
                                          [unit_pos + 1, 800 + yVar]], 1)
 
             # Number of creatures in regiment
-            text_panel = font8.render(str(len(a.units[unit].crew)) + "/"
-                                      + str(a.units[unit].number * a.units[unit].rows), True, DarkText)
+            text_panel = arial_font8.render(str(len(a.units[unit].crew)) + "/"
+                                            + str(a.units[unit].number * a.units[unit].rows), True, DarkText)
             screen.blit(text_panel, [384 + (number - b.waiting_index) * 52, 744 + yVar])
 
         number += 1
@@ -1292,13 +1182,13 @@ def draw_queue(screen, b):
                 #                              [unit_pos + 1, 800 + yVar]], 1)
 
                 # Number of creatures in regiment
-                text_panel = font10.render(str(len(a.units[card.number].crew)) + "/"
+                text_panel = arial_font10.render(str(len(a.units[card.number].crew)) + "/"
                                            + str(a.units[card.number].number * a.units[card.number].rows),
                                            True, DarkText)
                 screen.blit(text_panel, [384 + (number - b.queue_index) * 52, 742 + yVar])
 
                 # Regiment's morale
-                text_panel = font10.render(str(a.units[card.number].morale), True, DarkText)
+                text_panel = arial_font10.render(str(a.units[card.number].morale), True, DarkText)
                 screen.blit(text_panel, [x_pos + 4, y_pos + 8])
 
                 if card.f_color is not None:  # Draw flag
@@ -1319,7 +1209,7 @@ def draw_queue(screen, b):
                                          [x_pos + 5, y_pos + 53]))
 
                 # Act time
-                text_panel = font10.render(str(b.queue[number - b.queue_index].time_act), True, DarkText)
+                text_panel = arial_font10.render(str(b.queue[number - b.queue_index].time_act), True, DarkText)
                 screen.blit(text_panel, [400 + (number - b.queue_index) * 52, 788 + yVar])
 
             number += 1
@@ -1333,7 +1223,7 @@ def draw_queue(screen, b):
                 screen.blit(card_img, [x_pos + card.x_offset, y_pos + card.y_offset])
 
                 # Act time
-                text_panel = font10.render(str(b.queue[number - b.queue_index].time_act), True, DarkText)
+                text_panel = arial_font10.render(str(b.queue[number - b.queue_index].time_act), True, DarkText)
                 screen.blit(text_panel, [396 + (number - b.queue_index) * 52, 788 + yVar])
 
             number += 1
@@ -1356,7 +1246,7 @@ def draw_queue(screen, b):
                 screen.blit(card_img, [x_pos + card.x_offset, y_pos + card.y_offset])
 
                 # Act time
-                text_panel = font10.render(str(b.queue[number - b.queue_index].time_act), True, DarkText)
+                text_panel = arial_font10.render(str(b.queue[number - b.queue_index].time_act), True, DarkText)
                 screen.blit(text_panel, [396 + (number - b.queue_index) * 52, 788 + yVar])
 
                 if card.f_color is not None:  # Draw flag
@@ -1379,290 +1269,24 @@ def draw_queue(screen, b):
             number += 1
 
 
-def regiment_info_window(screen, b):
-    pygame.draw.polygon(screen, MainMenuColor, [[642, 70], [1278, 70], [1278, 600], [642, 600]])
-
-    # Close settlement window
-    pygame.draw.polygon(screen, CancelFieldColor, [[1254, 85], [1273, 85], [1273, 104], [1254, 104]])
-    pygame.draw.polygon(screen, CancelElementsColor, [[1254, 85], [1273, 85], [1273, 104], [1254, 104]], 2)
-    pygame.draw.line(screen, CancelElementsColor, [1257, 88], [1270, 101], 2)
-    pygame.draw.line(screen, CancelElementsColor, [1257, 101], [1270, 88], 2)
-
-    # Regiment's information
-    # Flag
-    if b.unit_info.first_color is not None:
-        pygame.draw.polygon(screen, FlagColors[b.unit_info.first_color],
-                            [[646, 75], [677, 75], [677, 86], [646, 86]])
-        pygame.draw.polygon(screen, FlagColors[b.unit_info.second_color],
-                            [[646, 87], [677, 87], [677, 98], [646, 98]])
-
-    # Regiment's name
-    text_panel = font20.render(b.unit_info.regiment_name, True, TitleText)
-    screen.blit(text_panel, [682, 75])
-
-    # Engaged status
-    text_status = None
-    if b.unit_info.engaged:
-        text_status = "Engaged"
-    else:
-        text_status = "Disengaged"
-    text_panel = arial_font16.render(text_status, True, TitleText)
-    screen.blit(text_panel, [646, 105])
-
-    # Routing
-    if b.unit_info.deserted:
-        text_panel = arial_font16.render("Routing", True, TitleText)
-        screen.blit(text_panel, [682, 105])
-
-    # Amount
-    text_panel = arial_font16.render("Amount - " + str(b.unit_info.amount), True, TitleText)
-    screen.blit(text_panel, [646, 125])
-
-    # Total HP left
-    text_panel = arial_font16.render("Hit points - " + str(b.unit_info.total_HP), True, TitleText)
-    screen.blit(text_panel, [646, 145])
-
-    # Current morale
-    text_panel = arial_font16.render("Morale - " + str(b.unit_info.morale), True, TitleText)
-    screen.blit(text_panel, [646, 165])
-
-    # Base health of single creature
-    text_panel = arial_font16.render("Base health - " + str(b.unit_info.health), True, TitleText)
-    screen.blit(text_panel, [646, 185])
-
-    # Leadership
-    text_panel = arial_font16.render("Leadership - " + str(b.unit_info.leadership), True, TitleText)
-    screen.blit(text_panel, [646, 205])
-
-    # Regiment's experience
-    text_panel = arial_font16.render("Experience - " + str(b.unit_info.experience), True, TitleText)
-    screen.blit(text_panel, [646, 225])
-
-    # Speed
-    text_panel = arial_font16.render("Speed - " + str(b.unit_info.speed), True, TitleText)
-    screen.blit(text_panel, [646, 245])
-
-    # Armor
-    text_panel = arial_font16.render("Armor - " + str(b.unit_info.armor), True, TitleText)
-    screen.blit(text_panel, [646, 265])
-
-    # Defence
-    text_panel = arial_font16.render("Defence - " + str(b.unit_info.defence), True, TitleText)
-    screen.blit(text_panel, [646, 285])
-
-    # Magic power
-    if b.unit_info.magic_power > 0:
-        text_panel = arial_font16.render("Magic power - " + str(b.unit_info.magic_power), True, TitleText)
-        screen.blit(text_panel, [646, 305])
-
-        # Mana reserve
-        text_panel = arial_font16.render("Mana reserve - " + str(b.unit_info.mana_reserve) + "/"
-                                         + str(b.unit_info.max_mana_reserve), True, TitleText)
-        screen.blit(text_panel, [646, 325])
-
-    ybase = 365
-
-    # Buttons - previous and next attack
-
-    pygame.draw.polygon(screen, RockTunel, [[646, ybase], [665, ybase], [665, ybase + 19], [646, ybase + 19]])
-    pygame.draw.polygon(screen, LineMainMenuColor1, [[646, ybase], [665, ybase], [665, ybase + 19], [646, ybase + 19]], 3)
-    pygame.draw.lines(screen, LineMainMenuColor1, False, [(662, ybase + 2), (650, ybase + 9), (662, ybase + 15)], 2)
-
-    pygame.draw.polygon(screen, RockTunel, [[786, ybase], [805, ybase], [805, ybase + 19], [786, ybase + 19]])
-    pygame.draw.polygon(screen, LineMainMenuColor1, [[786, ybase], [805, ybase], [805, ybase + 19], [786, ybase + 19]], 3)
-    pygame.draw.lines(screen, LineMainMenuColor1, False, [(789, ybase + 2), (801, ybase + 9), (789, ybase + 15)], 2)
-
-    # Attack name
-    text_panel = arial_font16.render(str(b.attack_info.attack_name), True, TitleText)
-    screen.blit(text_panel, [672, ybase])
-
-    if b.attack_info.attack_name != "Abilities":
-        # Attack type
-        text_panel = arial_font16.render(str(b.attack_info.attack_type), True, TitleText)
-        screen.blit(text_panel, [646, ybase + 20])
-
-        # Damage
-        dmg_text = str(b.attack_info.min_dmg)
-        if b.attack_info.min_dmg < b.attack_info.max_dmg:
-            dmg_text += " - " + str(b.attack_info.max_dmg)
-        text_panel = arial_font16.render("Damage - " + dmg_text, True, TitleText)
-        screen.blit(text_panel, [646, ybase + 40])
-
-        # Mastery level
-        text_panel = arial_font16.render("Mastery - " + str(b.attack_info.mastery), True, TitleText)
-        screen.blit(text_panel, [646, ybase + 60])
-
-        # Effective range
-        if b.attack_info.effective_range > 0:
-            text_panel = arial_font16.render("Effective range - " + str(b.attack_info.effective_range), True, TitleText)
-            screen.blit(text_panel, [646, ybase + 80])
-
-            # Range limit
-            text_panel = arial_font16.render("Range limit - " + str(b.attack_info.range_limit), True, TitleText)
-            screen.blit(text_panel, [646, ybase + 100])
-
-        # Tags
-        text_panel = arial_font16.render("Tags:", True, TitleText)
-        screen.blit(text_panel, [646, ybase + 120])
-        if len(b.attack_info.tags) > 0:
-            y_add = 0
-            for tag in b.attack_info.tags:
-                text_panel = arial_font16.render(str(tag), True, TitleText)
-                screen.blit(text_panel, [646, ybase + 140 + y_add * 20])
-                y_add += 1
-
-    else:
-        # Abilities
-        for ability in b.unit_info.abilities:
-            # Ability name
-            ybase += 20
-            text_panel = arial_font16.render(str(ability), True, TitleText)
-            screen.blit(text_panel, [646, ybase])
-
-    # Top right side
-    # Special tags
-    text_panel = arial_font16.render("Special tags:", True, TitleText)
-    screen.blit(text_panel, [1020, 85])
-
-    y_tag = 0
-    y_shift = 20
-    for tag in b.unit_info.reg_tags:
-        text_panel = arial_font16.render(tag.capitalize(), True, TitleText)
-        screen.blit(text_panel, [1020, 105 + y_shift * y_tag])
-
-        y_tag += 1
-
-    ybase = 205
-
-    # Buttons - previous and next skill
-
-    pygame.draw.polygon(screen, RockTunel, [[1020, ybase], [1039, ybase], [1039, ybase + 19], [1020, ybase + 19]])
-    pygame.draw.polygon(screen, LineMainMenuColor1, [[1020, ybase], [1039, ybase], [1039, ybase + 19], [1020, ybase + 19]],
-                        3)
-    pygame.draw.lines(screen, LineMainMenuColor1, False, [(1036, ybase + 2), (1024, ybase + 9), (1036, ybase + 15)], 2)
-
-    pygame.draw.polygon(screen, RockTunel, [[1160, ybase], [1179, ybase], [1179, ybase + 19], [1160, ybase + 19]])
-    pygame.draw.polygon(screen, LineMainMenuColor1, [[1160, ybase], [1179, ybase], [1179, ybase + 19], [1160, ybase + 19]],
-                        3)
-    pygame.draw.lines(screen, LineMainMenuColor1, False, [(1163, ybase + 2), (1175, ybase + 9), (1163, ybase + 15)], 2)
-
-    # Skills
-    text_panel = arial_font16.render("Skills:", True, TitleText)
-    screen.blit(text_panel, [1020, ybase - 20])
-
-    if b.skill_info is not None:
-        # Skill name
-        text_panel = arial_font16.render(b.skill_info.skill_name, True, TitleText)
-        screen.blit(text_panel, [1046, ybase])
-
-        # Skill application
-        text_panel = arial_font16.render(b.skill_info.application, True, TitleText)
-        screen.blit(text_panel, [1020, ybase + 20])
-
-        # Value
-        text_panel = arial_font16.render(b.skill_info.value_text, True, TitleText)
-        screen.blit(text_panel, [1020, ybase + 40])
-
-        # Skill tags
-        if len(b.skill_info.skill_tags) > 0:
-            y_add = 0
-            for tag in b.skill_info.skill_tags:
-                text_panel = arial_font16.render(str(tag), True, TitleText)
-                screen.blit(text_panel, [1020, ybase + 60 + y_add * 20])
-                y_add += 1
-
-    # Effects
-    text_panel = arial_font16.render("Effects:", True, TitleText)
-    screen.blit(text_panel, [1020, ybase + 140])
-
-    ybase = 365
-
-    # Buttons - previous and next effect
-
-    pygame.draw.polygon(screen, RockTunel, [[1020, ybase], [1039, ybase], [1039, ybase + 19], [1020, ybase + 19]])
-    pygame.draw.polygon(screen, LineMainMenuColor1,
-                        [[1020, ybase], [1039, ybase], [1039, ybase + 19], [1020, ybase + 19]],
-                        3)
-    pygame.draw.lines(screen, LineMainMenuColor1, False, [(1036, ybase + 2), (1024, ybase + 9), (1036, ybase + 15)], 2)
-
-    pygame.draw.polygon(screen, RockTunel, [[1160, ybase], [1179, ybase], [1179, ybase + 19], [1160, ybase + 19]])
-    pygame.draw.polygon(screen, LineMainMenuColor1,
-                        [[1160, ybase], [1179, ybase], [1179, ybase + 19], [1160, ybase + 19]],
-                        3)
-    pygame.draw.lines(screen, LineMainMenuColor1, False, [(1163, ybase + 2), (1175, ybase + 9), (1163, ybase + 15)], 2)
-
-    if b.effect_info is not None:
-        # Effect name
-        text_panel = arial_font16.render(b.effect_info.effect_name, True, TitleText)
-        screen.blit(text_panel, [1046, ybase])
-
-        # Duration of effect
-        text_panel = arial_font16.render(b.effect_info.time_text, True, TitleText)
-        screen.blit(text_panel, [1020, ybase + 20])
-
-        # Status information
-        y_add = 0
-        for status in b.effect_info.status_list:
-            value = ""
-            if status.quantity is not None:
-                value = str(status.quantity) + " " + str(status.method)
-            elif status.quality is not None:
-                value = str(status.quality)
-            text_panel = arial_font16.render(status.application + " " + value, True, TitleText)
-            screen.blit(text_panel, [1020, ybase + 40 + y_add * 20])
-            y_add += 1
-
-    ybase = 505
-
-    # Buttons - previous and next ability
-    pygame.draw.polygon(screen, RockTunel, [[1020, ybase], [1039, ybase], [1039, ybase + 19], [1020, ybase + 19]])
-    pygame.draw.polygon(screen, LineMainMenuColor1,
-                        [[1020, ybase], [1039, ybase], [1039, ybase + 19], [1020, ybase + 19]],
-                        3)
-    pygame.draw.lines(screen, LineMainMenuColor1, False, [(1036, ybase + 2), (1024, ybase + 9), (1036, ybase + 15)],
-                      2)
-
-    pygame.draw.polygon(screen, RockTunel, [[1160, ybase], [1179, ybase], [1179, ybase + 19], [1160, ybase + 19]])
-    pygame.draw.polygon(screen, LineMainMenuColor1,
-                        [[1160, ybase], [1179, ybase], [1179, ybase + 19], [1160, ybase + 19]],
-                        3)
-    pygame.draw.lines(screen, LineMainMenuColor1, False, [(1163, ybase + 2), (1175, ybase + 9), (1163, ybase + 15)],
-                      2)
-
-    # Abilities
-    text_panel = arial_font16.render("Abilities:", True, TitleText)
-    screen.blit(text_panel, [1020, ybase - 20])
-
-    if b.ability_info is not None:
-        # Ability name
-        text_panel = arial_font16.render(b.ability_info, True, TitleText)
-        screen.blit(text_panel, [1046, ybase])
-
-        # Ability description
-        for text_line in b.ability_description:
-            ybase += 20
-            text_panel = arial_font16.render(text_line, True, TitleText)
-            screen.blit(text_panel, [1020, ybase])
-
-
 def battle_end_window(screen, b):
     pygame.draw.polygon(screen, Board1, [[130, 100], [1150, 100], [1150, 400], [130, 400]])
 
     # Result
-    text_panel1 = font20.render(b.battle_end_message, True, TitleText)
+    text_panel1 = tnr_font20.render(b.battle_end_message, True, TitleText)
     screen.blit(text_panel1, [620 - len(b.battle_end_message), 103])
 
     # Attacker
-    text_panel1 = font20.render(b.attacker_realm, True, TitleText)
+    text_panel1 = tnr_font20.render(b.attacker_realm, True, TitleText)
     screen.blit(text_panel1, [430 - len(b.attacker_realm), 133])
 
     # Defender
-    text_panel1 = font20.render(b.defender_realm, True, TitleText)
+    text_panel1 = tnr_font20.render(b.defender_realm, True, TitleText)
     screen.blit(text_panel1, [850 - len(b.defender_realm), 133])
 
     # Earned experience
     if game_stats.player_power != b.defeated_side:
-        text_panel1 = font20.render("Experience +" + str(b.earned_experience), True, TitleText)
+        text_panel1 = tnr_font20.render("Experience +" + str(b.earned_experience), True, TitleText)
         screen.blit(text_panel1, [580, 163])
 
     # Display units
@@ -1781,7 +1405,7 @@ def battle_end_window(screen, b):
     # Button - End
     # pygame.draw.polygon(screen, FillButton, [[590, 138], [690, 138], [690, 160], [590, 160]])
     pygame.draw.polygon(screen, LineMainMenuColor1, [[590, 135], [690, 135], [690, 157], [590, 157]], 3)
-    text_panel5 = font20.render("End", True, TitleText)
+    text_panel5 = tnr_font20.render("End", True, TitleText)
     screen.blit(text_panel5, [625, 135])
 
 
@@ -1795,7 +1419,7 @@ def ability_menu_window(screen, b):
     pygame.draw.line(screen, CancelElementsColor, [1079, 122], [1092, 109], 2)
 
     # Ability school
-    text_panel1 = font20.render("Ability school", True, TitleText)
+    text_panel1 = tnr_font20.render("Ability school", True, TitleText)
     screen.blit(text_panel1, [188, 103])
 
     y_points = 0
@@ -1839,7 +1463,7 @@ def ability_menu_window(screen, b):
     pygame.draw.lines(screen, LineMainMenuColor1, False, [(436, 582), (442, 596), (448, 582)], 2)
 
     # Ability school
-    text_panel1 = font20.render("Abilities", True, TitleText)
+    text_panel1 = tnr_font20.render("Abilities", True, TitleText)
     screen.blit(text_panel1, [456, 103])
 
     y_points = 0
@@ -1885,7 +1509,7 @@ def ability_menu_window(screen, b):
     pygame.draw.lines(screen, LineMainMenuColor1, False, [(704, 582), (710, 596), (716, 582)], 2)
 
     # Description
-    text_panel1 = font20.render("Description", True, TitleText)
+    text_panel1 = tnr_font20.render("Description", True, TitleText)
     screen.blit(text_panel1, [728, 103])
 
     y_points2 = 0
@@ -1949,7 +1573,7 @@ def siege_equipment_menu_window(screen, b):
         machine_img = game_stats.gf_regiment_dict[siege_warfare_catalog.siege_machine_img[equipment[0]] + side]
         screen.blit(machine_img, [480 - img_width/2, y_base + y_shift * y_num + 30 - img_height/2])
 
-        text_label = font20.render(equipment[0], True, TitleText)
+        text_label = tnr_font20.render(equipment[0], True, TitleText)
         screen.blit(text_label, [520, y_base + y_shift * y_num + 17])
 
         pygame.draw.polygon(screen, LineMainMenuColor1, [[756, y_base + y_shift * y_num + 1],
@@ -1970,10 +1594,7 @@ def battle_screen(screen):
 
     draw_tiles(screen)  # Draw tiles
 
-    for battle in game_obj.game_battles:
-        if battle.attacker_realm == game_stats.player_power or \
-                battle.defender_realm == game_stats.player_power:
-            b = battle
+    b = common_selects.select_battle_by_realm_name(game_stats.player_power)
 
     if b.stage == "Formation":
         # print(str(b.stage))
@@ -1981,7 +1602,7 @@ def battle_screen(screen):
         pygame.draw.polygon(screen, FillButton, [[580, 10], [700, 10], [700, 32], [580, 32]])
         pygame.draw.polygon(screen, BorderNewGameColor, [[580, 10], [700, 10], [700, 32], [580, 32]], 3)
 
-        text_NewGame1 = font20.render("Start battle", True, TitleText)
+        text_NewGame1 = tnr_font20.render("Start battle", True, TitleText)
         screen.blit(text_NewGame1, [595, 10])
 
         # print(str(b.waiting_list))
@@ -2005,7 +1626,7 @@ def battle_screen(screen):
             x_pos = 76
             if b.available_siege_towers >= 10:
                 x_pos = 69
-            text_NewGame1 = font20.render(str(b.available_siege_towers), True, TitleText)
+            text_NewGame1 = tnr_font20.render(str(b.available_siege_towers), True, TitleText)
             screen.blit(text_NewGame1, [x_pos, 699 + yVar])
 
             border_color = LineMainMenuColor1
@@ -2022,7 +1643,7 @@ def battle_screen(screen):
             x_pos = 76
             if b.available_battering_rams >= 10:
                 x_pos = 69
-            text_NewGame1 = font20.render(str(b.available_battering_rams), True, TitleText)
+            text_NewGame1 = tnr_font20.render(str(b.available_battering_rams), True, TitleText)
             screen.blit(text_NewGame1, [x_pos, 761 + yVar])
 
     elif b.stage == "Fighting":
@@ -2056,7 +1677,7 @@ def battle_screen(screen):
                                                                                  [231, 795 + yVar], [74, 795 + yVar]],
                                                     3)
 
-                                text_NewGame1 = font20.render("Equipment", True, TitleText)
+                                text_NewGame1 = tnr_font20.render("Equipment", True, TitleText)
                                 screen.blit(text_NewGame1, [134, 755 + yVar])
 
                                 icon = "Icons/pick_up_siege_machine"
@@ -2077,7 +1698,7 @@ def battle_screen(screen):
         pygame.draw.polygon(screen, color, [[235, 740 + yVar], [357, 740 + yVar],
                                             [357, 765 + yVar], [235, 765 + yVar]], 3)
 
-        text_NewGame1 = font20.render("Wait (Q)", True, TitleText)
+        text_NewGame1 = tnr_font20.render("Wait (Q)", True, TitleText)
         screen.blit(text_NewGame1, [275, 741 + yVar])
 
         hourglass_img = game_stats.gf_misc_img_dict["Icons/battle_hourglass"]
@@ -2095,7 +1716,7 @@ def battle_screen(screen):
             pygame.draw.polygon(screen, color, [[235, 770 + yVar], [357, 770 + yVar],
                                                 [357, 795 + yVar], [235, 795 + yVar]], 3)
 
-            text_NewGame1 = font20.render("Defend (E)", True, TitleText)
+            text_NewGame1 = tnr_font20.render("Defend (E)", True, TitleText)
             screen.blit(text_NewGame1, [265, 771 + yVar])
 
             shield_img = game_stats.gf_misc_img_dict["Icons/battle_shield"]
@@ -2113,7 +1734,7 @@ def battle_screen(screen):
                                                                  [1100, 795 + yVar], [923, 795 + yVar]], 3)
 
                 attack_method = b.attack_name
-                text_NewGame1 = font20.render(attack_method, True, TitleText)
+                text_NewGame1 = tnr_font20.render(attack_method, True, TitleText)
                 screen.blit(text_NewGame1, [980, 755 + yVar])
 
                 attack_img = game_stats.gf_misc_img_dict["Icons/" + attack_method]
@@ -2128,7 +1749,7 @@ def battle_screen(screen):
                 arrow_img = game_stats.gf_misc_img_dict["Icons/arrow_next_full"]
                 screen.blit(arrow_img, (1105, 742 + yVar))
 
-                text_NewGame1 = font20.render("(R)", True, TitleText)
+                text_NewGame1 = tnr_font20.render("(R)", True, TitleText)
                 screen.blit(text_NewGame1, [1165, 755 + yVar])
 
             elif b.queue[0].obj_type == "Hero":
@@ -2137,7 +1758,7 @@ def battle_screen(screen):
                 pygame.draw.polygon(screen, LineMainMenuColor1, [[923, 740 + yVar], [1100, 740 + yVar],
                                                                  [1100, 795 + yVar], [923, 795 + yVar]], 3)
 
-                text_NewGame1 = font20.render("Abilities", True, TitleText)
+                text_NewGame1 = tnr_font20.render("Abilities", True, TitleText)
                 screen.blit(text_NewGame1, [990, 755 + yVar])
 
                 icon_img = game_stats.gf_misc_img_dict["Icons/abilities_icon"]
@@ -2151,20 +1772,22 @@ def battle_screen(screen):
             anim_battle_effects.message_float(screen, b)
 
     # Draw additional window
-    if b.battle_window == "Regiment info":
-        regiment_info_window(screen, b)
-
-    elif b.battle_window == "Battle end window":
-        battle_end_window(screen, b)
-
-    elif b.battle_window == "Ability menu":
-        ability_menu_window(screen, b)
-
-    elif b.battle_window == "Siege equipment menu":
-        siege_equipment_menu_window(screen, b)
+    if b.battle_window:
+        additional_windows[b.battle_window](screen, b)
+    # if b.battle_window == "Regiment info":
+    #     battle_regiment_information.regiment_info_window(screen, b)
+    #
+    # elif b.battle_window == "Battle end window":
+    #     battle_end_window(screen, b)
+    #
+    # elif b.battle_window == "Ability menu":
+    #     ability_menu_window(screen, b)
+    #
+    # elif b.battle_window == "Siege equipment menu":
+    #     siege_equipment_menu_window(screen, b)
 
     if game_stats.fps_status:
-        text_panel = font20.render(str(game_stats.fps), True, TitleText)
+        text_panel = tnr_font20.render(str(game_stats.fps), True, TitleText)
         screen.blit(text_panel, [10, 4])
 
 
@@ -2283,3 +1906,8 @@ school_imgs = {"Overall" : "everything",
                "Tactics" : "tactics",
                "Devine" : "devine",
                "Elemental" : "elemental"}
+
+additional_windows = {"Regiment info" : battle_regiment_information.regiment_info_window,
+                      "Battle end window" : battle_end_window,
+                      "Ability menu" : ability_menu_window,
+                      "Siege equipment menu" : siege_equipment_menu_window}

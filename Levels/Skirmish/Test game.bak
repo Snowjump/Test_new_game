@@ -5,7 +5,7 @@
 'new_level_map', (23040, 10156)
 'new_level_powers', (6144, 1694)
 'new_level_cities', (8192, 10131)
-'new_level_armies', (34816, 1227)
+'new_level_armies', (34816, 1320)
 'new_level_LE_cities_id_counter', (20992, 5)
 'new_level_LE_army_id_counter', (21504, 5)
 'new_level_LE_hero_id_counter', (22016, 5)
