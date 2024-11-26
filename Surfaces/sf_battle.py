@@ -1144,17 +1144,13 @@ def fill_counterattacks(b):
 
 def wait_but():
     print("wait_but")
-    for battle in game_obj.game_battles:
-        if battle.attacker_realm == game_stats.player_power or \
-                battle.defender_realm == game_stats.player_power:
-            b = battle
+    b = game_stats.present_battle
+    if b.queue[0].obj_type == "Regiment" or b.queue[0].obj_type == "Hero":
 
-        if b.queue[0].obj_type == "Regiment" or b.queue[0].obj_type == "Hero":
-
-            if b.realm_in_control == game_stats.player_power and b.ready_to_act:
-                b.ready_to_act = False
-                game_battle.action_order(b, "Wait", None)
-                # game_battle.complete_turn(b, 0.5)
+        if b.realm_in_control == game_stats.player_power and b.ready_to_act:
+            b.ready_to_act = False
+            game_battle.action_order(b, "Wait", None)
+            # game_battle.complete_turn(b, 0.5)
 
 
 def defend_but():
@@ -1622,6 +1618,7 @@ def end_battle_but():
             knight_lords_quest_result_scripts.result_scripts[loser.event.name](winner, attacker_realm, loser.event)
 
     game_obj.game_battles.remove(b)
+    game_stats.present_battle = None
 
     game_stats.attacker_army_id = 0
     game_stats.defender_army_id = 0

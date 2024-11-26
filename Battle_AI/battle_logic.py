@@ -1,7 +1,9 @@
 ## Among Myth and Wonder
+## battle_logic
 
-from Resources import game_obj
 from Resources import game_battle
+from Resources import common_selects
+
 from Battle_AI import hero_AI
 from Battle_AI import melee_AI
 from Battle_AI import ranged_AI
@@ -11,23 +13,18 @@ from Battle_AI import caster_AI
 
 def manage_unit(b, own_units, enemy_units, acting_unit, own_army_id, enemy_army_id, acting_hero):
     card = b.queue[0]
-    print("b.queue[0]: " + str(card.obj_type) + " " + str(card.owner))
+    print("manage_unit() b.queue[0]: " + str(card.obj_type) + " " + str(card.owner))
     if acting_hero is not None:
         print("manage_unit: " + acting_hero.hero_class + " " + acting_hero.name)
 
     if card.obj_type == "Regiment":
 
         route_true = False
-        unit = None
+        army = common_selects.select_army_by_id(card.army_id)
+        unit = army.units[card.number]
 
-        for army in game_obj.game_armies:
-            if army.army_id == card.army_id:
-                unit = army.units[card.number]
-
-                if unit.morale <= 0.0:
-                    route_true = True
-
-                break
+        if unit.morale <= 0.0:
+            route_true = True
 
         # Count units by type
         own_melee, own_ranged, enemy_melee, enemy_ranged = unit_account(own_units, enemy_units)

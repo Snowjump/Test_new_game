@@ -15,6 +15,7 @@ from Resources import algo_b_astar
 from Battle_AI import battle_logic
 from Resources import battle_skills
 from Resources import update_gf_battle
+from Resources import common_selects
 
 from Content import ability_catalog
 from Content import movement_catalog
@@ -127,84 +128,92 @@ def advance_queue(b):  # b - stands for Battle
 
     b.movement_grid = []
     if b.queue[0].obj_type == "Regiment":
-        for army in game_obj.game_armies:
-            if army.army_id == b.queue[0].army_id:
-                morale_restoration_bonus = 0.0
-                if army.hero is not None:
-                    for skill in army.hero.skills:
-                        for effect in skill.effects:
-                            if effect.application == "Bonus morale restoration":
-                                if effect.method == "addition":
-                                    morale_restoration_bonus += float(effect.quantity)
-                unit = army.units[b.queue[0].number]
+        army = common_selects.select_army_by_id(b.queue[0].army_id)
+        morale_restoration_bonus = 0.0
+        if army.hero is not None:
+            for skill in army.hero.skills:
+                for effect in skill.effects:
+                    if effect.application == "Bonus morale restoration":
+                        if effect.method == "addition":
+                            morale_restoration_bonus += float(effect.quantity)
+        unit = army.units[b.queue[0].number]
+        print("Regiment - " + unit.name + "; " + str(unit.position))
 
-                b.attack_type_index = 0
-                list_of_attacks = []
-                for attack in unit.attacks:
-                    list_of_attacks.append(str(attack.attack_type))
-                if "Abilities" in list_of_attacks:
-                    b.attack_type_index = int(list_of_attacks.index("Abilities"))
-                elif "Ranged" in list_of_attacks:
-                    b.attack_type_index = int(list_of_attacks.index("Ranged"))
-                b.attack_type_in_use = unit.attacks[b.attack_type_index].attack_type
-                b.attack_name = unit.attacks[b.attack_type_index].name
-                b.cur_effective_range = unit.attacks[b.attack_type_index].effective_range
-                # b.cur_range_limit = unit.attacks[b.attack_type_index].range_limit
-                b.cur_range_limit = attack_range_effect(army, unit, unit.attacks[b.attack_type_index].range_limit)
+        b.attack_type_index = 0
+        list_of_attacks = []
+        for attack in unit.attacks:
+            list_of_attacks.append(str(attack.attack_type))
+        if "Abilities" in list_of_attacks:
+            b.attack_type_index = int(list_of_attacks.index("Abilities"))
+        elif "Ranged" in list_of_attacks:
+            b.attack_type_index = int(list_of_attacks.index("Ranged"))
+        b.attack_type_in_use = unit.attacks[b.attack_type_index].attack_type
+        b.attack_name = unit.attacks[b.attack_type_index].name
+        b.cur_effective_range = unit.attacks[b.attack_type_index].effective_range
+        # b.cur_range_limit = unit.attacks[b.attack_type_index].range_limit
+        b.cur_range_limit = attack_range_effect(army, unit, unit.attacks[b.attack_type_index].range_limit)
 
-                # Reset engage status
-                unit.engaged = False
-                # Reset counterattack counter
-                unit.counterattack = 1
-                if army.hero is not None:
-                    for skill in army.hero.skills:
-                        for effect in skill.effects:
-                            if effect.application == "Bonus counterattack":
-                                if effect.method == "addition":
-                                    unit.counterattack += effect.quantity
-                # Restore some morale
-                if unit.morale + game_stats.battle_morale_base_restoration + morale_restoration_bonus > unit.leadership:
-                    unit.morale = float(unit.leadership)
-                else:
-                    unit.morale = float(math.ceil((unit.morale + game_stats.battle_morale_base_restoration
-                                                   + morale_restoration_bonus) * 100)) / 100
-                # float(math.ceil(damage_fraction / game_stats.battle_base_morale_hit * angle_modifier[angle])) / 100
-                # Check duration of effects
-                for e in unit.effects:
-                    if e.until_next_turn:
-                        print(str(e.name) + " effect has ended")
-                        unit.effects.remove(e)
+        # Reset engage status
+        unit.engaged = False
+        # Reset counterattack counter
+        unit.counterattack = 1
+        if army.hero is not None:
+            for skill in army.hero.skills:
+                for effect in skill.effects:
+                    if effect.application == "Bonus counterattack":
+                        if effect.method == "addition":
+                            unit.counterattack += effect.quantity
+        # Restore some morale
+        if unit.morale + game_stats.battle_morale_base_restoration + morale_restoration_bonus > unit.leadership:
+            unit.morale = float(unit.leadership)
+        else:
+            unit.morale = float(math.ceil((unit.morale + game_stats.battle_morale_base_restoration
+                                           + morale_restoration_bonus) * 100)) / 100
+        # float(math.ceil(damage_fraction / game_stats.battle_base_morale_hit * angle_modifier[angle])) / 100
+        # Check duration of effects
+        num_list = []
+        num = 0
+        for e in unit.effects:
+            if e.until_next_turn:
+                print(str(e.name) + " effect has ended")
+                num_list.append(num)
+                # unit.effects.remove(e)
+            num += 1
 
-                # Movement path
-                # MP = unit.speed
-                # acting_hero = None
-                # for army in game_obj.game_armies:
-                #     if army.army_id == b.queue[0].army_id:
-                acting_hero = army.hero
+        if num_list:
+            num_list = sorted(num_list, reverse=True)
+            for index in num_list:
+                del unit.effects[index]
 
-                mode = "March"
-                for skill in unit.skills:
-                    if skill.application == "Movement":
-                        if skill.quality == "Can fly":
-                            mode = "Flight"
-                            break
+        # Movement path
+        # MP = unit.speed
+        # acting_hero = None
+        # for army in game_obj.game_armies:
+        #     if army.army_id == b.queue[0].army_id:
+        acting_hero = army.hero
 
-                MP = calculate_speed(unit, acting_hero)
-                start = b.queue[0].position
+        mode = "March"
+        for skill in unit.skills:
+            if skill.application == "Movement":
+                if skill.quality == "Can fly":
+                    mode = "Flight"
+                    break
 
-                b.path, b.movement_grid = algo_b_movement_range.pseudo_astar(None, start, MP, b, mode)
+        MP = calculate_speed(unit, acting_hero)
+        start = b.queue[0].position
 
-                # Check if unit should route due to low morale
-                if unit.morale <= 0.0:
-                    # b.primary = "Move"
-                    b.secondary = "Route"
-                    routing_path(b, unit, acting_hero)
+        b.path, b.movement_grid = algo_b_movement_range.pseudo_astar(None, start, MP, b, mode)
 
-                break
+        # Check if unit should route due to low morale
+        if unit.morale <= 0.0:
+            print("advance_queue() -> routing_path()")
+            # b.primary = "Move"
+            b.secondary = "Route"
+            routing_path(b, unit, acting_hero)
 
 
 def complete_turn(b, add_time):
-    # print("complete_turn")
+    print("complete_turn")
     # b.queue[0].time_act += add_time
     # print("time_act - " + str(b.queue[0].time_act) + ", add_time - " + str(add_time))
     new_time = float(b.queue[0].time_act + add_time)
@@ -269,29 +278,32 @@ def action_order(b, first_action, second_action):
 
 
 def execute_order(b):
-    # print("Execution")
-    acting_hero = None
-    enemy_hero = None
+    print("execute_order()")
+    print("b.primary - " + str(b.primary) + "; b.secondary - " + str(b.secondary))
     unit = None
-    for army in game_obj.game_armies:
-        if army.army_id == b.queue[0].army_id:
-            # print("Execution for " + str(b.queue[0].obj_type))
-            if b.queue[0].obj_type != "Hero":
-                unit = army.units[b.queue[0].number]
-                if b.primary in ["Rotate", "Move", "Route"]:
-                    change_side_direction(unit, b)
-            acting_hero = army.hero
+    acting_army = common_selects.select_army_by_id(b.queue[0].army_id)
+    print("b.enemy_army_id - " + str(b.enemy_army_id))
+    # print("Execution for " + str(b.queue[0].obj_type))
+    if b.queue[0].obj_type != "Hero":
+        unit = acting_army.units[b.queue[0].number]
+        print(unit.name)
+        if b.primary in ["Rotate", "Move", "Route"]:
+            if b.tile_trail:
+                change_side_direction(unit, b)
+            elif b.secondary == "Route":
+                print("Nowhere to go - " + str(b.secondary))
+                b.primary = "Wait"
+                b.secondary = None
 
-        elif army.army_id == b.enemy_army_id:
-            enemy_hero = army.hero
+    acting_hero = acting_army.hero
+    enemy_army = None
+    enemy_hero = None
+    if b.enemy_army_id:
+        enemy_army = common_selects.select_army_by_id(b.enemy_army_id)
+        enemy_hero = enemy_army.hero
 
     if b.primary == "Move":
         print("execute_order - Move")
-        # for army in game_obj.game_armies:
-        #     if army.army_id == b.queue[0].army_id:
-        #         unit = army.units[b.queue[0].number]
-        #         break
-
         x1 = int(b.queue[0].position[0])
         y1 = int(b.queue[0].position[1])
         TileNum1 = (y1 - 1) * game_stats.battle_width + x1 - 1
@@ -1318,70 +1330,63 @@ def ranged_hit(b, unit, primary_target, target, acting_hero, enemy_hero):
                 b.dealt_damage += dmg
 
 
-def perform_battle_actions():
-    # print("perform_battle_actions")
-    for battle in game_obj.game_battles:
-        if battle.attacker_realm == game_stats.player_power or \
-                battle.defender_realm == game_stats.player_power:
-            b = battle
-            acting_hero = None
+def perform_battle_actions(b):
+    print("perform_battle_actions")
+    # b = game_stats.present_battle
+    acting_hero = None
 
-            for army in game_obj.game_armies:
-                if army.army_id in [b.attacker_id, b.defender_id]:
-                    if army.owner == b.realm_in_control:
-                        own_units = army.units
-                        if b.queue[0].obj_type != "Hero":
-                            acting_unit = own_units[b.queue[0].number]
-                            acting_hero = army.hero
-                        else:
-                            acting_unit = None
-                            acting_hero = army.hero
-                        own_army_id = army.army_id
-                    elif army.owner == b.enemy:
+    for army in game_obj.game_armies:
+        if army.army_id in [b.attacker_id, b.defender_id]:
+            if army.owner == b.realm_in_control:
+                own_units = army.units
+                if b.queue[0].obj_type != "Hero":
+                    acting_unit = own_units[b.queue[0].number]
+                    acting_hero = army.hero
+                else:
+                    acting_unit = None
+                    acting_hero = army.hero
+                own_army_id = army.army_id
+            elif army.owner == b.enemy:
 
-                        enemy_units = army.units
-                        enemy_army_id = army.army_id
-                        # print("b.enemy - " + str(b.enemy) + " army.army_id - " + str(army.army_id) +
-                        #       " enemy_army_id - " + str(enemy_army_id))
+                enemy_units = army.units
+                enemy_army_id = army.army_id
+                # print("b.enemy - " + str(b.enemy) + " army.army_id - " + str(army.army_id) +
+                #       " enemy_army_id - " + str(enemy_army_id))
 
-            if not b.battle_stop:
-                # print("if not b.battle_stop")
-                if b.realm_in_control != game_stats.player_power and b.AI_ready:
-                    battle_logic.manage_unit(b, own_units, enemy_units, acting_unit, own_army_id, enemy_army_id,
-                                             acting_hero)
+    if not b.battle_stop:
+        # print("if not b.battle_stop")
+        if b.realm_in_control != game_stats.player_power and b.AI_ready:
+            print("perform_battle_actions -> manage_unit")
+            battle_logic.manage_unit(b, own_units, enemy_units, acting_unit, own_army_id, enemy_army_id,
+                                     acting_hero)
 
-                if b.secondary == "Route" and b.realm_in_control == game_stats.player_power and b.primary is None:
-                    print('action_order(b, "Move", "Route")')
-                    action_order(b, "Move", "Route")
+        if b.secondary == "Route" and b.realm_in_control == game_stats.player_power and b.primary is None:
+            print('action_order(b, "Move", "Route")')
+            action_order(b, "Move", "Route")
 
-                execute_order(b)
-
-            # else:
-            #     battle_ending(b)
+        execute_order(b)
 
 
 def advance_battle_time(time_counted):
-    for b in game_obj.game_battles:
-        if b.attacker_realm == game_stats.player_power or \
-                b.defender_realm == game_stats.player_power:
+    b = game_stats.present_battle
 
-            if b.stage == "Fighting":
+    if b.stage == "Fighting":
 
-                b.battle_temp_time_passed = time_counted - b.battle_last_start
-                b.battle_display_time = int(b.battle_passed_time + b.battle_temp_time_passed)
+        b.battle_temp_time_passed = time_counted - b.battle_last_start
+        b.battle_display_time = int(b.battle_passed_time + b.battle_temp_time_passed)
 
-                # print("It works - " + str(math.floor(game_stats.display_time/1000) % 5))
-                if math.floor(b.battle_display_time / 1000) % 1 == 0:
-                    # print("math.floor(game_stats.display_time/1000) % 5 == 0")
-                    # print("game_stats.last_change - " + str(game_stats.last_change))
-                    # print("math.floor(game_stats.display_time/1000) - "
-                    # + str(math.floor(game_stats.display_time/1000)))
-                    if math.floor(b.battle_display_time / 1000) != b.battle_last_change:
-                        # print("math.floor(game_stats.display_time/1000) != game_stats.last_change")
-                        b.battle_last_change = math.floor(b.battle_display_time / 1000)
+        # print("It works - " + str(math.floor(game_stats.display_time/1000) % 5))
+        if math.floor(b.battle_display_time / 1000) % 1 == 0:
+            # print("math.floor(game_stats.display_time/1000) % 5 == 0")
+            # print("game_stats.last_change - " + str(game_stats.last_change))
+            # print("math.floor(game_stats.display_time/1000) - "
+            # + str(math.floor(game_stats.display_time/1000)))
+            if math.floor(b.battle_display_time / 1000) != b.battle_last_change:
+                # print("math.floor(game_stats.display_time/1000) != game_stats.last_change")
+                b.battle_last_change = math.floor(b.battle_display_time / 1000)
 
-                        # print("game_stats.current_screen - " + str(game_stats.current_screen))
-                        perform_battle_actions()
+                # print("game_stats.current_screen - " + str(game_stats.current_screen))
+                perform_battle_actions(b)
 
 
 def melee_attack_preparation(b, TileNum, position, x2, y2):
@@ -1427,9 +1432,14 @@ def melee_attack_preparation(b, TileNum, position, x2, y2):
 
     if not approach:  # Clicked on a center of square
         check = False
+    elif (approach[0] < 0 or game_stats.battle_width < approach[0]) \
+            or (approach[1] < 0 or game_stats.battle_height < approach[1]):
+        # Approach tile is out of bounds
+        check = False
     else:
+        print(word + ": TileNum position [x2, y2] - " + str([x2, y2]) + "; approach position - " + str(approach))
         ApproachTile = (approach[1] - 1) * game_stats.battle_width + approach[0] - 1
-        print("ApproachTile is " + str(ApproachTile))
+        print("ApproachTile is " + str(ApproachTile) + ", position [x2, y2] - " + str(approach))
 
         if b.battle_map[TileNum].map_object is not None:
             if b.battle_map[TileNum].map_object.obj_type == "Structure":
@@ -2083,11 +2093,9 @@ def disengage(b, position):
                         elif xy[1] == -1:
                             expected_direction = "SE"
 
-                    for army in game_obj.game_armies:
-                        if army.army_id == b.battle_map[TileNum].army_id:
-                            if army.units[b.battle_map[TileNum].unit_index].direction == expected_direction:
-                                army.units[b.battle_map[TileNum].unit_index].engaged = False
-                            break
+                    army = common_selects.select_army_by_id(b.battle_map[TileNum].army_id)
+                    if army.units[b.battle_map[TileNum].unit_index].direction == expected_direction:
+                        army.units[b.battle_map[TileNum].unit_index].engaged = False
 
 
 def reduce_morale(b, primary_target, before_HP, angle):
@@ -2132,15 +2140,17 @@ def routing_path(b, routing_unit, acting_hero):
         for i in range(1, 13):
             exit_positions.append([17, i])
 
+    print("exit_positions: " + str(exit_positions))
     chosen_route = None
     chosen_node = None
     for exit_pos in exit_positions:
+        # print("exit_pos - " + str(exit_pos))
         base_MP = calculate_speed(routing_unit, acting_hero)
         node, a_path = algo_b_astar.b_astar(None, routing_unit.position, exit_pos, None, base_MP, b, mode)
         if a_path is None:
-            print("No path for " + str(exit_pos))
-            exit_positions.remove(exit_pos)
-
+            # print("No path for " + str(exit_pos))
+            # exit_positions.remove(exit_pos)
+            pass
         else:
             a_path.pop(0)
             # a_path.pop(-1)
@@ -2153,7 +2163,8 @@ def routing_path(b, routing_unit, acting_hero):
                 chosen_node = node
 
     print("New path - " + str(chosen_route))
-    print("Final node - " + str(chosen_node.position))
+    if chosen_node:
+        print("Final node - " + str(chosen_node.position))
 
     if chosen_route is not None:
         # b.path, b.movement_grid = [chosen_node], chosen_route
@@ -2381,7 +2392,7 @@ def remove_aura_effects(unit_position, b):
 
                 number += 1
 
-            if len(index_list) > 0:
+            if index_list:
                 index_list = sorted(index_list, reverse=True)
                 for index in index_list:
                     del tile.aura_effects[index]

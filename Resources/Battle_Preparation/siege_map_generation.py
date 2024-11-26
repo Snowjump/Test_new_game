@@ -9,6 +9,7 @@ from Resources import game_obj
 from Resources import game_classes
 from Resources import effect_classes
 from Resources import update_gf_battle
+from Resources import common_selects
 
 from Content import objects_img_catalog
 from Content import terrain_seasons
@@ -151,6 +152,8 @@ def generate_map(attacker, defender):
                                                           game_stats.battle_result_script,
                                                           settlement.siege.siege_towers_ready,
                                                           settlement.siege.battering_rams_ready))
+
+    game_stats.present_battle = common_selects.select_battle_by_realm_name(game_stats.player_power)
 
     game_stats.attacker_realm = ""
     game_stats.defender_realm = ""

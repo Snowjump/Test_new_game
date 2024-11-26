@@ -245,7 +245,7 @@ class Land_Battle:  # class keeps information about outgoing battle
         self.realm_in_control = None  # Name of a realm - every time a queue card called, one of fighting players takes
         # control of battlefield if needed
         self.enemy = None  # Opposite of realm in control
-        self.enemy_army_id = None  # Id of army that belong to realm that is opposite to realm in control
+        self.enemy_army_id = None  # ID of army that belong to realm that is opposite to realm in control
         self.terrain = terrain
         self.conditions = conditions
         self.battle_type = battle_type

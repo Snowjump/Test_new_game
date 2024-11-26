@@ -68,7 +68,7 @@ def draw_lines_alpha(surface, color, closed, points, points2):
 
 
 def draw_tiles(screen):
-    battle = common_selects.select_battle_by_realm_name(game_stats.player_power)
+    battle = game_stats.present_battle
 
     for TileObj in battle.battle_map:
         x = int(TileObj.posxy[0])
@@ -173,40 +173,34 @@ def draw_tiles(screen):
             if TileObj.army_id is not None:
                 # print(str(TileObj.posxy))
                 focus = TileObj.army_id
-                for army in game_obj.game_armies:
-                    if army.army_id == focus:
-                        # Player should see only his army at formation stage
-                        if (army.owner == game_stats.player_power and battle.stage == "Formation") or \
-                                battle.stage != "Formation":
+                army = common_selects.select_army_by_id(focus)
+                # Player should see only his army at formation stage
+                if (army.owner == game_stats.player_power and battle.stage == "Formation") or \
+                        battle.stage != "Formation":
 
-                            unit = army.units[TileObj.unit_index]
+                    unit = army.units[TileObj.unit_index]
 
-                            # Draw direction lines
-                            draw_direction_lines(screen, battle, unit.direction, x, y, unit.position)
+                    # Draw direction lines
+                    draw_direction_lines(screen, battle, unit.direction, x, y, unit.position)
 
-                            # Draw creatures
-                            draw_creatures(screen, unit, x, y, army.owner, TileObj.unit_index, battle,
-                                           TileObj.posxy)
-
-                        break
+                    # Draw creatures
+                    draw_creatures(screen, unit, x, y, army.owner, TileObj.unit_index, battle,
+                                   TileObj.posxy)
 
             if TileObj.passing_army_id is not None:
                 focus = TileObj.passing_army_id
-                for army in game_obj.game_armies:
-                    if army.army_id == focus:
-                        # Player should see only his army at formation stage
-                        if (army.owner == game_stats.player_power and battle.stage == "Formation") or \
-                                battle.stage != "Formation":
-                            unit = army.units[TileObj.passing_unit_index]
+                army = common_selects.select_army_by_id(focus)
+                # Player should see only his army at formation stage
+                if (army.owner == game_stats.player_power and battle.stage == "Formation") or \
+                        battle.stage != "Formation":
+                    unit = army.units[TileObj.passing_unit_index]
 
-                            # Draw direction lines
-                            draw_direction_lines(screen, battle, unit.direction, x, y, unit.position)
+                    # Draw direction lines
+                    draw_direction_lines(screen, battle, unit.direction, x, y, unit.position)
 
-                            # Draw creatures
-                            draw_creatures(screen, unit, x, y, army.owner, TileObj.passing_unit_index, battle,
-                                           TileObj.posxy)
-
-                        break
+                    # Draw creatures
+                    draw_creatures(screen, unit, x, y, army.owner, TileObj.passing_unit_index, battle,
+                                   TileObj.posxy)
 
 
 def draw_direction_lines(screen, b, direction, x, y, check_position):
@@ -1049,14 +1043,11 @@ def draw_waiting_list(screen, b):
     pygame.draw.lines(screen, LineMainMenuColor1, False, [(904, 762 + yVar), (916, 770 + yVar), (904, 778 + yVar)], 2)
 
     # Units
+    player_id = int(b.defender_id)
     if b.attacker_realm == game_stats.player_power:
         player_id = int(b.attacker_id)
-    else:
-        player_id = int(b.defender_id)
 
-    for army in game_obj.game_armies:
-        if army.army_id == player_id:
-            a = army
+    a = common_selects.select_army_by_id(player_id)
 
     number = 0
     for unit in b.waiting_list:
@@ -1594,7 +1585,7 @@ def battle_screen(screen):
 
     draw_tiles(screen)  # Draw tiles
 
-    b = common_selects.select_battle_by_realm_name(game_stats.player_power)
+    b = game_stats.present_battle
 
     if b.stage == "Formation":
         # print(str(b.stage))
@@ -1654,38 +1645,36 @@ def battle_screen(screen):
         if b.battle_type == "Siege":
             if b.realm_in_control == game_stats.player_power:
                 if b.queue[0].obj_type == "Regiment" and b.ready_to_act:
-                    for army in game_obj.game_armies:
-                        if army.army_id == b.queue[0].army_id:
-                            unit = army.units[b.queue[0].number]
-                            # print("Regiment - " + unit.name)
-                            draw_button = False
+                    army = common_selects.select_army_by_id(b.queue[0].army_id)
+                    unit = army.units[b.queue[0].number]
+                    # print("Regiment - " + unit.name)
+                    draw_button = False
+                    drop_sm = False
+                    if unit.siege_engine is not None:
+                        draw_button = True
+                        drop_sm = True
+                    else:
+                        TileNum = (b.queue[0].position[1] - 1) * game_stats.battle_width\
+                                  + b.queue[0].position[0] - 1
+                        if len(b.battle_map[TileNum].siege_machines) > 0:
+                            draw_button = True
                             drop_sm = False
-                            if unit.siege_engine is not None:
-                                draw_button = True
-                                drop_sm = True
-                            else:
-                                TileNum = (b.queue[0].position[1] - 1) * game_stats.battle_width\
-                                          + b.queue[0].position[0] - 1
-                                if len(b.battle_map[TileNum].siege_machines) > 0:
-                                    draw_button = True
-                                    drop_sm = False
 
-                            if draw_button:
-                                pygame.draw.polygon(screen, FieldColor, [[74, 740 + yVar], [231, 740 + yVar],
-                                                                         [231, 795 + yVar], [74, 795 + yVar]])
-                                pygame.draw.polygon(screen, LineMainMenuColor1, [[74, 740 + yVar], [231, 740 + yVar],
-                                                                                 [231, 795 + yVar], [74, 795 + yVar]],
-                                                    3)
+                    if draw_button:
+                        pygame.draw.polygon(screen, FieldColor, [[74, 740 + yVar], [231, 740 + yVar],
+                                                                 [231, 795 + yVar], [74, 795 + yVar]])
+                        pygame.draw.polygon(screen, LineMainMenuColor1, [[74, 740 + yVar], [231, 740 + yVar],
+                                                                         [231, 795 + yVar], [74, 795 + yVar]],
+                                            3)
 
-                                text_NewGame1 = tnr_font20.render("Equipment", True, TitleText)
-                                screen.blit(text_NewGame1, [134, 755 + yVar])
+                        text_NewGame1 = tnr_font20.render("Equipment", True, TitleText)
+                        screen.blit(text_NewGame1, [134, 755 + yVar])
 
-                                icon = "Icons/pick_up_siege_machine"
-                                if drop_sm:
-                                    icon = "Icons/drop_siege_machine"
-                                icon_img = game_stats.gf_misc_img_dict[icon]
-                                screen.blit(icon_img, (77, 742 + yVar))
-                            break
+                        icon = "Icons/pick_up_siege_machine"
+                        if drop_sm:
+                            icon = "Icons/drop_siege_machine"
+                        icon_img = game_stats.gf_misc_img_dict[icon]
+                        screen.blit(icon_img, (77, 742 + yVar))
 
         # Wait button
         # Let regiment or hero spent 0,5 time

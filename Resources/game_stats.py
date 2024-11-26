@@ -4,7 +4,7 @@
 # Software versioning
 version_major = 0
 version_minor = 1
-version_micro = 18
+version_micro = 19
 
 time_counted = 0
 fps = 0.0
@@ -275,6 +275,7 @@ map_to_display = []  # List of tiles acceptable to draw in sc_game_board
 display_everything = False
 
 # Battles
+present_battle = None  # Reference battle that player is playing right now
 battle_id_counter = 0
 battle_width = 16
 battle_height = 12

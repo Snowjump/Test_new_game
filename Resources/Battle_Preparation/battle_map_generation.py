@@ -1,4 +1,4 @@
-## Miracle battles
+## Among Myth and Wonder
 ## battle_map_generation
 
 import random
@@ -7,6 +7,7 @@ from Resources import game_stats
 from Resources import game_classes
 from Resources import game_obj
 from Resources import update_gf_battle
+from Resources import common_selects
 
 from Content import objects_img_catalog
 from Content import terrain_seasons
@@ -146,6 +147,8 @@ def create_battle_map():
                                                           starting_defending_positions,
                                                           game_stats.battle_result_script,
                                                           0, 0))
+
+    game_stats.present_battle = common_selects.select_battle_by_realm_name(game_stats.player_power)
 
     # New visuals
     game_stats.gf_settlement_dict = {}
