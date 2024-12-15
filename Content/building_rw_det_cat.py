@@ -31,18 +31,14 @@ def artifact_market_details():
     TileNum = (y - 1) * game_stats.cur_level_width + x - 1
 
     if game_obj.game_map[TileNum].army_id is not None:
-        for army in game_obj.game_armies:
-            if army.army_id == game_obj.game_map[TileNum].army_id:
-                if army.hero is not None:
-                    game_stats.hero_inventory = army.hero.inventory
-                break
+        army = common_selects.select_army_by_id(game_obj.game_map[TileNum].army_id)
+        if army.hero is not None:
+            game_stats.hero_inventory = army.hero.inventory
 
     the_settlement = common_selects.select_settlement_by_id(game_stats.selected_settlement)
 
-    for realm in game_obj.game_powers:
-        if realm.name == the_settlement.owner:
-            game_stats.realm_artifact_collection = realm.artifact_collection
-            break
+    realm = common_selects.select_realm_by_name(the_settlement.owner)
+    game_stats.realm_artifact_collection = realm.artifact_collection
 
     # Update visuals
     # print("Update visuals")
@@ -157,17 +153,11 @@ def school_of_magic_details():
 def learn_skill_from_school():
     if game_stats.enough_resources_to_pay and game_stats.hero_in_settlement \
             and game_stats.selected_new_skill is not None and game_stats.hero_doesnt_know_this_skill:
-        # Index of settlement's tile in map list
-        x = int(game_stats.selected_tile[0])
-        y = int(game_stats.selected_tile[1])
-        TileNum = (y - 1) * game_stats.cur_level_width + x - 1
-
-        army = common_selects.select_army_by_id(game_obj.game_map[TileNum].army_id)
-        hero = army.hero
 
         the_settlement = common_selects.select_settlement_by_id(game_stats.selected_settlement)
-
         treasury = common_selects.select_treasury_by_realm_name(the_settlement.owner)
+        army = common_selects.select_army_by_id(game_obj.game_map[the_settlement.location].army_id)
+        hero = army.hero
 
         # Spent money
         for res in treasury:
@@ -201,5 +191,54 @@ def learn_skill_from_school():
         graphics_basic.prepare_resource_ribbon()
 
 
+def wheelwright_guild_details():
+    game_stats.rw_panel_det = game_classes.Object_Surface({1: learn_attribute_from_building},
+                                                          [[651, 217, 788, 237]],
+                                                          None,
+                                                          rw_click_scripts.attribute_store)
+
+    game_stats.enough_resources_to_pay = False
+
+    # Update visuals
+    img_list = ['Icons/paper_square_40']
+    update_gf_game_board.add_misc_sprites(img_list)
+    update_gf_game_board.update_skills_sprites()
+
+
+def learn_attribute_from_building():
+    if game_stats.enough_resources_to_pay and game_stats.hero_in_settlement \
+            and game_stats.selected_new_attribute is not None and game_stats.hero_doesnt_know_this_attribute:
+
+        the_settlement = common_selects.select_settlement_by_id(game_stats.selected_settlement)
+        treasury = common_selects.select_treasury_by_realm_name(the_settlement.owner)
+        army = common_selects.select_army_by_id(game_obj.game_map[the_settlement.location].army_id)
+        hero = army.hero
+
+        # Spent money
+        for res in treasury:
+            if "Florins" == res[0]:
+                res[1] -= int(game_stats.selected_item_price)
+                break
+
+        pack = game_stats.selected_new_attribute
+        # Increase knowledge and magic power of hero if needed
+        for attribute in pack.attribute_list:
+            if attribute.tag == "hero":
+                if attribute.stat == "magic power":
+                    hero.magic_power += int(attribute.value)
+                elif attribute.stat == "knowledge":
+                    hero.knowledge += int(attribute.value)
+                    hero.max_mana_reserve += int(attribute.value * 10)
+                    hero.mana_reserve += int(attribute.value * 10)
+
+        hero.attributes_list.append(pack)
+
+        game_stats.enough_resources_to_pay = None
+        game_stats.hero_doesnt_know_this_attribute = False
+
+        graphics_basic.prepare_resource_ribbon()
+
+
 building_catalog = {"KL artifact market" : artifact_market_details,
-                    "KL School of magic" : school_of_magic_details}
+                    "KL School of magic" : school_of_magic_details,
+                    "Wheelwright guild" : wheelwright_guild_details}

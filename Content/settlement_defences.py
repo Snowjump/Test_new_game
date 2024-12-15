@@ -1,4 +1,5 @@
-## Miracle battles
+## Among Myth and Wonder
+## settlement_defences
 
 from Resources import game_stats
 

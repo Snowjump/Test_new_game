@@ -1,4 +1,5 @@
-## Miracle battles
+## Among Myth and Wonder
+## artifact_assortment
 
 KL_artifact_market_assortment = ["Bronze spurs", "Page's chainmail", "Wooden chalice", "Medal of honor",
                                  "Red sceptre", "Sapphire ring"]

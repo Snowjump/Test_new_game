@@ -25,9 +25,7 @@ control_bonus = {"Knight_lords_control_1" : campaign_effect_classes.Control_Effe
 
 
 # Knight lords
-fill_ef_KL = {"Earth rampart" : [],
-              "Palisade" : [],
-              "Watermill" : [campaign_effect_classes.Building_Effect("Watermill industry",
+fill_ef_KL = {"Watermill" : [campaign_effect_classes.Building_Effect("Watermill industry",
                                                                      "Settlement",
                                                                      "Population",
                                                                      [pop_bonus["Watermill_production"],
@@ -36,18 +34,7 @@ fill_ef_KL = {"Earth rampart" : [],
                                                                      "Settlement",
                                                                      "Control",
                                                                      [control_bonus["Knight_lords_control_1"]])],
-              "KL artifact market" : [],
-              "School of magic" : [],
-              "Town council" : [],
-              "Town armory" : [],
-              "Blacksmith guild" : [],
-              "Armour district" : [],
-              "Lord's court" : [],
-              "Town convent" : [],
-              "Monastery" : [],
-              "Court bestiary" : [],
-              "Pegasus stables" : [],
-              "Engineering guild" : []}
+              }
 
 # Nature keepers
 fill_ef_NK = {}

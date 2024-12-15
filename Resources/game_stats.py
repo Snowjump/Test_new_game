@@ -4,7 +4,7 @@
 # Software versioning
 version_major = 0
 version_minor = 1
-version_micro = 19
+version_micro = 20
 
 time_counted = 0
 fps = 0.0
@@ -206,6 +206,8 @@ selected_new_attribute = None
 selected_new_skill = None
 selected_artifact_info = None
 hero_doesnt_know_this_skill = None
+hero_doesnt_know_this_attribute = None
+selected_item_price = None  # Price in florins
 
 first_army_exchange_list = []  # List of units to exchange
 second_army_exchange_list = []  # List of units to exchange

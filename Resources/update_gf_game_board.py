@@ -18,6 +18,7 @@ from Content import artifact_assortment
 from Content import artifact_imgs_cat
 from Content import skills_curriculum
 from Content import hero_skill_catalog
+from Content import battle_attributes_assortment
 
 from Screens.Game_Board_Windows import rw_building
 
@@ -485,7 +486,7 @@ def update_regiment_sprites():
             settlement = common_selects.select_settlement_by_id(game_stats.selected_settlement)
             for plot in settlement.buildings:
                 if plot.structure is not None:
-                    if len(plot.structure.recruitment) > 0 and plot.status == "Built":
+                    if plot.structure.recruitment and plot.status == "Built":
                         for recruit in plot.structure.recruitment:
                             unit_info = unit_img_catalog.units_img_dict_by_alignment[settlement.alignment][
                                 recruit.unit_name]
@@ -701,6 +702,10 @@ def open_settlement_building_sprites():
         settlement = common_selects.select_settlement_by_id(game_stats.selected_settlement)
         for plot in settlement.buildings:
             if plot.structure is not None:
+                print("plot.screen_position - " + str(plot.screen_position))
+                print("type(plot.structure) - " + str(type(plot.structure)))
+                print(str(plot.structure))
+                print("plot.structure - " + str(plot.structure.name))
                 building_img = pygame.image.load(plot.structure.img).convert_alpha()
                 building_img.set_colorkey(WhiteColor)
                 game_stats.gf_building_dict[plot.structure.name] = building_img
@@ -759,7 +764,7 @@ def update_skills_sprites():
                 skill_img.set_colorkey(WhiteColor)
                 game_stats.gf_skills_dict[img] = skill_img
 
-    if game_stats.rw_object is not None:
+    if game_stats.rw_object:
         print("rw_object - " + game_stats.rw_object.name)
         if game_stats.rw_object.name == "KL School of magic":
             name = rw_building.special_structures[game_stats.rw_object.name]
@@ -769,6 +774,14 @@ def update_skills_sprites():
                 skill_img = pygame.image.load('Img/Skills/' + skill_name + '.png').convert_alpha()
                 skill_img.set_colorkey(WhiteColor)
                 game_stats.gf_skills_dict[skill_name] = skill_img
+        elif game_stats.rw_object.name == "Wheelwright guild":
+            name = rw_building.special_structures[game_stats.rw_object.name]
+            assortment = battle_attributes_assortment.assortment_by_place[name]
+            for attribute in assortment:
+                attribute_name = assortment[attribute][3]
+                attribute_img = pygame.image.load('Img/Skills/' + attribute_name + '.png').convert_alpha()
+                attribute_img.set_colorkey(WhiteColor)
+                game_stats.gf_skills_dict[attribute_name] = attribute_img
 
 
 def update_artifact_sprites():

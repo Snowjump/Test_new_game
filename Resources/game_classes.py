@@ -400,8 +400,8 @@ class Queue_Card:  # class for tracking position of regiment in time queue
 
 class Regiment_Info_Card:  # Contain information about regiment that was clicked on with right mouse button
     def __init__(self, regiment_name, first_color, second_color, amount, total_HP, morale, health, experience, speed,
-                 leadership, engaged, deserted, attacks_amount, armor, defence, reg_tags, magic_power, mana_reserve,
-                 max_mana_reserve, abilities):
+                 leadership, engaged, deserted, attacks_amount, armour, final_armour, defence, reg_tags, magic_power,
+                 mana_reserve, max_mana_reserve, abilities):
         self.regiment_name = regiment_name
         self.first_color = first_color
         self.second_color = second_color
@@ -415,7 +415,8 @@ class Regiment_Info_Card:  # Contain information about regiment that was clicked
         self.engaged = engaged
         self.deserted = deserted
         self.attacks_amount = attacks_amount
-        self.armor = armor
+        self.armour = armour
+        self.final_armour = final_armour  # After applying effects
         self.defence = defence
         self.reg_tags = reg_tags  # List of regiment's tags
         self.magic_power = magic_power
@@ -452,15 +453,17 @@ class Effect_Info_Card:  # Contain information about regiment's skill for inform
 
 
 class Attribute_Package:
-    def __init__(self, attribute_list):
+    def __init__(self, attribute_list, package_name=None):
         self.attribute_list = attribute_list
+        self.package_name = package_name
 
 
 class Battle_Attribute:
-    def __init__(self, tag, stat, value):
+    def __init__(self, tag, stat, value, name=None):
         self.tag = tag
         self.stat = stat
         self.value = value
+        self.name = name
 
 
 class Hero:
@@ -476,7 +479,7 @@ class Hero:
         self.experience = experience
         self.magic_power = magic_power
         self.knowledge = knowledge
-        self.attributes_list = attributes_list
+        self.attributes_list = attributes_list  # Attribute_Package objects
         self.img = img
         self.img_source = img_source
         self.x_offset = x_offset

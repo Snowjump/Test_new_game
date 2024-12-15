@@ -6,23 +6,12 @@ import pygame.font
 
 from Resources import game_stats
 
+from Screens.colors_catalog import *
+from Screens.fonts_catalog import *
+
+from Screens.Interface_Elements import buttons
 from Screens.Game_Board_Windows import rw_sub_building_info
 
-WhiteColor = [255, 255, 255]
-
-MainMenuColor = [0x9F, 0x97, 0x97]
-FillButton = [0xD8, 0xBD, 0xA2]
-
-DarkText = [0x11, 0x11, 0x11]
-
-CancelFieldColor = [0xFF, 0x00, 0x00]
-CancelElementsColor = [0x99, 0x00, 0x00]
-
-tnr_font16 = pygame.font.SysFont('timesnewroman', 16)
-
-arial_font16 = pygame.font.SysFont('arial', 16)
-arial_font14 = pygame.font.SysFont('arial', 14)
-arial_font12 = pygame.font.SysFont('arial', 12)
 
 resources_icons = {"Florins" : "resource_florins",
                    "Food" : "resource_food",
@@ -53,10 +42,8 @@ def draw_upgrade_info(screen):
                          [950, 350]])
 
     # Close settlement window
-    pygame.draw.polygon(screen, CancelFieldColor, [[1254, 85], [1273, 85], [1273, 104], [1254, 104]])
-    pygame.draw.polygon(screen, CancelElementsColor, [[1254, 85], [1273, 85], [1273, 104], [1254, 104]], 2)
-    pygame.draw.line(screen, CancelElementsColor, [1257, 88], [1270, 101], 2)
-    pygame.draw.line(screen, CancelElementsColor, [1257, 101], [1270, 88], 2)
+    buttons.element_close_button(screen, "CancelFieldColor", "CancelElementsColor", "CancelElementsColor",
+                                 1254, 85, 19, 19, 2, 2)
 
     ## Left side
     # Icon image
@@ -87,11 +74,11 @@ def draw_upgrade_info(screen):
         text = str(number) + " turn to complete building"
     else:
         text = str(number) + " turns to complete building"
-    text_panel1 = tnr_font16.render(text, True, DarkText)
-    screen.blit(text_panel1, [972, 88])
+    text_panel1 = arial_font14.render(text, True, DarkText)
+    screen.blit(text_panel1, [972, 90])
 
     # Building cost
-    text_panel1 = arial_font16.render("Building cost:", True, DarkText)
+    text_panel1 = arial_font14.render("Building cost:", True, DarkText)
     screen.blit(text_panel1, [956, 110])
 
     y_shift = 18
@@ -108,13 +95,13 @@ def draw_upgrade_info(screen):
     # Required buildings in settlement
     if len(game_stats.rw_object.required_buildings) > 0:
         new_position = 130 + y_shift * y_points
-        text_panel1 = arial_font16.render("Required buildings in settlement:", True, DarkText)
+        text_panel1 = arial_font14.render("Required buildings in settlement:", True, DarkText)
         screen.blit(text_panel1, [956, new_position])
 
         y_shift = 20
         y_points = 0
         for tag in game_stats.rw_object.required_buildings:
-            text_panel1 = arial_font16.render(tag, True, DarkText)
+            text_panel1 = arial_font14.render(tag, True, DarkText)
             screen.blit(text_panel1, [956, new_position + 20 + y_shift * y_points])
             y_points += 1
 

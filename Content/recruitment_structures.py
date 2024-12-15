@@ -1,4 +1,5 @@
-## Miracle battles
+## Among Myth and Wonder
+## recruitment_structures
 
 class Hire_Unit:
     def __init__(self, unit_name, hiring_capacity, ready_units, replenishment_rate):
@@ -24,13 +25,7 @@ def prepare_recruitment(unit_list):
 
 # Knight lords
 # [unit_name, hiring_capacity, ready_units, replenishment_rate]
-LE_structures_KL = {"Earth rampart" : [],
-                    "Palisade" : [],
-                    "KL artifact market" : [],
-                    "School of magic": [],
-                    "Watermill" : [],
-                    "Cathedral" : [],
-                    "Town council": [["Peasant mob", 2, 1, 1],
+LE_structures_KL = {"Town council": [["Peasant mob", 2, 1, 1],
                                      ["Peasant bowmen", 2, 1, 1]],
                     "Town hall": [["Peasant mob", 3, 1, 1],
                                   ["Peasant bowmen", 3, 1, 1]],

@@ -186,14 +186,14 @@ def turn_end():
 
     # Every player has ended his turn
     if everyone_is_ready:
-        # Replenish movement points
         if len(game_obj.game_armies) > 0:
             for army in game_obj.game_armies:
                 additional_points = 0
-                if army.hero is not None:
+                if army.hero:
                     bonus_mana_increase = 0
                     total_knowledge = int(army.hero.knowledge)
                     # print("army.hero is not None")
+                    # Replenish movement points
                     for skill in army.hero.skills:
                         # print("Skill - " + str(skill.name))
                         for effect in skill.effects:
@@ -201,6 +201,11 @@ def turn_end():
                                 if effect.method == "addition":
                                     # print("Additional movement " + str(effect.quantity))
                                     additional_points += int(effect.quantity)
+
+                    for pack in army.hero.attributes_list:
+                        for attribute in pack.attribute_list:
+                            if attribute.stat == "Movement points":
+                                additional_points += int(attribute.value)
 
                     if len(army.hero.inventory) > 0:
                         for artifact in army.hero.inventory:
@@ -230,7 +235,7 @@ def turn_end():
                 # Movement
                 for unit in army.units:
                     unit.movement_points = int(unit.max_movement_points) + int(additional_points)
-                    # print(unit.name + " has " + str(unit.movement_points) + " movement points")
+                    print(unit.name + " has " + str(unit.movement_points) + " movement points")
 
                 # Update arrow visuals
                 if army.army_id == game_stats.selected_army:
@@ -404,9 +409,11 @@ def turn_end():
 def replenish_buildings():
     for city in game_obj.game_cities:
         for plot in city.buildings:
-            if plot.structure is not None:
-                # print("Replenishing " + str(plot.structure.name))
-                if len(plot.structure.recruitment) > 0:
+            if plot.structure:
+                print(city.name + " " + str(plot.screen_position) +
+                      "; type(plot.structure) " + str(type(plot.structure)))
+                print("Replenishing " + str(plot.structure.name))
+                if plot.structure.recruitment:
                     if plot.status == "Built":
                         # print("Replenishing " + str(plot.structure.name))
                         for lodge in plot.structure.recruitment:

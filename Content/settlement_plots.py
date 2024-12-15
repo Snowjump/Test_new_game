@@ -1,4 +1,5 @@
-## Miracle battles
+## Among Myth and Wonder
+## settlement_plots
 
 ## Dictionaries
 
@@ -7,8 +8,9 @@
 LE_dev_plots_KL = [  # Row 1
     ["Earth rampart", [1, 1], "Empty"],
     # Row 2
-    ["KL artifact market", [1, 3], "Empty"], ["School of magic", [2, 3], "Empty"],
     # Row 3
+    ["KL artifact market", [1, 3], "Empty"], ["School of magic", [2, 3], "Empty"],
+    ["Wheelwright guild", [3, 3], "Empty"],
     # Row 4
     ["Watermill", [1, 4], "Empty"], ["Cathedral", [2, 4], "Empty"],
     # Row 5

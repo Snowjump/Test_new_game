@@ -616,6 +616,11 @@ def population_lower_panel(screen):
     pygame.draw.polygon(screen, MainMenuColor,
                         [[400, 600 + yVar], [880, 600 + yVar], [880, 800 + yVar], [400, 800 + yVar]])
 
+    x = int(game_stats.selected_tile[0])
+    y = int(game_stats.selected_tile[1])
+    TileNum = (y - 1) * game_stats.new_level_width + x - 1
+    tile = game_stats.level_map[TileNum]
+
     obj = game_stats.lot_information
 
     # Facility
@@ -638,6 +643,10 @@ def population_lower_panel(screen):
     # Facility alignment
     text_panel = font20.render(obj.alignment, True, DarkText)
     screen.blit(text_panel, [x, 724 + yVar])
+
+    # City ID
+    text_panel = font20.render("City ID: " + str(tile.city_id), True, DarkText)
+    screen.blit(text_panel, [x, 754 + yVar])
 
     # Population
     x += 150

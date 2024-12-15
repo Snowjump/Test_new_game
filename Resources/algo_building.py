@@ -1,4 +1,5 @@
-## Miracle battles
+## Among Myth and Wonder
+## settlement_structures
 
 from Resources import game_obj
 from Resources import game_stats
@@ -109,12 +110,16 @@ def perform_construction():
                     if next_upgrade is not None:
                         parameters = settlement_structures.structures_groups[city.alignment][next_upgrade]
                         print(str(parameters))
-                        ef_list = ef_structures.ef_structures_cat[city.alignment][plot.structure.name]
-                        print("New recruitment - " + str(recruitment_structures.structures_groups[city.alignment]
-                              [parameters[0]]))
-                        recruitment = recruitment_structures.prepare_recruitment(
-                            recruitment_structures.structures_groups[city.alignment]
-                            [parameters[0]])
+                        ef_list = []
+                        if plot.structure.name in ef_structures.ef_structures_cat:
+                            ef_list = ef_structures.ef_structures_cat[city.alignment][plot.structure.name]
+                        recruitment = None
+                        if parameters[0] in recruitment_structures.structures_groups[city.alignment]:
+                            print("New recruitment - " + str(recruitment_structures.structures_groups[city.alignment]
+                                                             [parameters[0]]))
+                            recruitment = recruitment_structures.prepare_recruitment(
+                                recruitment_structures.structures_groups[city.alignment]
+                                [parameters[0]])
                         defences = None
                         if parameters[8] is not None:
                             defences = str(parameters[8])
@@ -158,7 +163,7 @@ def check_requirements():
 
 def update_control(structure, settlement):
     print("update_control")
-    if len(structure.provided_effects) > 0:
+    if structure.provided_effects:
         for effect in structure.provided_effects:
             print(effect.name)
             if effect.ef_type == "Control":

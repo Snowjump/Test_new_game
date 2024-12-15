@@ -1,4 +1,5 @@
-## Miracle battles
+## Among Myth and Wonder
+## anim_battle_effects
 
 from Resources import game_stats
 import math

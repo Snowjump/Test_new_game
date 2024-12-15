@@ -11,6 +11,7 @@ from Resources import skill_classes
 from Resources import artifact_classes
 from Resources import game_obj
 from Resources import update_gf_game_board
+from Resources import common_selects
 
 from Content import battle_attributes_catalog
 from Content import hero_skill_catalog
@@ -18,6 +19,7 @@ from Content import skill_weights
 from Content import artifact_assortment
 from Content import artifact_catalog
 from Content import skills_curriculum
+from Content import battle_attributes_assortment
 
 
 def hero_skills(position):
@@ -78,7 +80,8 @@ def hero_skills(position):
                             perk_capacity = 0
                             learned_perks = 0
                             for skill2 in game_stats.rw_object.skills:
-                                if skill2.skill_type == "Skill" and skill2.theme == hero_skill_catalog.hero_skill_data[skill][4]:
+                                if skill2.skill_type == "Skill" and skill2.theme == \
+                                        hero_skill_catalog.hero_skill_data[skill][4]:
                                     if skill2.skill_level == "Basic":
                                         perk_capacity = 1
                                     elif skill2.skill_level == "Advanced":
@@ -86,7 +89,8 @@ def hero_skills(position):
                                     else:
                                         perk_capacity = 3
 
-                                elif skill2.skill_type == "Perk" and skill2.theme == hero_skill_catalog.hero_skill_data[skill][4]:
+                                elif skill2.skill_type == "Perk" and skill2.theme == \
+                                        hero_skill_catalog.hero_skill_data[skill][4]:
                                     learned_perks += 1
 
                             if learned_perks < perk_capacity:
@@ -281,7 +285,7 @@ def hero_attributes(position):
         game_stats.rw_object.attribute_points_used += 1
         game_stats.rw_object.new_attribute_points -= 1
         game_stats.selected_new_attribute = None
-        if game_stats.skill_tree_level_index == 5:
+        if game_stats.skill_tree_level_index == 6:
             pass
         else:
             game_stats.skill_tree_level_index += 1
@@ -438,17 +442,8 @@ def artifact_market(position):
                                                                               details[3],
                                                                               details[4])
 
-                the_settlement = None
-                for city in game_obj.game_cities:
-                    if city.city_id == game_stats.selected_settlement:
-                        the_settlement = city
-                        break
-
-                treasury = None
-                for realm in game_obj.game_powers:
-                    if realm.name == the_settlement.owner:
-                        treasury = realm.coffers
-                        break
+                the_settlement = common_selects.select_settlement_by_id(game_stats.selected_settlement)
+                treasury = common_selects.select_treasury_by_realm_name(the_settlement.owner)
 
                 # Check available resources to pay a cost of regiment
                 enough_resources = True
@@ -463,22 +458,20 @@ def artifact_market(position):
                 y = int(game_stats.selected_tile[1])
                 TileNum = (y - 1) * game_stats.cur_level_width + x - 1
 
-                if game_obj.game_map[TileNum].army_id is not None:
-                    for army in game_obj.game_armies:
-                        if army.army_id == game_obj.game_map[TileNum].army_id:
-                            if army.hero is not None:
-                                game_stats.hero_in_settlement = True
-                                if len(army.hero.inventory) < 4:
-                                    game_stats.inventory_is_full = False
-                                else:
-                                    game_stats.inventory_is_full = True
+                if game_obj.game_map[TileNum].army_id:
+                    army = common_selects.select_army_by_id(game_obj.game_map[TileNum].army_id)
+                    if army.hero:
+                        game_stats.hero_in_settlement = True
+                        if len(army.hero.inventory) < 4:
+                            game_stats.inventory_is_full = False
+                        else:
+                            game_stats.inventory_is_full = True
 
-                                game_stats.already_has_an_artifact = False
-                                if len(army.hero.inventory) > 0:
-                                    for artifact in army.hero.inventory:
-                                        if artifact.name == artifact_name:
-                                            game_stats.already_has_an_artifact = True
-                            break
+                        game_stats.already_has_an_artifact = False
+                        if len(army.hero.inventory) > 0:
+                            for artifact in army.hero.inventory:
+                                if artifact.name == artifact_name:
+                                    game_stats.already_has_an_artifact = True
 
                 if enough_resources:
                     game_stats.enough_resources_to_pay = True
@@ -551,17 +544,8 @@ def school_of_magic(position):
                                                                          details[7],
                                                                          None)
 
-                the_settlement = None
-                for city in game_obj.game_cities:
-                    if city.city_id == game_stats.selected_settlement:
-                        the_settlement = city
-                        break
-
-                treasury = None
-                for realm in game_obj.game_powers:
-                    if realm.name == the_settlement.owner:
-                        treasury = realm.coffers
-                        break
+                the_settlement = common_selects.select_settlement_by_id(game_stats.selected_settlement)
+                treasury = common_selects.select_treasury_by_realm_name(the_settlement.owner)
 
                 # Check available resources to pay a cost of regiment
                 enough_resources = True
@@ -576,29 +560,79 @@ def school_of_magic(position):
                 else:
                     game_stats.enough_resources_to_pay = False
 
-                # Index of settlement's tile in map list
-                x = int(game_stats.selected_tile[0])
-                y = int(game_stats.selected_tile[1])
-                TileNum = (y - 1) * game_stats.cur_level_width + x - 1
-
                 # Is hero in settlement
-                if game_obj.game_map[TileNum].army_id is not None:
-                    for army in game_obj.game_armies:
-                        if army.army_id == game_obj.game_map[TileNum].army_id:
-                            if army.hero is not None:
-                                game_stats.hero_in_settlement = True
+                if game_obj.game_map[the_settlement.location].army_id:
+                    army = common_selects.select_army_by_id(game_obj.game_map[the_settlement.location].army_id)
+                    if army.hero:
+                        game_stats.hero_in_settlement = True
 
-                                # Does he already has learnt this skill
-                                not_learned = True
-                                for skill in army.hero.skills:
-                                    for tag in skill.tags:
-                                        if tag == skill_name:
-                                            not_learned = False
+                        # Does he already has learnt this skill
+                        not_learned = True
+                        for skill in army.hero.skills:
+                            for tag in skill.tags:
+                                if tag == skill_name:
+                                    not_learned = False
 
-                                game_stats.hero_doesnt_know_this_skill = not_learned
+                        game_stats.hero_doesnt_know_this_skill = not_learned
 
+
+def attribute_store(position):
+    if 650 < position[0] < 740 and 148 < position[1] < 190:
+        x_axis, y_axis = position[0], position[1]
+        x_axis -= 650
+        y_axis -= 148
+        print(str(x_axis) + ", " + str(y_axis))
+        if (x_axis % 45) <= 42:
+            x_axis = math.ceil(x_axis / 45)
+            print("x_axis - " + str(x_axis))
+
+            structure = game_stats.rw_object.name
+            dic = battle_attributes_assortment.assortment_by_place[structure]
+
+            if x_axis <= len(dic):
+                # print("len(dic) - " + str(len(dic)) + "; x_axis - " + str(x_axis))
+                key = list(dic)[x_axis - 1]
+                attribute = dic[key]
+                print("attribute - " + str(attribute))
+                new_attribute = game_classes.Battle_Attribute(
+                    str(attribute[0]),
+                    str(attribute[1]),
+                    int(attribute[2]))
+
+                game_stats.selected_new_attribute = game_classes.Attribute_Package([new_attribute],
+                                                                                   key)
+
+                the_settlement = common_selects.select_settlement_by_id(game_stats.selected_settlement)
+                treasury = common_selects.select_treasury_by_realm_name(the_settlement.owner)
+
+                # Check available resources to pay the cost of attribute
+                enough_resources = True
+                game_stats.selected_item_price = int(attribute[4])
+                for res in treasury:
+                    if "Florins" == res[0]:
+                        if game_stats.selected_item_price > res[1]:
+                            enough_resources = False
                             break
 
+                if enough_resources:
+                    game_stats.enough_resources_to_pay = True
+                else:
+                    game_stats.enough_resources_to_pay = False
+
+                # Is hero in settlement
+                if game_obj.game_map[the_settlement.location].army_id:
+                    army = common_selects.select_army_by_id(game_obj.game_map[the_settlement.location].army_id)
+                    if army.hero:
+                        game_stats.hero_in_settlement = True
+
+                        # Does he already has obtained this attribute
+                        not_learned = True
+                        for package in army.hero.attributes_list:
+                            if package.package_name == key:
+                                not_learned = False
+                                break
+
+                        game_stats.hero_doesnt_know_this_attribute = not_learned
 
 # special_structures = {"KL artifact market" : "KL artifact market",
 #                       "KL School of magic" : "KL School of magic"}

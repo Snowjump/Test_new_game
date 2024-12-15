@@ -19,6 +19,7 @@ from Resources import update_gf_game_board
 from Resources import update_gf_battle
 from Resources import game_pathfinding
 from Resources import common_selects
+from Resources import game_battle
 
 from Content import ability_catalog
 from Content import ability_desc_cat_hero
@@ -599,12 +600,8 @@ def find_battle_and_unit():
     y2 = int(b.selected_tile[1])
     TileNum = (y2 - 1) * game_stats.battle_width + x2 - 1
 
-    unit = None
-
-    for army in game_obj.game_armies:
-        if army.army_id == b.battle_map[TileNum].army_id:
-            unit = army.units[b.battle_map[TileNum].unit_index]
-            break
+    army = common_selects.select_army_by_id(b.battle_map[TileNum].army_id)
+    unit = army.units[b.battle_map[TileNum].unit_index]
 
     return b, unit
 
@@ -619,37 +616,34 @@ def fill_regiment_information(b, TileNum):
     b.effect_info = None
     b.ability_info = None
 
-    unit = None
     f_color = None
     s_color = None
-    attack = None
     skill = None
     effect = None
 
-    for army in game_obj.game_armies:
-        if army.army_id == b.battle_map[TileNum].army_id:
-            unit = army.units[b.battle_map[TileNum].unit_index]
-            attack = unit.attacks[b.regiment_attack_type_index]
-            if len(unit.skills) > 0:
-                skill = unit.skills[b.regiment_skills_index]
-            if len(unit.effects) > 0:
-                effect = unit.effects[b.regiment_effects_index]
+    army = common_selects.select_army_by_id(b.battle_map[TileNum].army_id)
+    unit = army.units[b.battle_map[TileNum].unit_index]
+    attack = unit.attacks[b.regiment_attack_type_index]
+    if len(unit.skills) > 0:
+        skill = unit.skills[b.regiment_skills_index]
+    if len(unit.effects) > 0:
+        effect = unit.effects[b.regiment_effects_index]
 
-            if army.owner != "Neutral":
-                for realm in game_obj.game_powers:
-                    if realm.name == army.owner:
-                        f_color = realm.f_color
-                        s_color = realm.s_color
-
-            break
+    if army.owner != "Neutral":
+        realm = common_selects.select_realm_by_name(army.owner)
+        f_color = realm.f_color
+        s_color = realm.s_color
 
     total_HP = 0
     for creature in unit.crew:
         total_HP += creature.HP
 
+    final_armour = game_battle.armour_effect(b, None, unit, unit.armour, None, army.hero)
+
     b.unit_info = game_classes.Regiment_Info_Card(unit.name, f_color, s_color, len(unit.crew), total_HP, unit.morale,
                                                   unit.max_HP, unit.experience, unit.speed, unit.leadership,
                                                   unit.engaged, unit.deserted, len(unit.attacks), unit.armour,
+                                                  final_armour,
                                                   unit.defence, unit.reg_tags, unit.magic_power, unit.mana_reserve,
                                                   unit.max_mana_reserve, unit.abilities)
 
@@ -658,11 +652,9 @@ def fill_regiment_information(b, TileNum):
                                                   attack.tags)
 
     if len(unit.skills) > 0:
-        value_text = ""
-        if skill is not None:
+        value_text = str(skill.quality)
+        if skill:
             value_text = str(skill.quantity)
-        else:
-            value_text = str(skill.quality)
         b.skill_info = game_classes.Skill_Info_Card(skill.name, skill.application, value_text, skill.skill_tags)
 
     if len(unit.effects) > 0:

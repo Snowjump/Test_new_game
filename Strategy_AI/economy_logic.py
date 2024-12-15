@@ -484,7 +484,7 @@ def hire_new_regiments(player, economy, rank_sum, rank_ea, the_army, the_settlem
     # rank_ea - expected amount of rank sum for an army
     unit_roster = []
     for plot in the_settlement.buildings:
-        if plot.status == "Built":
+        if plot.status == "Built" and plot.structure.recruitment:
             for hire_unit in plot.structure.recruitment:
                 # print(str(hire_unit.unit_name) + " ready_units - " + str(hire_unit.ready_units))
                 if hire_unit.ready_units > 0:

@@ -61,7 +61,7 @@ def draw_units(screen, settlement):
 
     for plot in settlement.buildings:
         if plot.structure is not None:
-            if len(plot.structure.recruitment) > 0 and plot.status == "Built":
+            if plot.structure.recruitment and plot.status == "Built":
                 for recruit in plot.structure.recruitment:
                     # Background
                     pygame.draw.polygon(screen, FillButton,

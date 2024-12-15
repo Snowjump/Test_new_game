@@ -210,6 +210,7 @@ def add_obstacle_sprites(TileObj, ObjName, ImgPath):
 def add_facility_sprites(TileNum):
     TileObj = game_stats.level_map[TileNum]
     if TileObj.lot.img_path + TileObj.lot.img_name not in game_stats.gf_facility_dict:
+        # print("img_path -" + TileObj.lot.img_path + "; img_name - " + TileObj.lot.img_name)
         obj_img = pygame.image.load('img/' +
                                     TileObj.lot.img_path + TileObj.lot.img_name +
                                     '.png')

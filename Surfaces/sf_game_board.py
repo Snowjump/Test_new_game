@@ -351,15 +351,12 @@ def game_board_surface_m1(position):
                 y_axis = math.ceil(y_axis / 52)
                 print(str(y_axis))
 
-                the_settlement = None
-                for city in game_obj.game_cities:
-                    if city.city_id == game_stats.selected_settlement:
-                        the_settlement = city
+                the_settlement = common_selects.select_settlement_by_id(game_stats.selected_settlement)
 
                 number = 0
                 for plot in the_settlement.buildings:
                     if plot.structure is not None:
-                        if len(plot.structure.recruitment) > 0 and plot.status == "Built":
+                        if plot.structure.recruitment and plot.status == "Built":
                             for unit_card in plot.structure.recruitment:
                                 number += 1
                                 if number == y_axis:
@@ -1004,6 +1001,7 @@ def exit_but():
     game_stats.current_screen = "Entrance Menu"
     print(game_stats.current_screen)
     game_stats.screen_to_draw = "main_menu_screen"
+    game_stats.right_window = ""
     game_stats.edit_instrument = ""
     game_stats.selected_tile = []
     game_stats.level_editor_panel = ""
@@ -1935,7 +1933,8 @@ def settlement_regiment_information():
     print("Morale - " + str(u.morale) + ", Leadership - " + str(u.leadership))
     game_stats.rw_unit_info = game_classes.Regiment_Info_Card(u.name, f_color, s_color, len(u.crew), total_HP, u.morale,
                                                               u.base_HP, u.experience, u.speed, u.base_leadership,
-                                                              u.engaged, u.deserted, len(u.attacks), u.armour, u.defence,
+                                                              u.engaged, u.deserted, len(u.attacks), u.armour, None,
+                                                              u.defence,
                                                               u.reg_tags, u.magic_power, u.mana_reserve,
                                                               u.max_mana_reserve, u.abilities)
 

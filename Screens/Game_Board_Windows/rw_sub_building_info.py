@@ -5,9 +5,8 @@ import pygame.font
 
 from Resources import game_stats
 
-DarkText = [0x11, 0x11, 0x11]
-
-arial_font14 = pygame.font.SysFont('arial', 14)
+from Screens.colors_catalog import *
+from Screens.fonts_catalog import *
 
 
 def building_effects_list(screen, y_points):
@@ -56,7 +55,7 @@ def building_effects_list(screen, y_points):
 
 def recruitment_list(screen, y_points):
     y_shift = 20
-    if len(game_stats.rw_object.recruitment) > 0:
+    if game_stats.rw_object.recruitment:
         for unit in game_stats.rw_object.recruitment:
             # Capacity
             text = "Recruit up to "

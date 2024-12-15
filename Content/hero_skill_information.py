@@ -1,4 +1,5 @@
-## Miracle battles
+## Among Myth and Wonder
+## hero_skill_information
 
 
 skill_desc = {"Basic logistics" : ["Every round army gains",

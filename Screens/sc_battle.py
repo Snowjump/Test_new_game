@@ -109,25 +109,24 @@ def draw_tiles(screen):
                     screen.blit(obj_img, ((x - 1) * 96 + x1, (y - 1) * 96 + y1))
 
             # Highlight selected unit with white border
-            if TileObj.posxy == battle.selected_unit_alt:
-                # print("Success TileObj.posxy - " + str(TileObj.posxy))
-                pygame.draw.polygon(screen, WhiteBorder,
-                                    [[(x - 1) * 96 + 1, (y - 1) * 96 + 1],
-                                     [(x - 1) * 96 + 96, (y - 1) * 96 + 1],
-                                     [(x - 1) * 96 + 96, (y - 1) * 96 + 96],
-                                     [(x - 1) * 96 + 1, (y - 1) * 96 + 96]], 1)
+            # if TileObj.posxy == battle.selected_unit_alt:
+            #     # print("Success TileObj.posxy - " + str(TileObj.posxy))
+            #     pygame.draw.polygon(screen, WhiteBorder,
+            #                         [[(x - 1) * 96 + 1, (y - 1) * 96 + 1],
+            #                          [(x - 1) * 96 + 96, (y - 1) * 96 + 1],
+            #                          [(x - 1) * 96 + 96, (y - 1) * 96 + 96],
+            #                          [(x - 1) * 96 + 1, (y - 1) * 96 + 96]], 1)
 
             # Highlight active unit with green border for human player
             if battle.realm_in_control == game_stats.player_power:
                 if battle.queue[0].obj_type == "Regiment" and battle.ready_to_act:
                     if TileObj.posxy == tuple(battle.queue[0].position):
                         # print("Success TileObj.posxy - " + str(TileObj.posxy))
-                        global LimeBorder
-                        LimeBorder = anim_battle_effects.border_blipping(LimeBorder)
+                        highlight_border = anim_battle_effects.border_blipping(LimeBorder)
 
                         points = [(1, 1), (96, 1), (96, 96), (1, 96)]
                         points2 = [(x - 1) * 96, (y - 1) * 96]
-                        draw_lines_alpha(screen, LimeBorder, True, points, points2)
+                        draw_lines_alpha(screen, highlight_border, True, points, points2)
 
             # Highlight with light green color movement grid
             if battle.realm_in_control == game_stats.player_power:
@@ -1128,10 +1127,7 @@ def draw_queue(screen, b):
                 x_pos = 380 + (number - b.queue_index) * 52
                 y_pos = 744 + yVar
 
-                for army in game_obj.game_armies:
-                    if army.army_id == card.army_id:
-                        a = army
-                        break
+                a = common_selects.select_army_by_id(card.army_id)
 
                 side = "_l"
                 if a.army_id == b.attacker_id:

@@ -401,7 +401,6 @@ def execute_order(b):
                 b.primary = "Damage message"
                 b.anim_message = "Damage and kills"
             elif b.secondary == "Route":
-
                 battle_skills.passive_charge_track(unit)
                 battle_ending(b)
 
@@ -840,6 +839,7 @@ def form_list_of_attackers(b, unit):
 
 
 def complete_melee_attack(b, unit, primary_target, angle, acting_hero, enemy_hero):
+    print("complete_melee_attack(): " + unit.name + " hitting " + primary_target.name)
     # Total HP among all creatures in targeted regiment
     # Needed to calculate morale hit
     before_HP = 0
@@ -1137,6 +1137,7 @@ def melee_hit(b, at_creature, unit, primary_target, target, acting_hero, enemy_h
 
 
 def kill_unit(b, primary_target):
+    print("kill_unit()")
     x = int(primary_target.position[0])
     y = int(primary_target.position[1])
     TileNum = (y - 1) * game_stats.battle_width + x - 1
@@ -1159,8 +1160,12 @@ def kill_unit(b, primary_target):
     # Disengaging surrounding units
     disengage(b, b.battle_map[TileNum].posxy)
 
+    # # Check if battle supposed to end
+    # battle_ending(b)
+
 
 def complete_ranged_attack(b, unit, primary_target, acting_hero, enemy_hero):
+    print("complete_ranged_attack(): " + unit.name + " hitting " + primary_target.name)
     # print("First time - " + str(unit))
     # print(unit.name)
     # Total HP among all creatures in targeted regiment
@@ -1663,6 +1668,14 @@ def armour_effect(b, unit, primary_target, base_armour, acting_hero, enemy_hero)
 
     # Hero skills and battle attributes
     if enemy_hero is not None:
+        # Attributes
+        if len(enemy_hero.attributes_list) > 0:
+            for pack in enemy_hero.attributes_list:
+                for a in pack.attribute_list:
+                    if a.stat == "armour":
+                        if a.tag in primary_target.reg_tags:
+                            addition_bonus_list.append(a.value)
+
         # Artifacts
         if len(enemy_hero.inventory) > 0:
             for artifact in enemy_hero.inventory:
@@ -1679,7 +1692,7 @@ def armour_effect(b, unit, primary_target, base_armour, acting_hero, enemy_hero)
                             if effect.method == "addition":
                                 addition_bonus_list.append(effect.quantity)
 
-    if acting_hero is not None:
+    if acting_hero:
         # Skills
         for s in acting_hero.skills:
             for effect in s.effects:
@@ -1712,7 +1725,7 @@ def armour_effect(b, unit, primary_target, base_armour, acting_hero, enemy_hero)
         print("Armour below zero - " + str(final_armour))
         final_armour = 0
 
-    print("Base armour - " + str(base_armour) + ", final armour - " + str(final_armour))
+    # print("Base armour - " + str(base_armour) + ", final armour - " + str(final_armour))
     return final_armour
 
 
@@ -1736,7 +1749,7 @@ def defence_effect(primary_target, base_defence, enemy_hero):
 
     # Hero skills and battle attributes
     if enemy_hero is not None:
-        print("Defence bonus provided by " + str(enemy_hero.name))
+        # print("Defence bonus provided by " + str(enemy_hero.name))
         # Skills
         for s in enemy_hero.skills:
             for effect in s.effects:
@@ -1797,8 +1810,8 @@ def defence_effect(primary_target, base_defence, enemy_hero):
     else:
         final_defence = int(final_defence)
 
-    print("base_defence - " + str(base_defence) + " => "
-          + "final_defence - " + str(final_defence))
+    # print("base_defence - " + str(base_defence) + " => "
+    #       + "final_defence - " + str(final_defence))
     return final_defence
 
 
@@ -1817,7 +1830,7 @@ def ranged_defence_effect(primary_target, enemy_hero):
         for addition in addition_bonus_list:
             final_defence += int(addition)
 
-    print("final_defence against ranged attack - " + str(final_defence))
+    # print("final_defence against ranged attack - " + str(final_defence))
     return final_defence
 
 
@@ -1865,7 +1878,7 @@ def melee_assault_effect(b, base_attack_mastery, acting_hero, unit, primary_targ
     TileNum = (primary_target.position[1] - 1) * game_stats.battle_width + primary_target.position[0] - 1
     if b.battle_map[TileNum].map_object is not None:
         if b.battle_map[TileNum].map_object.obj_type == "Structure":
-            print(b.battle_map[TileNum].map_object.obj_name)
+            # print(b.battle_map[TileNum].map_object.obj_name)
             for effect in b.battle_map[TileNum].map_object.properties.effects:
                 if effect.application == "Incoming attack":
                     if check_direction(unit, primary_target, effect.directions):
@@ -1933,8 +1946,8 @@ def melee_assault_effect(b, base_attack_mastery, acting_hero, unit, primary_targ
     else:
         final_attack_mastery = int(final_attack_mastery)
 
-    print("melee assault: base_attack_mastery - " + str(base_attack_mastery) + " => "
-          + "final_attack_mastery - " + str(final_attack_mastery))
+    # print("melee assault: base_attack_mastery - " + str(base_attack_mastery) + " => "
+    #       + "final_attack_mastery - " + str(final_attack_mastery))
     return final_attack_mastery
 
 
@@ -1972,7 +1985,7 @@ def shooting_effect(base_attack_mastery, acting_hero, unit, primary_target, b):
                             addition_bonus_list.append(a.value)
 
     division_bonus_list = cover_aura(unit, primary_target, division_bonus_list, b)
-    print("cover: division_bonus_list - " + str(division_bonus_list))
+    # print("cover: division_bonus_list - " + str(division_bonus_list))
     # Obsolete skill check
     # division_bonus_list = battle_skills.big_shields_bonus(primary_target, division_bonus_list)
 
@@ -1990,7 +2003,7 @@ def shooting_effect(base_attack_mastery, acting_hero, unit, primary_target, b):
         for multiplication in multiplication_bonus_list:
             final_attack_mastery *= float(multiplication)
 
-    print("final: division_bonus_list - " + str(division_bonus_list))
+    # print("final: division_bonus_list - " + str(division_bonus_list))
     if len(division_bonus_list) > 0:
         for division in division_bonus_list:
             final_attack_mastery /= float(division)
@@ -2002,8 +2015,8 @@ def shooting_effect(base_attack_mastery, acting_hero, unit, primary_target, b):
     else:
         final_attack_mastery = int(final_attack_mastery)
 
-    print("shooting: base_attack_mastery - " + str(base_attack_mastery) + " => "
-          + "final_attack_mastery - " + str(final_attack_mastery))
+    # print("shooting: base_attack_mastery - " + str(base_attack_mastery) + " => "
+    #       + "final_attack_mastery - " + str(final_attack_mastery))
     return final_attack_mastery
 
 
@@ -2031,8 +2044,8 @@ def accuracy_effect(b, base_accuracy, acting_hero, unit):
         for addition in addition_bonus_list:
             final_accuracy += int(addition)
 
-    print("shooting at far range: base_accuracy - " + str(base_accuracy) + " => "
-          + "final_accuracy - " + str(final_accuracy))
+    # print("shooting at far range: base_accuracy - " + str(base_accuracy) + " => "
+    #       + "final_accuracy - " + str(final_accuracy))
     return final_accuracy
 
 
@@ -2514,14 +2527,12 @@ def calculate_speed(unit, acting_hero):
 
 
 def check_if_no_one_left_alive(b):
-    # print("check_if_no_one_left_alive(b)")
+    print("check_if_no_one_left_alive()")
     alive = False
-    for army in game_obj.game_armies:
-        if army.army_id == b.enemy_army_id:
-            for unit in army.units:
-                if len(unit.crew) > 0:
-                    alive = True
-                    break
+    army = common_selects.select_army_by_id(b.enemy_army_id)
+    for unit in army.units:
+        if len(unit.crew) > 0:
+            alive = True
             break
 
     if not alive:

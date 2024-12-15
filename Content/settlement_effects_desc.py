@@ -1,4 +1,5 @@
 ## Among Myth and Wonder
+## settlement_effects_desc
 
 desc_catalog = {"Base Knight Lords control" : ["Province populated by",
                                                "Knight Lords realm",

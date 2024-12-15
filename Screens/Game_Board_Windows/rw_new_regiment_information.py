@@ -54,7 +54,7 @@ def new_regiment_info(screen):
     screen.blit(text_panel, [646, 217])
 
     # Armor
-    text_panel = arial_font16.render("Armor - " + str(u.armor), True, TitleText)
+    text_panel = arial_font16.render("Armour - " + str(u.armour), True, TitleText)
     screen.blit(text_panel, [646, 237])
 
     # Defence

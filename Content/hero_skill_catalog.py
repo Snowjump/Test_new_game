@@ -1,4 +1,5 @@
-## Miracle battles
+## Among Myth and Wonder
+## hero_skill_catalog
 
 from Resources import skill_classes
 

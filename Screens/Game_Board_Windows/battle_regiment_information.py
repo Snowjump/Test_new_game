@@ -93,8 +93,10 @@ def regiment_information_draw(screen, b):
     text_panel = arial_font16.render("Speed - " + str(b.unit_info.speed), True, TitleText)
     screen.blit(text_panel, [646, 245])
 
-    # Armor
-    text_panel = arial_font16.render("Armor - " + str(b.unit_info.armor), True, TitleText)
+    # Armour
+    text = "Armour - " + str(b.unit_info.final_armour) + "   (" + str(b.unit_info.armour) + " + "\
+           + str(b.unit_info.final_armour - b.unit_info.armour) + ")"
+    text_panel = arial_font16.render(text, True, TitleText)
     screen.blit(text_panel, [646, 265])
 
     # Defence

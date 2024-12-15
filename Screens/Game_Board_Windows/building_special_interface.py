@@ -1,4 +1,5 @@
 ## Among Myth and Wonder
+## building_special_interface
 
 import pygame.draw
 import pygame.font
@@ -11,25 +12,10 @@ from Content import artifact_information
 from Content import skills_curriculum
 from Content import hero_skill_catalog
 from Content import hero_skill_information
+from Content import battle_attributes_assortment
 
-WhiteColor = [255, 255, 255]
-
-MainMenuColor = [0x9F, 0x97, 0x97]
-LineMainMenuColor1 = [0x60, 0x60, 0x60]
-FillButton = [0xD8, 0xBD, 0xA2]
-
-HighlightOption = [0x00, 0xCC, 0xCC]
-
-DarkText = [0x11, 0x11, 0x11]
-ApproveFieldColor = [0x00, 0x99, 0x00]
-BasicColor = [0x7C, 0xFC, 0x00]
-
-tnr_font16 = pygame.font.SysFont('timesnewroman', 16)
-tnr_font14 = pygame.font.SysFont('timesnewroman', 14)
-
-arial_font16 = pygame.font.SysFont('arial', 16)
-arial_font14 = pygame.font.SysFont('arial', 14)
-arial_font12 = pygame.font.SysFont('arial', 12)
+from Screens.colors_catalog import *
+from Screens.fonts_catalog import *
 
 
 def draw_kl_artifact_market(screen):
@@ -38,6 +24,10 @@ def draw_kl_artifact_market(screen):
 
 def draw_kl_school_of_magic(screen):
     details_school_of_magic(screen, "KL School of magic")
+
+
+def draw_wheelwright_guild(screen):
+    details_wheelwright_guild(screen, "Wheelwright guild")
 
 
 # Common details
@@ -54,7 +44,7 @@ def details_artifact_market(screen, building):
 
         # Border
         border_color = DarkText
-        if game_stats.selected_artifact_info is not None:
+        if game_stats.selected_artifact_info:
             if artifact == game_stats.selected_artifact_info.name \
                     and game_stats.artifact_focus is None:
                 border_color = ApproveFieldColor
@@ -210,14 +200,14 @@ def details_school_of_magic(screen, building):
         img = game_stats.gf_misc_img_dict["Icons/paper_square_40"]
         screen.blit(img, [651 + x, 149])
 
-        # Artifact image
+        # Skill image
         skill_img = hero_skill_catalog.hero_skill_data[skill][0]
         img = game_stats.gf_skills_dict[skill_img]
         screen.blit(img, [651 + x, 149])
 
         x_points += 1
 
-    if game_stats.selected_new_skill is not None:
+    if game_stats.selected_new_skill:
         text_panel1 = arial_font16.render(game_stats.selected_new_skill.name, True, DarkText)
         screen.blit(text_panel1, [930, 85])
 
@@ -254,5 +244,83 @@ def details_school_of_magic(screen, building):
     screen.blit(text_panel1, [660, 220])
 
 
+def details_wheelwright_guild(screen, building):
+    text_panel1 = tnr_font16.render("Attributes", True, DarkText)
+    screen.blit(text_panel1, [650, 128])
+
+    assortment = battle_attributes_assortment.assortment_by_place[building]
+
+    x_shift = 45
+    x_points = 0
+    for attribute_name in assortment:
+        attribute = assortment[attribute_name]
+        x = x_shift * x_points
+
+        # Border
+        border_color = BasicColor
+        if game_stats.selected_new_attribute:
+            if attribute_name == game_stats.selected_new_attribute.package_name:
+                border_color = ApproveFieldColor
+        pygame.draw.polygon(screen, border_color, [[650 + x, 148],
+                                                   [691 + x, 148],
+                                                   [691 + x, 189],
+                                                   [650 + x, 189]], 1)
+
+        # Background
+        img = game_stats.gf_misc_img_dict["Icons/paper_square_40"]
+        screen.blit(img, [651 + x, 149])
+
+        # Attribute image
+        attribute_img = attribute[3]
+        img = game_stats.gf_skills_dict[attribute_img]
+        screen.blit(img, [651 + x, 149])
+
+        x_points += 1
+
+    if game_stats.selected_new_attribute:
+        pack = game_stats.selected_new_attribute
+        text_panel1 = arial_font16.render(str(pack.package_name), True, DarkText)
+        screen.blit(text_panel1, [930, 85])
+
+        y_shift = 20
+        y_points = 0
+        for attribute in pack.attribute_list:
+            text_panel1 = arial_font14.render(attribute.tag, True, DarkText)
+            screen.blit(text_panel1, [930, 106 + y_shift * y_points])
+            y_points += 1
+            text_panel1 = arial_font14.render(attribute.stat, True, DarkText)
+            screen.blit(text_panel1, [930, 106 + y_shift * y_points])
+            y_points += 1
+            text_panel1 = arial_font14.render("+" + str(attribute.value), True, DarkText)
+            screen.blit(text_panel1, [930, 106 + y_shift * y_points])
+            y_points += 1
+
+    if game_stats.selected_item_price:
+        # Price
+        text_panel1 = tnr_font16.render("Price", True, DarkText)
+        screen.blit(text_panel1, [651, 194])
+
+        # Florins icon
+        icon_img = game_stats.gf_misc_img_dict["resource_florins"]
+        screen.blit(icon_img, (691, 196))
+
+        # Value
+        text_panel1 = tnr_font16.render(str(game_stats.selected_item_price), True, DarkText)
+        screen.blit(text_panel1, [710, 194])
+
+    # Button - buy attribute for hero
+    pygame.draw.polygon(screen, FillButton,
+                        [[651, 217], [788, 217], [788, 237], [651, 237]])
+    color1 = LineMainMenuColor1
+    if game_stats.enough_resources_to_pay and game_stats.hero_in_settlement \
+            and game_stats.selected_new_attribute is not None and game_stats.hero_doesnt_know_this_attribute:
+        color1 = HighlightOption
+    pygame.draw.polygon(screen, color1, [[651, 217], [788, 217], [788, 237], [651, 237]], 2)
+
+    text_panel1 = arial_font14.render("Obtain new attribute", True, DarkText)
+    screen.blit(text_panel1, [656, 220])
+
+
 structure_cat = {"KL artifact market": draw_kl_artifact_market,
-                 "KL School of magic": draw_kl_school_of_magic}
+                 "KL School of magic": draw_kl_school_of_magic,
+                 "Wheelwright guild" : draw_wheelwright_guild}
