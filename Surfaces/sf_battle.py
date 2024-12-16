@@ -639,12 +639,13 @@ def fill_regiment_information(b, TileNum):
         total_HP += creature.HP
 
     final_armour = game_battle.armour_effect(b, None, unit, unit.armour, None, army.hero)
+    final_defence = game_battle.defence_effect(unit, unit.defence, army.hero)
 
     b.unit_info = game_classes.Regiment_Info_Card(unit.name, f_color, s_color, len(unit.crew), total_HP, unit.morale,
                                                   unit.max_HP, unit.experience, unit.speed, unit.leadership,
                                                   unit.engaged, unit.deserted, len(unit.attacks), unit.armour,
-                                                  final_armour,
-                                                  unit.defence, unit.reg_tags, unit.magic_power, unit.mana_reserve,
+                                                  final_armour, unit.defence, final_defence, unit.reg_tags,
+                                                  unit.magic_power, unit.mana_reserve,
                                                   unit.max_mana_reserve, unit.abilities)
 
     b.attack_info = game_classes.Attack_Info_Card(attack.name, attack.attack_type, attack.min_dmg, attack.max_dmg,

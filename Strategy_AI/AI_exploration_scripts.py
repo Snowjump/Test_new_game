@@ -9,6 +9,7 @@ from Resources import game_basic
 from Resources import game_classes
 from Resources import game_autobattle
 from Resources import common_selects
+from Resources import common_transactions
 
 from Content import exploration_scripts
 
@@ -85,21 +86,15 @@ def anglers_cabin_event(obj, army):
 
         if buy_artifact:
             realm = common_selects.select_realm_by_name(army.owner)
-            for res in realm.coffers:
-                if res[0] == "Florins":
-                    # print("Florins - " + str(res[1]) + "; " + str(artifact_name) + " - " +
-                    #       str(artifact_catalog.artifact_data[artifact_name][2]))
-                    if res[1] <= 3000:
-                        res[1] -= 3000
+            price = [["Florins", 3000]]
+            if common_transactions.sufficient_funds(price, realm):
+                common_transactions.payment(price, realm)
 
-                        exploration_scripts.spread_reward(army, realm, obj.properties.storage)
+                exploration_scripts.spread_reward(army, realm, obj.properties.storage)
 
-                        obj.properties.storage = []
-                        obj.properties.need_replenishment = True
-                        obj.properties.time_left_before_replenishment = int(
-                            obj.properties.waiting_time_for_replenishment)
-
-                        break
+                obj.properties.storage = []
+                obj.properties.need_replenishment = True
+                obj.properties.time_left_before_replenishment = int(obj.properties.waiting_time_for_replenishment)
 
 
 def champions_tent_event(obj, army):
@@ -138,7 +133,7 @@ def leshys_hut_event(obj, army):
         # Lose money
         price = [["Florins", 1500]]
         realm = common_selects.select_realm_by_name(army.owner)
-        exploration_scripts.payment(price, realm)
+        common_transactions.payment(price, realm)
     elif result == 1:
         # Lose regiments
         units_to_destroy = math.ceil(len(army.units)/8)

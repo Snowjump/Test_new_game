@@ -100,7 +100,9 @@ def regiment_information_draw(screen, b):
     screen.blit(text_panel, [646, 265])
 
     # Defence
-    text_panel = arial_font16.render("Defence - " + str(b.unit_info.defence), True, TitleText)
+    text = "Defence - " + str(b.unit_info.final_defence) + "   (" + str(b.unit_info.defence) + " + " \
+           + str(b.unit_info.final_defence - b.unit_info.defence) + ")"
+    text_panel = arial_font16.render(text, True, TitleText)
     screen.blit(text_panel, [646, 285])
 
     # Magic power

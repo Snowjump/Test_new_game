@@ -1,6 +1,5 @@
 ## Among Myth and Wonder
 ## exploration_scripts
-## game_basic
 
 import pygame
 import random
@@ -12,6 +11,7 @@ from Resources import artifact_classes
 from Resources import game_obj
 from Resources import game_basic
 from Resources import common_selects
+from Resources import common_transactions
 from Resources import graphics_basic
 
 from Content import artifact_imgs_cat
@@ -104,8 +104,8 @@ def anglers_cabin_obtain_artifact():
     #             break
     price = [["Florins", 3000]]
 
-    if check_funds(price, the_realm.coffers):
-        payment(price, the_realm)
+    if common_transactions.sufficient_funds(price, the_realm):
+        common_transactions.payment(price, the_realm)
         spread_reward(the_army, the_realm, lot.properties.storage)
 
         lot.properties.storage = []
@@ -179,7 +179,7 @@ def leshys_hut_close():
     elif lot.properties.storage[0] == 2:
         # Lose money
         price = [["Florins", 1500]]
-        payment(price, the_realm)
+        common_transactions.payment(price, the_realm)
     elif lot.properties.storage[0] == 1:
         # Lose regiments
         units_to_destroy = math.ceil(len(the_army.units)/8)
@@ -494,44 +494,6 @@ def spread_reward(army, realm, script_rewards):
                                                                            details[2],
                                                                            details[3],
                                                                            details[4]))
-
-
-def check_funds(resources, coffers):
-    enough_to_pay = False
-
-    all_resources_present = True
-    for price in resources:
-        for res in coffers:
-            if res[0] == price[0]:
-                if res[1] < price[1]:
-                    all_resources_present = False
-                    break
-
-    if all_resources_present:
-        enough_to_pay = True
-
-        # # Pay the price
-        #
-        # for price in resources:
-        #     for res in coffers:
-        #         if res[0] == price[0]:
-        #             res[1] -= price[1]
-
-    return enough_to_pay
-
-
-def payment(resources, realm):
-    for price in resources:
-        print("payment() - " + str(price))
-        for res in realm.coffers:
-            if res[0] == price[0]:
-                if res[1] - price[1] > 0:
-                    res[1] -= price[1]
-                else:
-                    res[1] = 0
-
-    if realm.name == game_stats.player_power:
-        graphics_basic.prepare_resource_ribbon()
 
 
 def update_max_mana_reserve(hero):

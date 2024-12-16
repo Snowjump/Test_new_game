@@ -400,8 +400,8 @@ class Queue_Card:  # class for tracking position of regiment in time queue
 
 class Regiment_Info_Card:  # Contain information about regiment that was clicked on with right mouse button
     def __init__(self, regiment_name, first_color, second_color, amount, total_HP, morale, health, experience, speed,
-                 leadership, engaged, deserted, attacks_amount, armour, final_armour, defence, reg_tags, magic_power,
-                 mana_reserve, max_mana_reserve, abilities):
+                 leadership, engaged, deserted, attacks_amount, armour, final_armour, defence, final_defence, reg_tags,
+                 magic_power, mana_reserve, max_mana_reserve, abilities):
         self.regiment_name = regiment_name
         self.first_color = first_color
         self.second_color = second_color
@@ -418,6 +418,7 @@ class Regiment_Info_Card:  # Contain information about regiment that was clicked
         self.armour = armour
         self.final_armour = final_armour  # After applying effects
         self.defence = defence
+        self.final_defence = final_defence  # After applying effects
         self.reg_tags = reg_tags  # List of regiment's tags
         self.magic_power = magic_power
         self.mana_reserve = mana_reserve

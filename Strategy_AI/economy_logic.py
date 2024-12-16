@@ -12,6 +12,7 @@ from Resources import artifact_classes
 from Resources import algo_building
 from Resources import skill_classes
 from Resources import update_gf_game_board
+from Resources import common_selects
 
 from Content import production_methods
 from Content import unit_alignment_catalog
@@ -739,20 +740,11 @@ def hire_a_hero(player, economy, the_army, settlement):
 def buy_artifacts_settlements(player, economy, LUOS):
     # print(player.name + ": buy_artifacts_settlements")
     for TileNum in LUOS:
-        if game_obj.game_map[TileNum].army_id is not None:
-            the_settlement = None
-            for settlement in game_obj.game_cities:
-                if settlement.city_id == game_obj.game_map[TileNum].city_id:
-                    the_settlement = settlement
-                    break
+        if game_obj.game_map[TileNum].army_id:
+            the_settlement = common_selects.select_settlement_by_id(game_obj.game_map[TileNum].city_id)
+            the_army = common_selects.select_army_by_id(game_obj.game_map[TileNum].army_id)
 
-            the_army = None
-            for army in game_obj.game_armies:
-                if army.army_id == game_obj.game_map[TileNum].army_id:
-                    the_army = army
-                    break
-
-            if the_army.hero is not None:
+            if the_army.hero:
                 the_hero = the_army.hero
                 print(the_hero.name + ": buy_artifacts_settlements")
 
@@ -826,20 +818,11 @@ def buy_artifacts_settlements(player, economy, LUOS):
 
 def learn_skills_settlements(player, economy, LUOS):
     for TileNum in LUOS:
-        if game_obj.game_map[TileNum].army_id is not None:
-            the_settlement = None
-            for settlement in game_obj.game_cities:
-                if settlement.city_id == game_obj.game_map[TileNum].city_id:
-                    the_settlement = settlement
-                    break
+        if game_obj.game_map[TileNum].army_id:
+            the_settlement = common_selects.select_settlement_by_id(game_obj.game_map[TileNum].city_id)
+            the_army = common_selects.select_army_by_id(game_obj.game_map[TileNum].army_id)
 
-            the_army = None
-            for army in game_obj.game_armies:
-                if army.army_id == game_obj.game_map[TileNum].army_id:
-                    the_army = army
-                    break
-
-            if the_army.hero is not None:
+            if the_army.hero:
                 the_hero = the_army.hero
                 print(the_hero.name + ": learn_skills_settlements")
 

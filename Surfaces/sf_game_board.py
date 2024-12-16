@@ -1934,7 +1934,7 @@ def settlement_regiment_information():
     game_stats.rw_unit_info = game_classes.Regiment_Info_Card(u.name, f_color, s_color, len(u.crew), total_HP, u.morale,
                                                               u.base_HP, u.experience, u.speed, u.base_leadership,
                                                               u.engaged, u.deserted, len(u.attacks), u.armour, None,
-                                                              u.defence,
+                                                              u.defence, None,
                                                               u.reg_tags, u.magic_power, u.mana_reserve,
                                                               u.max_mana_reserve, u.abilities)
 
