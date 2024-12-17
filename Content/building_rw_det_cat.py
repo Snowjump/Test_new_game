@@ -9,6 +9,7 @@ from Resources import artifact_classes
 from Resources import update_gf_game_board
 from Resources import common_selects
 from Resources import graphics_basic
+from Resources import common_transactions
 
 from Content import rw_click_scripts
 from Content import artifact_catalog
@@ -155,15 +156,13 @@ def learn_skill_from_school():
             and game_stats.selected_new_skill is not None and game_stats.hero_doesnt_know_this_skill:
 
         the_settlement = common_selects.select_settlement_by_id(game_stats.selected_settlement)
-        treasury = common_selects.select_treasury_by_realm_name(the_settlement.owner)
+        realm = common_selects.select_realm_by_name(the_settlement.owner)
         army = common_selects.select_army_by_id(game_obj.game_map[the_settlement.location].army_id)
         hero = army.hero
 
         # Spent money
-        for res in treasury:
-            if "Florins" == res[0]:
-                res[1] -= int(2000)
-                break
+        resources = [["Florins", int(2000)]]
+        common_transactions.payment(resources, realm)
 
         # New learned skill
         new_skill = hero_skill_catalog.hero_skill_data[game_stats.selected_new_skill.name]
@@ -210,15 +209,13 @@ def learn_attribute_from_building():
             and game_stats.selected_new_attribute is not None and game_stats.hero_doesnt_know_this_attribute:
 
         the_settlement = common_selects.select_settlement_by_id(game_stats.selected_settlement)
-        treasury = common_selects.select_treasury_by_realm_name(the_settlement.owner)
+        realm = common_selects.select_realm_by_name(the_settlement.owner)
         army = common_selects.select_army_by_id(game_obj.game_map[the_settlement.location].army_id)
         hero = army.hero
 
         # Spent money
-        for res in treasury:
-            if "Florins" == res[0]:
-                res[1] -= int(game_stats.selected_item_price)
-                break
+        resources = [["Florins", int(game_stats.selected_item_price)]]
+        common_transactions.payment(resources, realm)
 
         pack = game_stats.selected_new_attribute
         # Increase knowledge and magic power of hero if needed

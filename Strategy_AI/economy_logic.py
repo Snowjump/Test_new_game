@@ -13,6 +13,7 @@ from Resources import algo_building
 from Resources import skill_classes
 from Resources import update_gf_game_board
 from Resources import common_selects
+from Resources import common_transactions
 
 from Content import production_methods
 from Content import unit_alignment_catalog
@@ -24,6 +25,7 @@ from Content import hero_names
 from Content import artifact_assortment
 from Content import artifact_catalog
 from Content import skills_curriculum
+from Content import battle_attributes_assortment
 
 from Storage import create_unit
 
@@ -43,7 +45,7 @@ def manage_economy(player):
         economy.ingredients_income = 0
         economy.armament_income = 0
         economy.tools_income = 0
-        #~~~#
+        # ~~~#
         economy.florins_expenses = 0
         economy.food_expenses = 0
         economy.wood_expenses = 0
@@ -226,6 +228,9 @@ def build_new_army(player, small_armies_ea, medium_armies_ea, LUOS):
     # Learn skills
     learn_skills_settlements(player, economy, LUOS)
 
+    # Obtain hero attributes
+    obtain_attributes_settlement(player, economy, LUOS)
+
 
 def create_medium_armies(player, economy, medium_armies_ea, settlements_with_dedicated_medium_armies):
     if medium_armies_ea > 0:
@@ -280,10 +285,12 @@ def create_medium_armies(player, economy, medium_armies_ea, settlements_with_ded
                                                 if economy.food_expenses + expense[1] > economy.food_income * 0.8:
                                                     affordable = False
                                             elif expense[0] == "Armament":
-                                                if economy.armament_expenses + expense[1] > economy.armament_income * 0.8:
+                                                if economy.armament_expenses + expense[
+                                                    1] > economy.armament_income * 0.8:
                                                     affordable = False
                                             elif expense[0] == "Ingredients":
-                                                if economy.ingredients_expenses + expense[1] > economy.ingredients_income * 0.8:
+                                                if economy.ingredients_expenses + expense[
+                                                    1] > economy.ingredients_income * 0.8:
                                                     affordable = False
                                             elif expense[0] == "Wood":
                                                 if economy.wood_expenses + expense[1] > economy.wood_income * 0.8:
@@ -387,9 +394,10 @@ def create_medium_armies(player, economy, medium_armies_ea, settlements_with_ded
                                 if army.army_id == game_obj.game_map[the_settlement.location].army_id:
                                     the_army = army
 
-                                    player.AI_cogs.army_roles.append(strategy_AI_classes.army_roles(int(the_army.army_id),
-                                                                                                    "Idle",
-                                                                                                    2))  # Medium size
+                                    player.AI_cogs.army_roles.append(
+                                        strategy_AI_classes.army_roles(int(the_army.army_id),
+                                                                       "Idle",
+                                                                       2))  # Medium size
 
                                     for army_role in player.AI_cogs.army_roles:
                                         if army_role.army_id == the_army.army_id:
@@ -661,13 +669,13 @@ def hire_a_hero(player, economy, the_army, settlement):
         # second_list = list(range(len(starting_skills.starting_skills_by_class[hero_class])))
         # print("second_list - " + str(second_list))
         # if first_starting_skill is not None:
-            # first_starting_skill = random.randint(0, len(starting_skills.starting_skills_by_class[hero_class]) - 1)
-            # second_list.remove(first_starting_skill)
-            # print("first_starting_skill - " + str(first_starting_skill))
+        # first_starting_skill = random.randint(0, len(starting_skills.starting_skills_by_class[hero_class]) - 1)
+        # second_list.remove(first_starting_skill)
+        # print("first_starting_skill - " + str(first_starting_skill))
         # second_starting_skill = random.choice(second_list)
         # print("second_starting_skill - " + str(second_starting_skill))
         # if not starting_skills.locked_first_skill_check[hero_class]:
-            # first_skill_name = starting_skills.starting_skills_by_class[hero_class][first_starting_skill]
+        # first_skill_name = starting_skills.starting_skills_by_class[hero_class][first_starting_skill]
         # else:
         #     first_skill_name = starting_skills.locked_first_skill_by_class[hero_class]
         print("first_skill_name - " + first_skill_name)
@@ -716,7 +724,6 @@ def hire_a_hero(player, economy, the_army, settlement):
         game_basic.learn_new_abilities(first_skill_name, the_army.hero)
         game_basic.learn_new_abilities(second_skill_name, the_army.hero)
         the_army.hero.archetype = str(hero_archetype)
-
 
         new_experience, bonus_level = game_basic.increase_level_for_new_heroes(settlement)
         game_basic.hero_next_level(the_army.hero, new_experience)
@@ -832,20 +839,14 @@ def learn_skills_settlements(player, economy, LUOS):
                     learn_skill = True
 
                 skills_list = []
+                resources = [["Florins", 2000]]
                 if learn_skill:
                     for plot in the_settlement.buildings:
                         if plot.status == "Built":
                             if plot.structure.name in ["KL School of magic"]:
 
                                 for new_skill in skills_curriculum.curriculum_by_school[plot.structure.name]:
-                                    enough_florins = False
-                                    for res in player.coffers:
-                                        if res[0] == "Florins":
-                                            print("Florins - " + str(res[1]) + "; " + str(new_skill) + " - " +
-                                                  str(2000))
-                                            if 2000 <= res[1]:
-                                                enough_florins = True
-                                                break
+                                    enough_florins = common_transactions.sufficient_funds(resources, player.coffers)
 
                                     if enough_florins:
                                         add_skill = True
@@ -857,50 +858,111 @@ def learn_skills_settlements(player, economy, LUOS):
                                         if add_skill:
                                             skills_list.append(str(new_skill))
 
-                if skills_list:
-                    # print("Skills: " + str(skills_list))
-                    new_skill = random.choice(skills_list)
-                    # print("New skill - " + str(new_skill))
+                    if skills_list:
+                        # print("Skills: " + str(skills_list))
+                        new_skill = random.choice(skills_list)
+                        # print("New skill - " + str(new_skill))
 
-                    # Spent money
-                    for res in player.coffers:
-                        if res[0] == "Florins":
-                            res[1] -= 2000
-                            break
+                        # Pay for skill
+                        common_transactions.payment(resources, player.coffers)
 
-                    # Transfer money to traders
-                    for pops in the_settlement.residency:
-                        if pops.name == "Merchants":
-                            no_money = True
-                            for product in pops.reserve:
-                                # Pay money to seller
-                                if product[0] == "Florins":
-                                    no_money = False
-                                    product[1] += 2000
+                        # Transfer money to traders
+                        for pops in the_settlement.residency:
+                            if pops.name == "Merchants":
+                                no_money = True
+                                for product in pops.reserve:
+                                    # Pay money to seller
+                                    if product[0] == "Florins":
+                                        no_money = False
+                                        product[1] += 2000
 
-                            if no_money:
-                                pops.reserve.append(["Florins", 2000])
-                            break
+                                if no_money:
+                                    pops.reserve.append(["Florins", 2000])
+                                break
 
-                    # Learn new skill
-                    details = hero_skill_catalog.hero_skill_data[new_skill]
-                    counting = 0
-                    for skill in the_hero.skills:
-                        if skill.skill_type == "Skill":
-                            counting += 1
+                        # Learn new skill
+                        details = hero_skill_catalog.hero_skill_data[new_skill]
+                        counting = 0
+                        for skill in the_hero.skills:
+                            if skill.skill_type == "Skill":
+                                counting += 1
 
-                    position = [0, int(counting)]
+                        position = [0, int(counting)]
 
-                    the_hero.skills.append(skill_classes.Hero_Skill(str(new_skill),
-                                                                    str(details[0]),
-                                                                    str(details[1]),
-                                                                    str(details[2]),
-                                                                    str(details[3]),
-                                                                    str(details[4]),
-                                                                    list(details[5]),
-                                                                    list(details[6]),
-                                                                    details[7],
-                                                                    position))
+                        the_hero.skills.append(skill_classes.Hero_Skill(str(new_skill),
+                                                                        str(details[0]),
+                                                                        str(details[1]),
+                                                                        str(details[2]),
+                                                                        str(details[3]),
+                                                                        str(details[4]),
+                                                                        list(details[5]),
+                                                                        list(details[6]),
+                                                                        details[7],
+                                                                        position))
 
-                    for skill in the_hero.skills:
-                        print(skill.name)
+                        for skill in the_hero.skills:
+                            print(skill.name)
+
+
+def obtain_attributes_settlement(player, economy, LUOS):
+    for TileNum in LUOS:
+        if game_obj.game_map[TileNum].army_id:
+            the_settlement = common_selects.select_settlement_by_id(game_obj.game_map[TileNum].city_id)
+            the_army = common_selects.select_army_by_id(game_obj.game_map[TileNum].army_id)
+
+            if the_army.hero:
+                the_hero = the_army.hero
+                obtain_attribute = False
+                # Random chance (20%) to learn new skill
+                if random.randint(0, 100) <= 20:
+                    obtain_attribute = True
+
+                attributes_list = []
+                if obtain_attribute:
+                    for plot in the_settlement.buildings:
+                        if plot.status == "Built":
+                            if plot.structure.name in ["Wheelwright guild"]:
+                                dic = battle_attributes_assortment.assortment_by_place[plot.structure.name]
+                                key_list = list(dic)
+                                for key in key_list:
+                                    attribute = dic[key]
+                                    resources = [["Florins", attribute[4]]]
+                                    enough_florins = common_transactions.sufficient_funds(resources, player.coffers)
+
+                                    if enough_florins:
+                                        add_attribute = True
+                                        for package in the_hero.attributes_list:
+                                            if package.package_name == key:
+                                                add_attribute = False
+                                                break
+
+                                        if add_attribute:
+                                            attributes_list.append([str(key), dic])
+
+                    if attributes_list:
+                        new_attribute = random.choice(attributes_list)
+                        attribute_info = new_attribute[1][new_attribute[0]]
+
+                        # Pay for attribute
+                        resources = [["Florins", attribute_info[4]]]
+                        common_transactions.payment(resources, player.coffers)
+
+                        # Learn new attribute
+                        att = game_classes.Battle_Attribute(
+                            str(attribute_info[0]),
+                            str(attribute_info[1]),
+                            int(attribute_info[2]))
+
+                        pack = game_classes.Attribute_Package([att],
+                                                              new_attribute[0])
+
+                        for attribute in pack.attribute_list:
+                            if attribute.tag == "hero":
+                                if attribute.stat == "magic power":
+                                    the_hero.magic_power += int(attribute.value)
+                                elif attribute.stat == "knowledge":
+                                    the_hero.knowledge += int(attribute.value)
+                                    the_hero.max_mana_reserve += int(attribute.value * 10)
+                                    the_hero.mana_reserve += int(attribute.value * 10)
+
+                        the_hero.attributes_list.append(pack)
