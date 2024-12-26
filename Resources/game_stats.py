@@ -4,7 +4,7 @@
 # Software versioning
 version_major = 0
 version_minor = 1
-version_micro = 22
+version_micro = 23
 
 time_counted = 0
 fps = 0.0
@@ -208,6 +208,7 @@ selected_artifact_info = None
 hero_doesnt_know_this_skill = None
 hero_doesnt_know_this_attribute = None
 selected_item_price = None  # Price in florins
+detailed_regiment_info = False
 
 first_army_exchange_list = []  # List of units to exchange
 second_army_exchange_list = []  # List of units to exchange
@@ -235,6 +236,7 @@ pops_card_index = 0  # Index for scrolling population cards
 faction_screen_index = 0  # Index of selected faction from upper left column
 faction_pops_index = 0  # Index for scrolling faction's population
 
+# Messages
 quest_area = "Quest messages"
 selected_quest_messages = None  # From realm.quests_messages
 quest_message_index = None  # Index of selected quest message from left column in Quest log window panel
@@ -244,6 +246,7 @@ selected_diplomatic_notifications = None
 diplomatic_message_index = None  # Index of selected diplomatic message from left column in Quest log window panel
 diplomatic_message_panel = None
 
+# Diplomacy
 realm_inspection = None  # Realm object to show information about
 explored_contacts = []  # List of list [first color, second color, realm name]
 contact_index = 0  # For scrolling contact list
@@ -284,6 +287,7 @@ battle_height = 12
 battle_base_modifier = 0.2
 battle_base_morale_hit = 0.2
 battle_morale_base_restoration = 0.3
+
 # Beginning of the battle information
 attacker_army_id = 0
 attacker_realm = ""

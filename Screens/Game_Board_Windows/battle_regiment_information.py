@@ -1,5 +1,5 @@
 ## Among Myth and Wonder
-## battle_regiment_information
+    ## battle_regiment_information
 
 import pygame.draw
 import pygame.font
@@ -8,10 +8,15 @@ from Screens.colors_catalog import *
 from Screens.fonts_catalog import *
 
 from Screens.Interface_Elements import buttons
+from Resources import game_stats
 
 
 def regiment_info_window(screen, b):
     pygame.draw.polygon(screen, MainMenuColor, [[642, 70], [1278, 70], [1278, 600], [642, 600]])
+
+    # Switch detailed regiment information
+    buttons.element_button(screen, "i", "arial_font16", "DarkText", "RockTunel", "LineMainMenuColor1",
+                           1230, 85, 19, 19, 9, 2, 2)
 
     # Close settlement window
     buttons.element_close_button(screen, "CancelFieldColor", "CancelElementsColor", "CancelElementsColor",
@@ -94,14 +99,16 @@ def regiment_information_draw(screen, b):
     screen.blit(text_panel, [646, 245])
 
     # Armour
-    text = "Armour - " + str(b.unit_info.final_armour) + "   (" + str(b.unit_info.armour) + " + "\
-           + str(b.unit_info.final_armour - b.unit_info.armour) + ")"
+    text = "Armour - " + str(b.unit_info.final_armour)
+    if game_stats.detailed_regiment_info:
+        text += "   (" + str(b.unit_info.armour) + " + " + str(b.unit_info.final_armour - b.unit_info.armour) + ")"
     text_panel = arial_font16.render(text, True, TitleText)
     screen.blit(text_panel, [646, 265])
 
     # Defence
-    text = "Defence - " + str(b.unit_info.final_defence) + "   (" + str(b.unit_info.defence) + " + " \
-           + str(b.unit_info.final_defence - b.unit_info.defence) + ")"
+    text = "Defence - " + str(b.unit_info.final_defence)
+    if game_stats.detailed_regiment_info:
+        text += "   (" + str(b.unit_info.defence) + " + " + str(b.unit_info.final_defence - b.unit_info.defence) + ")"
     text_panel = arial_font16.render(text, True, TitleText)
     screen.blit(text_panel, [646, 285])
 

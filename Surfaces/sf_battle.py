@@ -61,7 +61,8 @@ regiment_info_window_zone = [[1254, 85, 1273, 104],
                              [1020, 365, 1038, 365 + 18],
                              [1200, 365, 1218, 365 + 18],
                              [1020, 505, 1038, 505 + 18],
-                             [1200, 505, 1218, 505 + 18]]
+                             [1200, 505, 1218, 505 + 18],
+                             [1230, 85, 1249, 104]]
 
 siege_equipment_menu_window_zone = [[816, 206, 835, 225]]
 
@@ -672,6 +673,13 @@ def fill_regiment_information(b, TileNum):
         b.ability_description = ability_desc_cat_regiment.script_cat[b.ability_info](unit)
 
     b.battle_window = "Regiment info"
+
+
+def switch_detailed_regiment_info():
+    if game_stats.detailed_regiment_info:
+        game_stats.detailed_regiment_info = False
+    else:
+        game_stats.detailed_regiment_info = True
 
 
 def close_information_window():
@@ -1658,7 +1666,8 @@ regiment_info_window_funs = {1 : close_information_window,
                              6 : previous_effect_info,
                              7 : next_effect_info,
                              8 : previous_ability_info,
-                             9 : next_ability_info}
+                             9 : next_ability_info,
+                             10 : switch_detailed_regiment_info}
 
 window_buttons = {"Battle end window": battle_end_window_funs,
                   "Ability menu": ability_menu_window_funs,

@@ -5,6 +5,7 @@ from Screens.colors_catalog import *
 from Screens.fonts_catalog import *
 
 font_dic = {"tnr_font16" : tnr_font16,
+            "arial_font16" : arial_font16,
             "arial_font14" : arial_font14}
 
 color_dic = {"LineMainMenuColor1" : LineMainMenuColor1,
