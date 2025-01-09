@@ -68,8 +68,8 @@ def prepare_known_map(player_power):
                 # break
 
         for army in game_obj.game_armies:
-            # print("Army location is " + str(army.location))
-            # print("Army owner is " + str(army.owner))
+            print("Army location is " + str(army.location))
+            print("Army owner is " + str(army.owner))
             if army.owner == power.name:
                 # print("Army location is " + str(army.location))
                 x = int((army.location + 1) % game_stats.cur_level_width)
@@ -80,8 +80,6 @@ def prepare_known_map(player_power):
                         power.known_map.append(tile)
                     if tile not in tiles_pool:
                         tiles_pool.append(tile)
-
-                break
 
         prepare_diplomatic_contacts(power, tiles_pool)
 

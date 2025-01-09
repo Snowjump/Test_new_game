@@ -11,17 +11,20 @@ from Battle_AI import hybrid_AI
 from Battle_AI import caster_AI
 
 
-def manage_unit(b, own_units, enemy_units, acting_unit, own_army_id, enemy_army_id, acting_hero):
+def manage_unit(b, acting_army, enemy_army, acting_unit, acting_hero):
+    own_units = acting_army.units
+    enemy_units = enemy_army.units
+    own_army_id = acting_army.army_id
+    enemy_army_id = enemy_army.army_id
     card = b.queue[0]
     print("manage_unit() b.queue[0]: " + str(card.obj_type) + " " + str(card.owner))
-    if acting_hero is not None:
+    if acting_hero:
         print("manage_unit: " + acting_hero.hero_class + " " + acting_hero.name)
 
     if card.obj_type == "Regiment":
 
         route_true = False
-        army = common_selects.select_army_by_id(card.army_id)
-        unit = army.units[card.number]
+        unit = own_units[card.number]
 
         if unit.morale <= 0.0:
             route_true = True
@@ -80,7 +83,7 @@ def manage_unit(b, own_units, enemy_units, acting_unit, own_army_id, enemy_army_
                                         enemy_ranged, enemy_units)
 
     elif card.obj_type == "Hero":
-        hero_AI.manage_hero(b, acting_hero, own_units, enemy_units, own_army_id, enemy_army_id)
+        hero_AI.manage_hero(b, acting_hero, acting_army, enemy_army, own_units)
 
 
 def unit_account(own_units, enemy_units):

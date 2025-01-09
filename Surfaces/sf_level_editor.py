@@ -853,7 +853,7 @@ def create_development_plots(alignment):
                 pass
             else:
                 print("Next upgrade is - " + str(upgrade[0]))
-                ef_list = None
+                ef_list = []
                 if str(plot[0]) in ef_structures.ef_structures_cat:
                     ef_list = ef_structures.ef_structures_cat[alignment][str(plot[0])]
 
@@ -1073,11 +1073,7 @@ def plot_row_up():
 
 
 def plot_row_down():
-    settlement = None
-    for city in game_stats.editor_cities:
-        if city.city_id == game_stats.selected_city_id:
-            settlement = city
-            break
+    settlement = common_selects.select_settlement_by_id(game_stats.selected_city_id)
 
     list_of_rows = []
     for plot in settlement.buildings:
@@ -1095,12 +1091,12 @@ def build_structure(city, plot):
     plot.structure = plot.upgrade
     plot.upgrade = None
     next_upgrade = settlement_structures.new_upgrades_cat[city.alignment][plot.structure.name]
-    if plot.structure.defensive_structure is not None:
+    if plot.structure.defensive_structure:
         settlement_defences.defence_scripts[plot.structure.name](city)
-    if next_upgrade is not None:
+    if next_upgrade:
         parameters = settlement_structures.structures_groups[city.alignment][next_upgrade]
 
-        ef_list = None
+        ef_list = []
         if plot.structure.name in ef_structures.ef_structures_cat:
             ef_list = ef_structures.ef_structures_cat[city.alignment][plot.structure.name]
 

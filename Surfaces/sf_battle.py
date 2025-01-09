@@ -68,31 +68,29 @@ siege_equipment_menu_window_zone = [[816, 206, 835, 225]]
 
 
 def battle_keys(key_action):
-    for battle in game_obj.game_battles:
-        if battle.attacker_realm == game_stats.player_power or \
-                battle.defender_realm == game_stats.player_power:
+    b = game_stats.present_battle
 
-            if key_action == 119:  # W
-                battle.battle_pov[1] -= 1
-            elif key_action == 115:  # S
-                battle.battle_pov[1] += 1
-            elif key_action == 97:  # A
-                battle.battle_pov[0] -= 1
-            elif key_action == 100:  # D
-                battle.battle_pov[0] += 1
-            elif key_action == 113:  # Q
-                wait_but()
-            elif key_action == 101:  # E
-                defend_but()
-            elif key_action == 114:  # R
-                prepare_change_attack_method()
+    if key_action == 119:  # W
+        b.battle_pov[1] -= 1
+    elif key_action == 115:  # S
+        b.battle_pov[1] += 1
+    elif key_action == 97:  # A
+        b.battle_pov[0] -= 1
+    elif key_action == 100:  # D
+        b.battle_pov[0] += 1
+    elif key_action == 113:  # Q
+        wait_but()
+    elif key_action == 101:  # E
+        defend_but()
+    elif key_action == 114:  # R
+        prepare_change_attack_method()
 
-            elif key_action == 120:  # key - X
-                print("game_stats.fps_status - " + str(game_stats.fps_status))
-                if game_stats.fps_status:
-                    game_stats.fps_status = False
-                else:
-                    game_stats.fps_status = True
+    elif key_action == 120:  # key - X
+        print("game_stats.fps_status - " + str(game_stats.fps_status))
+        if game_stats.fps_status:
+            game_stats.fps_status = False
+        else:
+            game_stats.fps_status = True
 
 
 def battle_surface_m1(position):
@@ -530,63 +528,45 @@ def battle_surface_m3(position):
 
 def m1_click_structure(b, TileNum, x2, y2):
     result = False
-    if b.battle_type == "Siege":
-        if b.realm_in_control == game_stats.player_power:
-            if b.queue[0].obj_type == "Regiment" and b.ready_to_act:
-                # print("Regiment attacking the gates")
-                for army in game_obj.game_armies:
-                    if army.army_id == b.queue[0].army_id:
-                        unit = army.units[b.queue[0].number]
-                        if unit.siege_engine is not None:
-                            if unit.siege_engine == "Battering ram":
-                                if b.battle_map[TileNum].map_object is not None:
-                                    print(b.battle_map[TileNum].map_object.obj_name)
-                                    if b.battle_map[TileNum].map_object.obj_name in ["Palisade_gates"]:
-                                        approach = [x2 - 1, y2]
+    if b.battle_type == "Siege" and b.realm_in_control == game_stats.player_power:
+        if b.queue[0].obj_type == "Regiment" and b.ready_to_act:
+            # print("Regiment attacking the gates")
+            army = common_selects.select_army_by_id(b.queue[0].army_id)
+            unit = army.units[b.queue[0].number]
+            if unit.siege_engine:
+                if b.battle_map[TileNum].map_object:
+                    print(b.battle_map[TileNum].map_object.obj_name)
+                    if unit.siege_engine == "Battering ram":
+                        if b.battle_map[TileNum].map_object.obj_name in ["Palisade_gates"]:
+                            approach = [x2 - 1, y2]
+                            if approach in b.movement_grid:
+                                b.move_destination = [int(approach[0]), int(approach[1])]
+                                result = set_siege_stats(b, "Move", "Break the gates", x2, y2, unit)
+                            elif approach == b.queue[0].position:
+                                result = set_siege_stats(b, "Rotate", "Break the gates", x2, y2, unit)
 
-                                        if approach in b.movement_grid:
-                                            game_battle.disengage(b, b.queue[0].position)
-                                            b.ready_to_act = False
-                                            b.attacking_rotate.append(b.queue[0].number)
-                                            b.move_destination = [int(approach[0]), int(approach[1])]
-                                            b.target_destination = [int(x2), int(y2)]
-                                            game_battle.action_order(b, "Move", "Break the gates")
-                                            result = True
-
-                                        elif approach == b.queue[0].position:
-                                            game_battle.disengage(b, b.queue[0].position)
-                                            b.ready_to_act = False
-                                            b.attacking_rotate.append(b.queue[0].number)
-                                            b.target_destination = [int(x2), int(y2)]
-                                            game_battle.action_order(b, "Rotate", "Break the gates")
-                                            result = True
-
-                            elif unit.siege_engine == "Siege tower":
-                                if b.battle_map[TileNum].map_object is not None:
-                                    print(b.battle_map[TileNum].map_object.obj_name)
-                                    if b.battle_map[TileNum].map_object.obj_name in ["Palisade_bottom", "Palisade"]:
-                                        approach = [x2 - 1, y2]
-
-                                        if approach in b.movement_grid:
-                                            game_battle.disengage(b, b.queue[0].position)
-                                            b.ready_to_act = False
-                                            b.attacking_rotate.append(b.queue[0].number)
-                                            b.move_destination = [int(approach[0]), int(approach[1])]
-                                            b.target_destination = [int(x2), int(y2)]
-                                            game_battle.action_order(b, "Move", "Dock the wall")
-                                            result = True
-
-                                        elif approach == b.queue[0].position:
-                                            game_battle.disengage(b, b.queue[0].position)
-                                            b.ready_to_act = False
-                                            b.attacking_rotate.append(b.queue[0].number)
-                                            b.target_destination = [int(x2), int(y2)]
-                                            game_battle.action_order(b, "Rotate", "Dock the wall")
-                                            result = True
-                        break
+                    elif unit.siege_engine == "Siege tower":
+                        if b.battle_map[TileNum].map_object.obj_name in ["Palisade_bottom", "Palisade"]:
+                            approach = [x2 - 1, y2]
+                            if approach in b.movement_grid:
+                                b.move_destination = [int(approach[0]), int(approach[1])]
+                                result = set_siege_stats(b, "Move", "Dock the wall", x2, y2, unit)
+                            elif approach == b.queue[0].position:
+                                result = set_siege_stats(b, "Rotate", "Dock the wall", x2, y2, unit)
 
     # print("m1_click_structure: result - " + str(result))
     return result
+
+
+def set_siege_stats(b, primary_action, secondary_action, x, y, unit):
+    game_battle.disengage(b, b.queue[0].position)
+    b.ready_to_act = False
+    b.attacking_rotate.append(game_classes.Rotation_Data(tuple((x, y)),
+                                                         unit.position,
+                                                         b.queue[0].army_id))
+    b.target_destination = [int(x), int(y)]
+    game_battle.action_order(b, primary_action, secondary_action)
+    return True
 
 
 def find_battle_and_unit():
@@ -643,9 +623,9 @@ def fill_regiment_information(b, TileNum):
     final_defence = game_battle.defence_effect(unit, unit.defence, army.hero)
 
     b.unit_info = game_classes.Regiment_Info_Card(unit.name, f_color, s_color, len(unit.crew), total_HP, unit.morale,
-                                                  unit.max_HP, unit.experience, unit.speed, unit.leadership,
-                                                  unit.engaged, unit.deserted, len(unit.attacks), unit.armour,
-                                                  final_armour, unit.defence, final_defence, unit.reg_tags,
+                                                  unit.max_HP, unit.base_HP, unit.experience, unit.speed,
+                                                  unit.leadership, unit.engaged, unit.deserted, len(unit.attacks),
+                                                  unit.armour, final_armour, unit.defence, final_defence, unit.reg_tags,
                                                   unit.magic_power, unit.mana_reserve,
                                                   unit.max_mana_reserve, unit.abilities)
 
@@ -857,6 +837,8 @@ def start_battle_but():
     b = common_selects.select_battle_by_realm_name(game_stats.player_power)
 
     if len(b.waiting_list) == 0:
+        army_attacker = common_selects.select_army_by_id(b.attacker_id)
+        army_defender = common_selects.select_army_by_id(b.defender_id)
         b.stage = "Fighting"
         print("stage - " + str(b.stage))
         b.selected_tile = []
@@ -864,19 +846,24 @@ def start_battle_but():
         b.selected_unit_alt = ()
         b.preparation_siege_machine = None
 
-        fill_morale(b)
-        fill_max_HP(b)
-        fill_mana_reserve(b)
-        fill_magic_power(b)
-        fill_counterattacks(b)
+        fill_morale(army_attacker)
+        fill_morale(army_defender)
+        fill_max_HP(army_attacker)
+        fill_max_HP(army_defender)
+        fill_mana_reserve(army_attacker)
+        fill_mana_reserve(army_defender)
+        fill_magic_power(army_attacker)
+        fill_magic_power(army_defender)
+        fill_counterattacks(army_attacker)
+        fill_counterattacks(army_defender)
 
         # Form queue
         game_battle.form_queue(b)
 
-        for army in game_obj.game_armies:
-            if army.army_id == b.attacker_id or army.army_id == b.defender_id:
-                for unit in army.units:
-                    game_battle.apply_aura(unit, b, army.army_id)
+        for unit in army_attacker.units:
+            game_battle.apply_aura(unit, b, army_attacker.army_id)
+        for unit in army_defender.units:
+            game_battle.apply_aura(unit, b, army_defender.army_id)
 
         game_battle.advance_queue(b)
 
@@ -885,16 +872,11 @@ def start_battle_but():
 
 
 def siege_tower_reserve_but():
-    b = None
-    for battle in game_obj.game_battles:
-        if battle.attacker_realm == game_stats.player_power or \
-                battle.defender_realm == game_stats.player_power:
-            b = battle
-            break
+    b = game_stats.present_battle
 
     if b.battle_type != "Siege":
         # Wrong battle type, should ignore clicking this button
-        b.button_pressed = True
+        b.button_pressed = False
     else:
         if b.selected_unit == -1:
             if b.preparation_siege_machine == "Siege tower":
@@ -904,26 +886,16 @@ def siege_tower_reserve_but():
                     b.unit_card = -1
                 b.preparation_siege_machine = "Siege tower"
         else:
-            the_army = None
-            for army in game_obj.game_armies:
-                if army.army_id == b.battle_map[b.selected_unit].army_id:
-                    the_army = army
-                    break
-
+            the_army = common_selects.select_army_by_id(b.battle_map[b.selected_unit].army_id)
             the_unit = the_army.units[b.battle_map[b.selected_unit].unit_index]
-            if the_unit.siege_engine is not None:
+            if the_unit.siege_engine:
                 if the_unit.siege_engine == "Siege tower":
                     the_unit.siege_engine = None
                     b.available_siege_towers += 1
 
 
 def battering_ram_reserve_but():
-    b = None
-    for battle in game_obj.game_battles:
-        if battle.attacker_realm == game_stats.player_power or \
-                battle.defender_realm == game_stats.player_power:
-            b = battle
-            break
+    b = game_stats.present_battle
 
     # print("selected_unit: " + str(b.selected_unit))
     # print("battle_type: " + str(b.battle_type))
@@ -931,7 +903,7 @@ def battering_ram_reserve_but():
 
     if b.battle_type != "Siege":
         # Wrong battle type, should ignore clicking this button
-        b.button_pressed = True
+        b.button_pressed = False
     else:
         if b.selected_unit == -1:
             if b.preparation_siege_machine == "Battering ram":
@@ -941,14 +913,9 @@ def battering_ram_reserve_but():
                     b.unit_card = -1
                 b.preparation_siege_machine = "Battering ram"
         else:
-            the_army = None
-            for army in game_obj.game_armies:
-                if army.army_id == b.battle_map[b.selected_unit].army_id:
-                    the_army = army
-                    break
-
+            the_army = common_selects.select_army_by_id(b.battle_map[b.selected_unit].army_id)
             the_unit = the_army.units[b.battle_map[b.selected_unit].unit_index]
-            if the_unit.siege_engine is not None:
+            if the_unit.siege_engine:
                 if the_unit.siege_engine == "Battering ram":
                     the_unit.siege_engine = None
                     b.available_battering_rams += 1
@@ -1017,130 +984,118 @@ def handle_siege_equipment():
                     b.battle_window = "Siege equipment menu"
 
 
-def fill_morale(b):
-    for army in game_obj.game_armies:
-        if army.army_id == b.attacker_id or army.army_id == b.defender_id:
-            bonus_leadership = 0.0
-            if army.hero is not None:
-                # Skills
-                for skill in army.hero.skills:
-                    for effect in skill.effects:
-                        if effect.application == "Bonus leadership":
-                            if effect.method == "addition":
-                                bonus_leadership += float(effect.quantity)
+def fill_morale(army):
+    bonus_leadership = 0.0
+    if army.hero is not None:
+        # Skills
+        for skill in army.hero.skills:
+            for effect in skill.effects:
+                if effect.application == "Bonus leadership":
+                    if effect.method == "addition":
+                        bonus_leadership += float(effect.quantity)
 
-                # Artifacts
-                if len(army.hero.inventory) > 0:
-                    for artifact in army.hero.inventory:
-                        for effect in artifact.effects:
-                            if effect.application == "Bonus leadership":
+        # Artifacts
+        if len(army.hero.inventory) > 0:
+            for artifact in army.hero.inventory:
+                for effect in artifact.effects:
+                    if effect.application == "Bonus leadership":
+                        if effect.method == "addition":
+                            bonus_leadership += float(effect.quantity)
+                        elif effect.method == "subtraction":
+                            bonus_leadership -= float(effect.quantity)
+
+    for unit in army.units:
+        unit.leadership = float(unit.base_leadership) + float(bonus_leadership)
+        # print(unit.name + ": base_leadership - " + str(unit.base_leadership) + ", bonus_leadership - " +
+        #       str(bonus_leadership) + ", unit.leadership - " + str(unit.leadership))
+        if unit.leadership < 1.0:
+            unit.leadership = 1.0
+        unit.morale = float(unit.leadership)
+
+
+def fill_max_HP(army):
+    bonus_HP = 0
+    if army.hero is not None:
+        for skill in army.hero.skills:
+            for effect in skill.effects:
+                if effect.application == "Bonus fortitude":
+                    if effect.method == "addition":
+                        bonus_HP += int(effect.quantity)
+    for unit in army.units:
+        unit.max_HP = int(unit.base_HP) + int(bonus_HP)
+        for creature in unit.crew:
+            creature.HP = int(unit.max_HP)
+
+
+def fill_mana_reserve(army):
+    for unit in army.units:
+        bonus_mana_reserve = 0
+        if army.hero is not None:
+            # Artifacts
+            if len(army.hero.inventory) > 0:
+                for artifact in army.hero.inventory:
+                    for effect in artifact.effects:
+                        if effect.application == "Bonus mana reserve":
+                            allowed = True
+                            if len(effect.other_tags) > 0:
+                                allowed = False
+                                for unit_tag in unit.reg_tags:
+                                    if unit_tag in effect.other_tags:
+                                        allowed = True
+
+                            if allowed:
                                 if effect.method == "addition":
-                                    bonus_leadership += float(effect.quantity)
+                                    bonus_mana_reserve += int(effect.quantity)
                                 elif effect.method == "subtraction":
-                                    bonus_leadership -= float(effect.quantity)
+                                    bonus_mana_reserve -= int(effect.quantity)
 
-            for unit in army.units:
-                unit.leadership = float(unit.base_leadership) + float(bonus_leadership)
-                # print(unit.name + ": base_leadership - " + str(unit.base_leadership) + ", bonus_leadership - " +
-                #       str(bonus_leadership) + ", unit.leadership - " + str(unit.leadership))
-                if unit.leadership < 1.0:
-                    unit.leadership = 1.0
-                unit.morale = float(unit.leadership)
+        unit.mana_reserve = int(unit.max_mana_reserve) + int(bonus_mana_reserve)
+        # print(unit.name + ": max_mana_reserve - " + str(unit.max_mana_reserve) + ", bonus_mana_reserve - " +
+        #       str(bonus_mana_reserve) + ", unit.mana_reserve - " + str(unit.mana_reserve))
+        if unit.mana_reserve < 0:
+            unit.mana_reserve = 0
 
 
-def fill_max_HP(b):
-    for army in game_obj.game_armies:
-        if army.army_id == b.attacker_id or army.army_id == b.defender_id:
-            bonus_HP = 0
-            if army.hero is not None:
-                for skill in army.hero.skills:
-                    for effect in skill.effects:
-                        if effect.application == "Bonus fortitude":
-                            if effect.method == "addition":
-                                bonus_HP += int(effect.quantity)
-            for unit in army.units:
-                unit.max_HP = int(unit.base_HP) + int(bonus_HP)
-                for creature in unit.crew:
-                    creature.HP = int(unit.max_HP)
+def fill_magic_power(army):
+    for unit in army.units:
+        bonus_MP = 0
+        if army.hero is not None:
+            # Artifacts
+            if len(army.hero.inventory) > 0:
+                for artifact in army.hero.inventory:
+                    for effect in artifact.effects:
+                        if effect.application == "Bonus Magic Power":
+                            allowed = True
+                            if len(effect.other_tags) > 0:
+                                allowed = False
+                                for unit_tag in unit.reg_tags:
+                                    if unit_tag in effect.other_tags:
+                                        allowed = True
+
+                            if allowed:
+                                if effect.method == "addition":
+                                    bonus_MP += int(effect.quantity)
+                                elif effect.method == "subtraction":
+                                    bonus_MP -= int(effect.quantity)
+
+        unit.magic_power = int(unit.base_magic_power) + int(bonus_MP)
+        # print(unit.name + ": base_magic_power - " + str(unit.base_magic_power) + ", bonus_MP - " +
+        #       str(bonus_MP) + ", unit.magic_power - " + str(unit.magic_power))
+        if unit.magic_power < 0:
+            unit.magic_power = 0
 
 
-def fill_mana_reserve(b):
-    for army in game_obj.game_armies:
-        if army.army_id == b.attacker_id or army.army_id == b.defender_id:
+def fill_counterattacks(army):
+    counter_attacks_value = 1
+    if army.hero is not None:
+        for skill in army.hero.skills:
+            for effect in skill.effects:
+                if effect.application == "Bonus counterattack":
+                    if effect.method == "addition":
+                        counter_attacks_value += effect.quantity
 
-            for unit in army.units:
-                bonus_mana_reserve = 0
-                if army.hero is not None:
-                    # Artifacts
-                    if len(army.hero.inventory) > 0:
-                        for artifact in army.hero.inventory:
-                            for effect in artifact.effects:
-                                if effect.application == "Bonus mana reserve":
-                                    allowed = True
-                                    if len(effect.other_tags) > 0:
-                                        allowed = False
-                                        for unit_tag in unit.reg_tags:
-                                            if unit_tag in effect.other_tags:
-                                                allowed = True
-
-                                    if allowed:
-                                        if effect.method == "addition":
-                                            bonus_mana_reserve += int(effect.quantity)
-                                        elif effect.method == "subtraction":
-                                            bonus_mana_reserve -= int(effect.quantity)
-
-                unit.mana_reserve = int(unit.max_mana_reserve) + int(bonus_mana_reserve)
-                # print(unit.name + ": max_mana_reserve - " + str(unit.max_mana_reserve) + ", bonus_mana_reserve - " +
-                #       str(bonus_mana_reserve) + ", unit.mana_reserve - " + str(unit.mana_reserve))
-                if unit.mana_reserve < 0:
-                    unit.mana_reserve = 0
-
-
-def fill_magic_power(b):
-    for army in game_obj.game_armies:
-        if army.army_id == b.attacker_id or army.army_id == b.defender_id:
-
-            for unit in army.units:
-                bonus_MP = 0
-                if army.hero is not None:
-                    # Artifacts
-                    if len(army.hero.inventory) > 0:
-                        for artifact in army.hero.inventory:
-                            for effect in artifact.effects:
-                                if effect.application == "Bonus Magic Power":
-                                    allowed = True
-                                    if len(effect.other_tags) > 0:
-                                        allowed = False
-                                        for unit_tag in unit.reg_tags:
-                                            if unit_tag in effect.other_tags:
-                                                allowed = True
-
-                                    if allowed:
-                                        if effect.method == "addition":
-                                            bonus_MP += int(effect.quantity)
-                                        elif effect.method == "subtraction":
-                                            bonus_MP -= int(effect.quantity)
-
-                unit.magic_power = int(unit.base_magic_power) + int(bonus_MP)
-                # print(unit.name + ": base_magic_power - " + str(unit.base_magic_power) + ", bonus_MP - " +
-                #       str(bonus_MP) + ", unit.magic_power - " + str(unit.magic_power))
-                if unit.magic_power < 0:
-                    unit.magic_power = 0
-
-
-def fill_counterattacks(b):
-    for army in game_obj.game_armies:
-        if army.army_id == b.attacker_id or army.army_id == b.defender_id:
-            counter_attacks_value = 1
-            if army.hero is not None:
-                for skill in army.hero.skills:
-                    for effect in skill.effects:
-                        if effect.application == "Bonus counterattack":
-                            if effect.method == "addition":
-                                counter_attacks_value += effect.quantity
-
-            for unit in army.units:
-                unit.counterattack = int(counter_attacks_value)
+    for unit in army.units:
+        unit.counterattack = int(counter_attacks_value)
 
 
 def wait_but():

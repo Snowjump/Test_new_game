@@ -208,6 +208,7 @@ def apply_effects(PM_pops, building_plots, goods, taxes):
     # Building effects
     for plot in building_plots:
         if plot.status == "Built":
+            print("apply_effects: " + str(plot.structure.name))
             if len(plot.structure.provided_effects) > 0:
                 for building_ef in plot.structure.provided_effects:
                     if building_ef.ef_type == "Population":

@@ -15,11 +15,10 @@ from Strategy_AI import AI_exploration_cond
 from Strategy_AI.Logic_Solutions import power_ranking
 
 
-def solution(realm, role, friendly_cities, hostile_cities, at_war_list):
+def solution(realm, role, friendly_cities, hostile_cities, at_war_list, army):
     print("")
     print("explore_neutral_lands")
     rank_sum = 0
-    army = common_selects.select_army_by_id(role.army_id)
 
     for unit in army.units:
         rank_sum += unit.rank

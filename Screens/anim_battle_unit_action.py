@@ -1,4 +1,5 @@
-## Miracle battles
+## Among Myth and Wonder
+## anim_battle_unit_action
 
 from Resources import game_stats
 import math
@@ -56,26 +57,7 @@ def unit_march(b, unit_index, parent, creature_position, number, row, line, widt
         x = int(child[0]) - int(b.battle_pov[0])
         y = int(child[1]) - int(b.battle_pov[1])
 
-        new_direction = ""
-        if parent[0] == child[0]:
-            if parent[1] > child[1]:
-                new_direction = "N"
-            elif parent[1] < child[1]:
-                new_direction = "S"
-        elif parent[0] > child[0]:
-            if parent[1] > child[1]:
-                new_direction = "NW"
-            elif parent[1] < child[1]:
-                new_direction = "SW"
-            elif parent[1] == child[1]:
-                new_direction = "W"
-        elif parent[0] < child[0]:
-            if parent[1] > child[1]:
-                new_direction = "NE"
-            elif parent[1] < child[1]:
-                new_direction = "SE"
-            elif parent[1] == child[1]:
-                new_direction = "E"
+        new_direction = give_new_direction(parent, child)
 
         div_row = rows - 1
         if div_row == 0:
@@ -85,81 +67,7 @@ def unit_march(b, unit_index, parent, creature_position, number, row, line, widt
         if div_number == 0:
             div_number = 1
 
-        if new_direction == "E":
-            if number == 1:
-                new_position = [(x - 1) * 96 + 4 + 90 - width,
-                                (y - 1) * 96 + 4 + 90 - height - (48 - height / 2)]
-            else:
-                new_position = [(x - 1) * 96 + 4 + 90 - width - (row - 1) * ((90 - width) / div_row),
-                                (y - 1) * 96 + 4 + 90 - height - (number - line) * ((90 - height) / div_number)]
-
-        elif new_direction == "W":
-            if number == 1:
-                new_position = [(x - 1) * 96 + 4,
-                                (y - 1) * 96 + 4 + 90 - height - (48 - height / 2)]
-            else:
-                new_position = [(x - 1) * 96 + 4 +  # unit.crew[index].img_width +
-                                (row - 1) * ((90 - width) / div_row),
-                                (y - 1) * 96 + 4 + 90 - height - (number - line) * ((90 - height) / div_number)]
-
-        elif new_direction == "N":
-            if number == 1:
-                new_position = [(x - 1) * 96 + 4 + (48 - width / 2),
-                                (y - 1) * 96 + 4]
-            else:
-                new_position = [(x - 1) * 96 + 4 +  # unit.crew[index].img_width +
-                                (number - line) * ((90 - width) / div_number),
-                                (y - 1) * 96 + 4 +  # 90 - unit.crew[index].img_height -
-                                (row - 1) * ((90 - height) / div_row)]
-
-        elif new_direction == "S":
-            if number == 1:
-                new_position = [(x - 1) * 96 + 4 + (48 - width / 2),
-                                (y - 1) * 96 + 4 + 90 - height]
-            else:
-                new_position = [(x - 1) * 96 + 4 +  # unit.crew[index].img_width +
-                                (number - line) * ((90 - width) / div_number),
-                                (y - 1) * 96 + 4 + 90 - height - (row - 1) * ((90 - height) / div_row)]
-
-        elif new_direction == "NE":
-            if number == 1:
-                new_position = [(x - 1) * 96 + 48,
-                                (y - 1) * 96 + 48 - height]
-            else:
-                new_position = [(x - 1) * 96 + 48 - (width / 2) -
-                                (row - 1) * (48 / div_row) + (line - 1) * (40 / div_number),
-                                (y - 1) * 96 + 48 - (height / 2) -
-                                (number - line) * (48 / div_number) + (row - 1) * (40 / div_row)]
-
-        elif new_direction == "NW":
-            if number == 1:
-                new_position = [(x - 1) * 96 + 48 - width,
-                                (y - 1) * 96 + 48 - height]
-            else:
-                new_position = [(x - 1) * 96 + 48 - (width / 2) +
-                                (row - 1) * (48 / div_row) - (line - 1) * (40 / div_number),
-                                (y - 1) * 96 + 48 - (height / 2) -
-                                (number - line) * (48 / div_number) + (row - 1) * (40 / div_row)]
-
-        elif new_direction == "SE":
-            if number == 1:
-                new_position = [(x - 1) * 96 + 48,
-                                (y - 1) * 96 + 48]
-            else:
-                new_position = [(x - 1) * 96 + 48 - (width / 2) -
-                                (row - 1) * (48 / div_row) + (line - 1) * (40 / div_number),
-                                (y - 1) * 96 + 48 - (height / 2) +
-                                (number - line) * (48 / div_number) - (row - 1) * (40 / div_row)]
-
-        elif new_direction == "SW":
-            if number == 1:
-                new_position = [(x - 1) * 96 + 48 - width,
-                                (y - 1) * 96 + 48]
-            else:
-                new_position = [(x - 1) * 96 + 48 - (width / 2) +
-                                (row - 1) * (48 / div_row) - (line - 1) * (40 / div_number),
-                                (y - 1) * 96 + 48 - (height / 2) +
-                                (number - line) * (48 / div_number) - (row - 1) * (40 / div_row)]
+        new_position = give_new_position(new_direction, number, width, height, line, row, div_row, div_number, x, y)
 
         x = (new_position[0] - creature_position[0])
         y = (new_position[1] - creature_position[1])
@@ -180,34 +88,31 @@ def unit_march(b, unit_index, parent, creature_position, number, row, line, widt
         return [0, 0]
 
 
-def unit_rotate(b, unit_index, owner, current_position, creature_position, number, row, line, width, height, rows):
-    if unit_index in b.attacking_rotate and owner == b.queue[0].owner:
-        child = list(b.target_destination)
+def unit_rotate(b, unit, unit_index, owner, current_position, creature_position, number, row, line, width, height, rows):
+    rotating_attacker = False
+    for regiment_info in b.attacking_rotate:
+        if regiment_info.posxy == current_position:
+            # print("attacking_rotate " + unit.name + ": current_position - " + str(current_position) +
+            #       "; regiment_info.posxy - " + str(regiment_info.posxy))
+            rotating_attacker = True
+            break
+    rotating_defender = False
+    for regiment_info in b.defending_rotate:
+        if regiment_info.posxy == current_position:
+            # print("defending_rotate " + unit.name + ": current_position - " + str(current_position) +
+            #       "; regiment_info.posxy - " + str(regiment_info.posxy))
+            rotating_defender = True
+            break
 
+    if rotating_attacker and b.secondary == "Melee attack":
+        child = list(b.target_destination)
         parent = list(current_position)
         x = int(parent[0]) - int(b.battle_pov[0])
         y = int(parent[1]) - int(b.battle_pov[1])
 
-        new_direction = ""
-        if parent[0] == child[0]:
-            if parent[1] > child[1]:
-                new_direction = "N"
-            elif parent[1] < child[1]:
-                new_direction = "S"
-        elif parent[0] > child[0]:
-            if parent[1] > child[1]:
-                new_direction = "NW"
-            elif parent[1] < child[1]:
-                new_direction = "SW"
-            elif parent[1] == child[1]:
-                new_direction = "W"
-        elif parent[0] < child[0]:
-            if parent[1] > child[1]:
-                new_direction = "NE"
-            elif parent[1] < child[1]:
-                new_direction = "SE"
-            elif parent[1] == child[1]:
-                new_direction = "E"
+        new_direction = give_new_direction(parent, child)
+        # print(unit.name + ": unit.direction - " + str(unit.direction) + " changes to new_direction - "
+        #       + str(new_direction))
 
         div_row = rows - 1
         if div_row == 0:
@@ -217,81 +122,13 @@ def unit_rotate(b, unit_index, owner, current_position, creature_position, numbe
         if div_number == 0:
             div_number = 1
 
-        if new_direction == "E":
-            if number == 1:
-                new_position = [(x - 1) * 96 + 4 + 90 - width,
-                                (y - 1) * 96 + 4 + 90 - height - (48 - height / 2)]
-            else:
-                new_position = [(x - 1) * 96 + 4 + 90 - width - (row - 1) * ((90 - width) / div_row),
-                                (y - 1) * 96 + 4 + 90 - height - (number - line) * ((90 - height) / div_number)]
+        # print(str(b.queue[0].owner) + "; army ID - " + str(b.queue[0].army_id) + "; number - " + str(b.queue[0].number)
+        #       + "; new_direction - " + str(new_direction))
+        # print("parent - " + str(parent) + "; child - " + str(child))
+        # print("owner - " + str(owner) + "; b.queue[0].owner - " + str(b.queue[0].owner) +
+        #       "; b.enemy - " + str(b.enemy))
 
-        elif new_direction == "W":
-            if number == 1:
-                new_position = [(x - 1) * 96 + 4,
-                                (y - 1) * 96 + 4 + 90 - height - (48 - height / 2)]
-            else:
-                new_position = [(x - 1) * 96 + 4 +  # unit.crew[index].img_width +
-                                (row - 1) * ((90 - width) / div_row),
-                                (y - 1) * 96 + 4 + 90 - height - (number - line) * ((90 - height) / div_number)]
-
-        elif new_direction == "N":
-            if number == 1:
-                new_position = [(x - 1) * 96 + 4 + (48 - width / 2),
-                                (y - 1) * 96 + 4]
-            else:
-                new_position = [(x - 1) * 96 + 4 +  # unit.crew[index].img_width +
-                                (number - line) * ((90 - width) / div_number),
-                                (y - 1) * 96 + 4 +  # 90 - unit.crew[index].img_height -
-                                (row - 1) * ((90 - height) / div_row)]
-
-        elif new_direction == "S":
-            if number == 1:
-                new_position = [(x - 1) * 96 + 4 + (48 - width / 2),
-                                (y - 1) * 96 + 4 + 90 - height]
-            else:
-                new_position = [(x - 1) * 96 + 4 +  # unit.crew[index].img_width +
-                                (number - line) * ((90 - width) / div_number),
-                                (y - 1) * 96 + 4 + 90 - height - (row - 1) * ((90 - height) / div_row)]
-
-        elif new_direction == "NE":
-            if number == 1:
-                new_position = [(x - 1) * 96 + 48,
-                                (y - 1) * 96 + 48 - height]
-            else:
-                new_position = [(x - 1) * 96 + 48 - (width / 2) -
-                                (row - 1) * (48 / div_row) + (line - 1) * (40 / div_number),
-                                (y - 1) * 96 + 48 - (height / 2) -
-                                (number - line) * (48 / div_number) + (row - 1) * (40 / div_row)]
-
-        elif new_direction == "NW":
-            if number == 1:
-                new_position = [(x - 1) * 96 + 48 - width,
-                                (y - 1) * 96 + 48 - height]
-            else:
-                new_position = [(x - 1) * 96 + 48 - (width / 2) +
-                                (row - 1) * (48 / div_row) - (line - 1) * (40 / div_number),
-                                (y - 1) * 96 + 48 - (height / 2) -
-                                (number - line) * (48 / div_number) + (row - 1) * (40 / div_row)]
-
-        elif new_direction == "SE":
-            if number == 1:
-                new_position = [(x - 1) * 96 + 48,
-                                (y - 1) * 96 + 48]
-            else:
-                new_position = [(x - 1) * 96 + 48 - (width / 2) -
-                                (row - 1) * (48 / div_row) + (line - 1) * (40 / div_number),
-                                (y - 1) * 96 + 48 - (height / 2) +
-                                (number - line) * (48 / div_number) - (row - 1) * (40 / div_row)]
-
-        elif new_direction == "SW":
-            if number == 1:
-                new_position = [(x - 1) * 96 + 48 - width,
-                                (y - 1) * 96 + 48]
-            else:
-                new_position = [(x - 1) * 96 + 48 - (width / 2) +
-                                (row - 1) * (48 / div_row) - (line - 1) * (40 / div_number),
-                                (y - 1) * 96 + 48 - (height / 2) +
-                                (number - line) * (48 / div_number) - (row - 1) * (40 / div_row)]
+        new_position = give_new_position(new_direction, number, width, height, line, row, div_row, div_number, x, y)
 
         x = (new_position[0] - creature_position[0])
         y = (new_position[1] - creature_position[1])
@@ -307,33 +144,14 @@ def unit_rotate(b, unit_index, owner, current_position, creature_position, numbe
         k = ((250 - abs((spread * 1000) % 500 - 250)) / 250) * -12
         return [x * spread, y * spread + k]
 
-    elif unit_index in b.defending_rotate and owner == b.enemy:
+    elif rotating_defender:
+        # print("rotating_defender " + unit.name)
         child = list(b.queue[0].position)
-
         parent = list(current_position)
         x = int(parent[0]) - int(b.battle_pov[0])
         y = int(parent[1]) - int(b.battle_pov[1])
 
-        new_direction = ""
-        if parent[0] == child[0]:
-            if parent[1] > child[1]:
-                new_direction = "N"
-            elif parent[1] < child[1]:
-                new_direction = "S"
-        elif parent[0] > child[0]:
-            if parent[1] > child[1]:
-                new_direction = "NW"
-            elif parent[1] < child[1]:
-                new_direction = "SW"
-            elif parent[1] == child[1]:
-                new_direction = "W"
-        elif parent[0] < child[0]:
-            if parent[1] > child[1]:
-                new_direction = "NE"
-            elif parent[1] < child[1]:
-                new_direction = "SE"
-            elif parent[1] == child[1]:
-                new_direction = "E"
+        new_direction = give_new_direction(parent, child)
 
         div_row = rows - 1
         if div_row == 0:
@@ -343,81 +161,7 @@ def unit_rotate(b, unit_index, owner, current_position, creature_position, numbe
         if div_number == 0:
             div_number = 1
 
-        if new_direction == "E":
-            if number == 1:
-                new_position = [(x - 1) * 96 + 4 + 90 - width,
-                                (y - 1) * 96 + 4 + 90 - height - (48 - height / 2)]
-            else:
-                new_position = [(x - 1) * 96 + 4 + 90 - width - (row - 1) * ((90 - width) / div_row),
-                                (y - 1) * 96 + 4 + 90 - height - (number - line) * ((90 - height) / div_number)]
-
-        elif new_direction == "W":
-            if number == 1:
-                new_position = [(x - 1) * 96 + 4,
-                                (y - 1) * 96 + 4 + 90 - height - (48 - height / 2)]
-            else:
-                new_position = [(x - 1) * 96 + 4 +  # unit.crew[index].img_width +
-                                (row - 1) * ((90 - width) / div_row),
-                                (y - 1) * 96 + 4 + 90 - height - (number - line) * ((90 - height) / div_number)]
-
-        elif new_direction == "N":
-            if number == 1:
-                new_position = [(x - 1) * 96 + 4 + (48 - width / 2),
-                                (y - 1) * 96 + 4]
-            else:
-                new_position = [(x - 1) * 96 + 4 +  # unit.crew[index].img_width +
-                                (number - line) * ((90 - width) / div_number),
-                                (y - 1) * 96 + 4 +  # 90 - unit.crew[index].img_height -
-                                (row - 1) * ((90 - height) / div_row)]
-
-        elif new_direction == "S":
-            if number == 1:
-                new_position = [(x - 1) * 96 + 4 + (48 - width / 2),
-                                (y - 1) * 96 + 4 + 90 - height]
-            else:
-                new_position = [(x - 1) * 96 + 4 +  # unit.crew[index].img_width +
-                                (number - line) * ((90 - width) / div_number),
-                                (y - 1) * 96 + 4 + 90 - height - (row - 1) * ((90 - height) / div_row)]
-
-        elif new_direction == "NE":
-            if number == 1:
-                new_position = [(x - 1) * 96 + 48,
-                                (y - 1) * 96 + 48 - height]
-            else:
-                new_position = [(x - 1) * 96 + 48 - (width / 2) -
-                                (row - 1) * (48 / div_row) + (line - 1) * (40 / div_number),
-                                (y - 1) * 96 + 48 - (height / 2) -
-                                (number - line) * (48 / div_number) + (row - 1) * (40 / div_row)]
-
-        elif new_direction == "NW":
-            if number == 1:
-                new_position = [(x - 1) * 96 + 48 - width,
-                                (y - 1) * 96 + 48 - height]
-            else:
-                new_position = [(x - 1) * 96 + 48 - (width / 2) +
-                                (row - 1) * (48 / div_row) - (line - 1) * (40 / div_number),
-                                (y - 1) * 96 + 48 - (height / 2) -
-                                (number - line) * (48 / div_number) + (row - 1) * (40 / div_row)]
-
-        elif new_direction == "SE":
-            if number == 1:
-                new_position = [(x - 1) * 96 + 48,
-                                (y - 1) * 96 + 48]
-            else:
-                new_position = [(x - 1) * 96 + 48 - (width / 2) -
-                                (row - 1) * (48 / div_row) + (line - 1) * (40 / div_number),
-                                (y - 1) * 96 + 48 - (height / 2) +
-                                (number - line) * (48 / div_number) - (row - 1) * (40 / div_row)]
-
-        elif new_direction == "SW":
-            if number == 1:
-                new_position = [(x - 1) * 96 + 48 - width,
-                                (y - 1) * 96 + 48]
-            else:
-                new_position = [(x - 1) * 96 + 48 - (width / 2) +
-                                (row - 1) * (48 / div_row) - (line - 1) * (40 / div_number),
-                                (y - 1) * 96 + 48 - (height / 2) +
-                                (number - line) * (48 / div_number) - (row - 1) * (40 / div_row)]
+        new_position = give_new_position(new_direction, number, width, height, line, row, div_row, div_number, x, y)
 
         x = (new_position[0] - creature_position[0])
         y = (new_position[1] - creature_position[1])
@@ -447,81 +191,7 @@ def unit_rotate(b, unit_index, owner, current_position, creature_position, numbe
         if div_number == 0:
             div_number = 1
 
-        if new_direction == "E":
-            if number == 1:
-                new_position = [(x - 1) * 96 + 4 + 90 - width,
-                                (y - 1) * 96 + 4 + 90 - height - (48 - height / 2)]
-            else:
-                new_position = [(x - 1) * 96 + 4 + 90 - width - (row - 1) * ((90 - width) / div_row),
-                                (y - 1) * 96 + 4 + 90 - height - (number - line) * ((90 - height) / div_number)]
-
-        elif new_direction == "W":
-            if number == 1:
-                new_position = [(x - 1) * 96 + 4,
-                                (y - 1) * 96 + 4 + 90 - height - (48 - height / 2)]
-            else:
-                new_position = [(x - 1) * 96 + 4 +  # unit.crew[index].img_width +
-                                (row - 1) * ((90 - width) / div_row),
-                                (y - 1) * 96 + 4 + 90 - height - (number - line) * ((90 - height) / div_number)]
-
-        elif new_direction == "N":
-            if number == 1:
-                new_position = [(x - 1) * 96 + 4 + (48 - width / 2),
-                                (y - 1) * 96 + 4]
-            else:
-                new_position = [(x - 1) * 96 + 4 +  # unit.crew[index].img_width +
-                                (number - line) * ((90 - width) / div_number),
-                                (y - 1) * 96 + 4 +  # 90 - unit.crew[index].img_height -
-                                (row - 1) * ((90 - height) / div_row)]
-
-        elif new_direction == "S":
-            if number == 1:
-                new_position = [(x - 1) * 96 + 4 + (48 - width / 2),
-                                (y - 1) * 96 + 4 + 90 - height]
-            else:
-                new_position = [(x - 1) * 96 + 4 +  # unit.crew[index].img_width +
-                                (number - line) * ((90 - width) / div_number),
-                                (y - 1) * 96 + 4 + 90 - height - (row - 1) * ((90 - height) / div_row)]
-
-        elif new_direction == "NE":
-            if number == 1:
-                new_position = [(x - 1) * 96 + 48,
-                                (y - 1) * 96 + 48 - height]
-            else:
-                new_position = [(x - 1) * 96 + 48 - (width / 2) -
-                                (row - 1) * (48 / div_row) + (line - 1) * (40 / div_number),
-                                (y - 1) * 96 + 48 - (height / 2) -
-                                (number - line) * (48 / div_number) + (row - 1) * (40 / div_row)]
-
-        elif new_direction == "NW":
-            if number == 1:
-                new_position = [(x - 1) * 96 + 48 - width,
-                                (y - 1) * 96 + 48 - height]
-            else:
-                new_position = [(x - 1) * 96 + 48 - (width / 2) +
-                                (row - 1) * (48 / div_row) - (line - 1) * (40 / div_number),
-                                (y - 1) * 96 + 48 - (height / 2) -
-                                (number - line) * (48 / div_number) + (row - 1) * (40 / div_row)]
-
-        elif new_direction == "SE":
-            if number == 1:
-                new_position = [(x - 1) * 96 + 48,
-                                (y - 1) * 96 + 48]
-            else:
-                new_position = [(x - 1) * 96 + 48 - (width / 2) -
-                                (row - 1) * (48 / div_row) + (line - 1) * (40 / div_number),
-                                (y - 1) * 96 + 48 - (height / 2) +
-                                (number - line) * (48 / div_number) - (row - 1) * (40 / div_row)]
-
-        elif new_direction == "SW":
-            if number == 1:
-                new_position = [(x - 1) * 96 + 48 - width,
-                                (y - 1) * 96 + 48]
-            else:
-                new_position = [(x - 1) * 96 + 48 - (width / 2) +
-                                (row - 1) * (48 / div_row) - (line - 1) * (40 / div_number),
-                                (y - 1) * 96 + 48 - (height / 2) +
-                                (number - line) * (48 / div_number) - (row - 1) * (40 / div_row)]
+        new_position = give_new_position(new_direction, number, width, height, line, row, div_row, div_number, x, y)
 
         x = (new_position[0] - creature_position[0])
         y = (new_position[1] - creature_position[1])
@@ -548,59 +218,9 @@ def machine_march(b, unit_index, parent, creature_position, owner, img_width, im
         x = int(child[0]) - int(b.battle_pov[0])
         y = int(child[1]) - int(b.battle_pov[1])
 
-        new_direction = ""
-        if parent[0] == child[0]:
-            if parent[1] > child[1]:
-                new_direction = "N"
-            elif parent[1] < child[1]:
-                new_direction = "S"
-        elif parent[0] > child[0]:
-            if parent[1] > child[1]:
-                new_direction = "NW"
-            elif parent[1] < child[1]:
-                new_direction = "SW"
-            elif parent[1] == child[1]:
-                new_direction = "W"
-        elif parent[0] < child[0]:
-            if parent[1] > child[1]:
-                new_direction = "NE"
-            elif parent[1] < child[1]:
-                new_direction = "SE"
-            elif parent[1] == child[1]:
-                new_direction = "E"
+        new_direction = give_new_direction(parent, child)
 
-        new_position = []
-        if new_direction == "E":
-            new_position = [(x - 1) * 96 + 90 - img_width,
-                            (y - 1) * 96 + 60 - img_height]
-
-        elif new_direction == "W":
-            new_position = [(x - 1) * 96 + 7,
-                            (y - 1) * 96 + 60 - img_height]
-
-        elif new_direction == "N":
-            new_position = [(x - 1) * 96 + 49 - (img_width / 2),
-                            (y - 1) * 96 + 35 - img_height]
-
-        elif new_direction == "S":
-            new_position = [(x - 1) * 96 + 49 - (img_width / 2),
-                            (y - 1) * 96 + 81 - img_height]
-
-        elif new_direction == "NE":
-            new_position = [(x - 1) * 96 + 65 - (img_width / 2),
-                            (y - 1) * 96 + 28 - img_height]
-
-        elif new_direction == "NW":
-            new_position = [(x - 1) * 96 + 32 - (img_width / 2),
-                            (y - 1) * 96 + 28 - img_height]
-
-        elif new_direction == "SE":
-            new_position = [(x - 1) * 96 + 65 - (img_width / 2),
-                            (y - 1) * 96 + 75 - img_height]
-
-        elif new_direction == "SW":
-            new_position = [(x - 1) * 96 + 32 - (img_width / 2),
-                            (y - 1) * 96 + 75 - img_height]
+        new_position = give_new_position_machine(new_direction, img_width, img_height, x, y)
 
         x = (new_position[0] - creature_position[0])
         y = (new_position[1] - creature_position[1])
@@ -620,66 +240,31 @@ def machine_march(b, unit_index, parent, creature_position, owner, img_width, im
 
 
 def machine_rotate(b, unit_index, owner, current_position, creature_position, img_width, img_height):
-    new_position = []
-    if unit_index in b.attacking_rotate and owner == b.queue[0].owner:
+    rotating_attacker = False
+    for regiment_info in b.attacking_rotate:
+        if regiment_info.posxy == current_position:
+            # print("attacking_rotate " + unit.name + ": current_position - " + str(current_position) +
+            #       "; regiment_info.posxy - " + str(regiment_info.posxy))
+            rotating_attacker = True
+            break
+    rotating_defender = False
+    for regiment_info in b.defending_rotate:
+        if regiment_info.posxy == current_position:
+            # print("defending_rotate " + unit.name + ": current_position - " + str(current_position) +
+            #       "; regiment_info.posxy - " + str(regiment_info.posxy))
+            rotating_defender = True
+            break
+
+    if rotating_attacker and b.secondary in ["Melee attack", "Break the gates", "Dock the wall"]:
         child = list(b.target_destination)
 
         parent = list(current_position)
         x = int(parent[0]) - int(b.battle_pov[0])
         y = int(parent[1]) - int(b.battle_pov[1])
 
-        new_direction = ""
-        if parent[0] == child[0]:
-            if parent[1] > child[1]:
-                new_direction = "N"
-            elif parent[1] < child[1]:
-                new_direction = "S"
-        elif parent[0] > child[0]:
-            if parent[1] > child[1]:
-                new_direction = "NW"
-            elif parent[1] < child[1]:
-                new_direction = "SW"
-            elif parent[1] == child[1]:
-                new_direction = "W"
-        elif parent[0] < child[0]:
-            if parent[1] > child[1]:
-                new_direction = "NE"
-            elif parent[1] < child[1]:
-                new_direction = "SE"
-            elif parent[1] == child[1]:
-                new_direction = "E"
+        new_direction = give_new_direction(parent, child)
 
-        if new_direction == "E":
-            new_position = [(x - 1) * 96 + 90 - img_width,
-                            (y - 1) * 96 + 60 - img_height]
-
-        elif new_direction == "W":
-            new_position = [(x - 1) * 96 + 7,
-                            (y - 1) * 96 + 60 - img_height]
-
-        elif new_direction == "N":
-            new_position = [(x - 1) * 96 + 49 - (img_width / 2),
-                            (y - 1) * 96 + 35 - img_height]
-
-        elif new_direction == "S":
-            new_position = [(x - 1) * 96 + 49 - (img_width / 2),
-                            (y - 1) * 96 + 81 - img_height]
-
-        elif new_direction == "NE":
-            new_position = [(x - 1) * 96 + 65 - (img_width / 2),
-                            (y - 1) * 96 + 28 - img_height]
-
-        elif new_direction == "NW":
-            new_position = [(x - 1) * 96 + 32 - (img_width / 2),
-                            (y - 1) * 96 + 28 - img_height]
-
-        elif new_direction == "SE":
-            new_position = [(x - 1) * 96 + 65 - (img_width / 2),
-                            (y - 1) * 96 + 75 - img_height]
-
-        elif new_direction == "SW":
-            new_position = [(x - 1) * 96 + 32 - (img_width / 2),
-                            (y - 1) * 96 + 75 - img_height]
+        new_position = give_new_position_machine(new_direction, img_width, img_height, x, y)
 
         x = (new_position[0] - creature_position[0])
         y = (new_position[1] - creature_position[1])
@@ -695,65 +280,16 @@ def machine_rotate(b, unit_index, owner, current_position, creature_position, im
         k = ((250 - abs((spread * 1000) % 500 - 250)) / 250) * -6
         return [x * spread, y * spread + k]
 
-    elif unit_index in b.defending_rotate and owner == b.enemy:
+    elif rotating_defender:
         child = list(b.queue[0].position)
 
         parent = list(current_position)
         x = int(parent[0]) - int(b.battle_pov[0])
         y = int(parent[1]) - int(b.battle_pov[1])
 
-        new_direction = ""
-        if parent[0] == child[0]:
-            if parent[1] > child[1]:
-                new_direction = "N"
-            elif parent[1] < child[1]:
-                new_direction = "S"
-        elif parent[0] > child[0]:
-            if parent[1] > child[1]:
-                new_direction = "NW"
-            elif parent[1] < child[1]:
-                new_direction = "SW"
-            elif parent[1] == child[1]:
-                new_direction = "W"
-        elif parent[0] < child[0]:
-            if parent[1] > child[1]:
-                new_direction = "NE"
-            elif parent[1] < child[1]:
-                new_direction = "SE"
-            elif parent[1] == child[1]:
-                new_direction = "E"
+        new_direction = give_new_direction(parent, child)
 
-        if new_direction == "E":
-            new_position = [(x - 1) * 96 + 90 - img_width,
-                            (y - 1) * 96 + 60 - img_height]
-
-        elif new_direction == "W":
-            new_position = [(x - 1) * 96 + 7,
-                            (y - 1) * 96 + 60 - img_height]
-
-        elif new_direction == "N":
-            new_position = [(x - 1) * 96 + 49 - (img_width / 2),
-                            (y - 1) * 96 + 35 - img_height]
-
-        elif new_direction == "S":
-            new_position = [(x - 1) * 96 + 49 - (img_width / 2),
-                            (y - 1) * 96 + 81 - img_height]
-
-        elif new_direction == "NE":
-            new_position = [(x - 1) * 96 + 65 - (img_width / 2),
-                            (y - 1) * 96 + 28 - img_height]
-
-        elif new_direction == "NW":
-            new_position = [(x - 1) * 96 + 32 - (img_width / 2),
-                            (y - 1) * 96 + 28 - img_height]
-
-        elif new_direction == "SE":
-            new_position = [(x - 1) * 96 + 65 - (img_width / 2),
-                            (y - 1) * 96 + 75 - img_height]
-
-        elif new_direction == "SW":
-            new_position = [(x - 1) * 96 + 32 - (img_width / 2),
-                            (y - 1) * 96 + 75 - img_height]
+        new_position = give_new_position_machine(new_direction, img_width, img_height, x, y)
 
         x = (new_position[0] - creature_position[0])
         y = (new_position[1] - creature_position[1])
@@ -775,37 +311,7 @@ def machine_rotate(b, unit_index, owner, current_position, creature_position, im
         x = int(parent[0]) - int(b.battle_pov[0])
         y = int(parent[1]) - int(b.battle_pov[1])
 
-        if new_direction == "E":
-            new_position = [(x - 1) * 96 + 90 - img_width,
-                            (y - 1) * 96 + 60 - img_height]
-
-        elif new_direction == "W":
-            new_position = [(x - 1) * 96 + 7,
-                            (y - 1) * 96 + 60 - img_height]
-
-        elif new_direction == "N":
-            new_position = [(x - 1) * 96 + 49 - (img_width / 2),
-                            (y - 1) * 96 + 35 - img_height]
-
-        elif new_direction == "S":
-            new_position = [(x - 1) * 96 + 49 - (img_width / 2),
-                            (y - 1) * 96 + 81 - img_height]
-
-        elif new_direction == "NE":
-            new_position = [(x - 1) * 96 + 65 - (img_width / 2),
-                            (y - 1) * 96 + 28 - img_height]
-
-        elif new_direction == "NW":
-            new_position = [(x - 1) * 96 + 32 - (img_width / 2),
-                            (y - 1) * 96 + 28 - img_height]
-
-        elif new_direction == "SE":
-            new_position = [(x - 1) * 96 + 65 - (img_width / 2),
-                            (y - 1) * 96 + 75 - img_height]
-
-        elif new_direction == "SW":
-            new_position = [(x - 1) * 96 + 32 - (img_width / 2),
-                            (y - 1) * 96 + 75 - img_height]
+        new_position = give_new_position_machine(new_direction, img_width, img_height, x, y)
 
         x = (new_position[0] - creature_position[0])
         y = (new_position[1] - creature_position[1])
@@ -846,3 +352,147 @@ def unit_nosedive(b, unit_index, owner):
 
     else:
         return [0, 0]
+
+
+def give_new_direction(parent, child):
+    new_direction = ""
+    if parent[0] == child[0]:
+        if parent[1] > child[1]:
+            new_direction = "N"
+        elif parent[1] < child[1]:
+            new_direction = "S"
+    elif parent[0] > child[0]:
+        if parent[1] > child[1]:
+            new_direction = "NW"
+        elif parent[1] < child[1]:
+            new_direction = "SW"
+        elif parent[1] == child[1]:
+            new_direction = "W"
+    elif parent[0] < child[0]:
+        if parent[1] > child[1]:
+            new_direction = "NE"
+        elif parent[1] < child[1]:
+            new_direction = "SE"
+        elif parent[1] == child[1]:
+            new_direction = "E"
+
+    return new_direction
+
+
+def give_new_position(new_direction, number, width, height, line, row, div_row, div_number, x, y):
+    new_position = [None, None]
+    if new_direction == "E":
+        if number == 1:
+            new_position = [(x - 1) * 96 + 4 + 90 - width,
+                            (y - 1) * 96 + 4 + 90 - height - (48 - height / 2)]
+        else:
+            new_position = [(x - 1) * 96 + 4 + 90 - width - (row - 1) * ((90 - width) / div_row),
+                            (y - 1) * 96 + 4 + 90 - height - (number - line) * ((90 - height) / div_number)]
+
+    elif new_direction == "W":
+        if number == 1:
+            new_position = [(x - 1) * 96 + 4,
+                            (y - 1) * 96 + 4 + 90 - height - (48 - height / 2)]
+        else:
+            new_position = [(x - 1) * 96 + 4 +  # unit.crew[index].img_width +
+                            (row - 1) * ((90 - width) / div_row),
+                            (y - 1) * 96 + 4 + 90 - height - (number - line) * ((90 - height) / div_number)]
+
+    elif new_direction == "N":
+        if number == 1:
+            new_position = [(x - 1) * 96 + 4 + (48 - width / 2),
+                            (y - 1) * 96 + 4]
+        else:
+            new_position = [(x - 1) * 96 + 4 +  # unit.crew[index].img_width +
+                            (number - line) * ((90 - width) / div_number),
+                            (y - 1) * 96 + 4 +  # 90 - unit.crew[index].img_height -
+                            (row - 1) * ((90 - height) / div_row)]
+
+    elif new_direction == "S":
+        if number == 1:
+            new_position = [(x - 1) * 96 + 4 + (48 - width / 2),
+                            (y - 1) * 96 + 4 + 90 - height]
+        else:
+            new_position = [(x - 1) * 96 + 4 +  # unit.crew[index].img_width +
+                            (number - line) * ((90 - width) / div_number),
+                            (y - 1) * 96 + 4 + 90 - height - (row - 1) * ((90 - height) / div_row)]
+
+    elif new_direction == "NE":
+        if number == 1:
+            new_position = [(x - 1) * 96 + 48,
+                            (y - 1) * 96 + 48 - height]
+        else:
+            new_position = [(x - 1) * 96 + 48 - (width / 2) -
+                            (row - 1) * (48 / div_row) + (line - 1) * (40 / div_number),
+                            (y - 1) * 96 + 48 - (height / 2) -
+                            (number - line) * (48 / div_number) + (row - 1) * (40 / div_row)]
+
+    elif new_direction == "NW":
+        if number == 1:
+            new_position = [(x - 1) * 96 + 48 - width,
+                            (y - 1) * 96 + 48 - height]
+        else:
+            new_position = [(x - 1) * 96 + 48 - (width / 2) +
+                            (row - 1) * (48 / div_row) - (line - 1) * (40 / div_number),
+                            (y - 1) * 96 + 48 - (height / 2) -
+                            (number - line) * (48 / div_number) + (row - 1) * (40 / div_row)]
+
+    elif new_direction == "SE":
+        if number == 1:
+            new_position = [(x - 1) * 96 + 48,
+                            (y - 1) * 96 + 48]
+        else:
+            new_position = [(x - 1) * 96 + 48 - (width / 2) -
+                            (row - 1) * (48 / div_row) + (line - 1) * (40 / div_number),
+                            (y - 1) * 96 + 48 - (height / 2) +
+                            (number - line) * (48 / div_number) - (row - 1) * (40 / div_row)]
+
+    elif new_direction == "SW":
+        if number == 1:
+            new_position = [(x - 1) * 96 + 48 - width,
+                            (y - 1) * 96 + 48]
+        else:
+            new_position = [(x - 1) * 96 + 48 - (width / 2) +
+                            (row - 1) * (48 / div_row) - (line - 1) * (40 / div_number),
+                            (y - 1) * 96 + 48 - (height / 2) +
+                            (number - line) * (48 / div_number) - (row - 1) * (40 / div_row)]
+
+    return new_position
+
+
+def give_new_position_machine(new_direction, img_width, img_height, x, y):
+    new_position = [None, None]
+
+    if new_direction == "E":
+        new_position = [(x - 1) * 96 + 90 - img_width,
+                        (y - 1) * 96 + 60 - img_height]
+
+    elif new_direction == "W":
+        new_position = [(x - 1) * 96 + 7,
+                        (y - 1) * 96 + 60 - img_height]
+
+    elif new_direction == "N":
+        new_position = [(x - 1) * 96 + 49 - (img_width / 2),
+                        (y - 1) * 96 + 35 - img_height]
+
+    elif new_direction == "S":
+        new_position = [(x - 1) * 96 + 49 - (img_width / 2),
+                        (y - 1) * 96 + 81 - img_height]
+
+    elif new_direction == "NE":
+        new_position = [(x - 1) * 96 + 65 - (img_width / 2),
+                        (y - 1) * 96 + 28 - img_height]
+
+    elif new_direction == "NW":
+        new_position = [(x - 1) * 96 + 32 - (img_width / 2),
+                        (y - 1) * 96 + 28 - img_height]
+
+    elif new_direction == "SE":
+        new_position = [(x - 1) * 96 + 65 - (img_width / 2),
+                        (y - 1) * 96 + 75 - img_height]
+
+    elif new_direction == "SW":
+        new_position = [(x - 1) * 96 + 32 - (img_width / 2),
+                        (y - 1) * 96 + 75 - img_height]
+
+    return new_position

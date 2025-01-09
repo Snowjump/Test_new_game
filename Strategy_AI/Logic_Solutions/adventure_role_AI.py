@@ -15,10 +15,9 @@ from Strategy_AI import AI_exploration_cond
 from Strategy_AI.Logic_Solutions import power_ranking
 
 
-def solution(realm, role, friendly_cities, hostile_cities, at_war_list):
+def solution(realm, role, friendly_cities, hostile_cities, at_war_list, army):
     print("")
-    print("adventure_role_AI")
-    army = common_selects.select_army_by_id(role.army_id)
+    print("adventure_role_AI.solution()")
 
     city_id_in_location = game_obj.game_map[army.location].city_id
     go_to_adventure = False
@@ -26,10 +25,10 @@ def solution(realm, role, friendly_cities, hostile_cities, at_war_list):
         # Shouldn't go to adventure
         print("Army is shattered")
         pass
-    elif army.action in ["Fighting", "Besieged", "Besieging"]:
-        # Shouldn't go to adventure due to fighting
-        print("Army " + str(army.army_id) + " is busy fighting")
-        pass
+    # elif army.action in ["Fighting", "Besieged", "Besieging"]:
+    #     # Shouldn't go to adventure due to fighting
+    #     print("Army " + str(army.army_id) + " is busy " + army.action.lower())
+    #     pass
     elif role.army_role == "Adventure":
         print("army.route: " + str(army.route))
         print("army.army_id = " + str(army.army_id) + "; army.action = " + str(army.action))

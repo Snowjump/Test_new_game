@@ -16,14 +16,17 @@ from Battle_AI import battle_logic
 from Resources import battle_skills
 from Resources import update_gf_battle
 from Resources import common_selects
+from Resources import common_lists
+from Resources.Game_Battle import execute_order_funs
 
-from Content import ability_catalog
 from Content import movement_catalog
 from Content import siege_warfare_catalog
 
 
 # Battle queue keeps record in what order will act regiments, heroes and effects
 def form_queue(b):  # b - stands for Battle
+    print("")
+    print("form_queue()")
     blank = []
 
     for army in game_obj.game_armies:
@@ -45,7 +48,7 @@ def form_queue(b):  # b - stands for Battle
                               unit.crew[0].img_height, "Regiment"])
                 index += 1
 
-            if a.hero is not None:
+            if a.hero:
                 print("Add " + str(a.hero.name) + " to queue")
                 blank.append([a.army_id, a.owner, None, None, a.hero.img_source, a.hero.img, first_color,
                               second_color, a.hero.x_offset, a.hero.y_offset, 0, 0, "Hero"])
@@ -75,6 +78,7 @@ def advance_queue(b):  # b - stands for Battle
 
     if len(list_of_effect_cards) > 0:
         list_of_effect_cards = sorted(list_of_effect_cards, reverse=True)
+        index_list = []
         for element in list_of_effect_cards:
             for army in game_obj.game_armies:
                 if army.army_id == b.queue[element].army_id:
@@ -82,7 +86,9 @@ def advance_queue(b):  # b - stands for Battle
                         if effect.name == b.queue[element].title:
                             army.units[b.queue[element].number].effects.remove(effect)
                     break
-            del b.queue[element]
+            index_list.append(element)
+
+        common_lists.reversed_list_cleaning(b.queue, index_list)
 
     # Resetting
     b.attacking_rotate = []
@@ -105,6 +111,8 @@ def advance_queue(b):  # b - stands for Battle
         b.AI_ready = True
 
     if b.queue[0].obj_type != "Hero":
+        print(str(b.queue[0].owner) + " " + str(b.queue[0].obj_type) + " " + str(b.queue[0].number) + " "
+              + str(b.queue[0].position))
         # Move screen
         x = int(b.queue[0].position[0])
         y = int(b.queue[0].position[1])
@@ -130,7 +138,7 @@ def advance_queue(b):  # b - stands for Battle
     if b.queue[0].obj_type == "Regiment":
         army = common_selects.select_army_by_id(b.queue[0].army_id)
         morale_restoration_bonus = 0.0
-        if army.hero is not None:
+        if army.hero:
             for skill in army.hero.skills:
                 for effect in skill.effects:
                     if effect.application == "Bonus morale restoration":
@@ -157,7 +165,7 @@ def advance_queue(b):  # b - stands for Battle
         unit.engaged = False
         # Reset counterattack counter
         unit.counterattack = 1
-        if army.hero is not None:
+        if army.hero:
             for skill in army.hero.skills:
                 for effect in skill.effects:
                     if effect.application == "Bonus counterattack":
@@ -180,6 +188,7 @@ def advance_queue(b):  # b - stands for Battle
                 # unit.effects.remove(e)
             num += 1
 
+        common_lists
         if num_list:
             num_list = sorted(num_list, reverse=True)
             for index in num_list:
@@ -275,479 +284,83 @@ def action_order(b, first_action, second_action):
 
         # Disengaging surrounding units
         disengage(b, b.queue[0].position)
+        print("")
 
 
 def execute_order(b):
     print("execute_order()")
     print("b.primary - " + str(b.primary) + "; b.secondary - " + str(b.secondary))
-    unit = None
+    acting_unit = None
     acting_army = common_selects.select_army_by_id(b.queue[0].army_id)
-    print("b.enemy_army_id - " + str(b.enemy_army_id))
-    # print("Execution for " + str(b.queue[0].obj_type))
-    if b.queue[0].obj_type != "Hero":
-        unit = acting_army.units[b.queue[0].number]
-        print(unit.name)
-        if b.primary in ["Rotate", "Move", "Route"]:
-            if b.tile_trail:
-                change_side_direction(unit, b)
-            elif b.secondary == "Route":
-                print("Nowhere to go - " + str(b.secondary))
-                b.primary = "Wait"
-                b.secondary = None
-
     acting_hero = acting_army.hero
     enemy_army = None
     enemy_hero = None
     if b.enemy_army_id:
         enemy_army = common_selects.select_army_by_id(b.enemy_army_id)
         enemy_hero = enemy_army.hero
+    # print("b.enemy_army_id - " + str(b.enemy_army_id))
+    # print("Execution for " + str(b.queue[0].obj_type))
+    if b.queue[0].obj_type != "Hero":
+        acting_unit = acting_army.units[b.queue[0].number]
+        print(acting_unit.name + " - not a hero")
+        if b.primary in ["Rotate", "Move", "Route"]:
+            if b.tile_trail:
+                change_side_direction(acting_unit, b, acting_army, enemy_army)
+            elif b.secondary == "Route":
+                print("Nowhere to go - " + str(b.secondary))
+                b.primary = "Wait"
+                b.secondary = None
 
     if b.primary == "Move":
-        print("execute_order - Move")
-        x1 = int(b.queue[0].position[0])
-        y1 = int(b.queue[0].position[1])
-        TileNum1 = (y1 - 1) * game_stats.battle_width + x1 - 1
-
-        # open_or_close_the_gate(b, TileNum1)  # develop more later
-
-        print("game_battle .. execute_order() .. b.tile_trail:")
-        print(str(b.tile_trail))
-        print("")
-        b.queue[0].position = b.tile_trail.pop(0)
-
-        update_true = True
-        if b.secondary == "Route":
-            if b.queue[0].position[0] < 1 or b.queue[0].position[0] > game_stats.battle_width:
-                update_true = False
-
-        x2 = int(b.queue[0].position[0])
-        y2 = int(b.queue[0].position[1])
-        TileNum2 = (y2 - 1) * game_stats.battle_width + x2 - 1
-
-        if update_true:
-            if b.secondary == "Hit and fly":
-                # This flying regiment is striking enemy from above
-                # Therefore it is staying in the air
-                b.battle_map[TileNum2].passing_unit_index = int(b.queue[0].number)
-                b.battle_map[TileNum2].passing_army_id = int(b.queue[0].army_id)
-
-            elif len(b.tile_trail) != 0:
-                # Regular rules
-                b.battle_map[TileNum2].passing_unit_index = int(b.queue[0].number)
-                b.battle_map[TileNum2].passing_army_id = int(b.queue[0].army_id)
-
-        if b.battle_map[TileNum1].army_id == b.queue[0].army_id \
-                and b.battle_map[TileNum1].unit_index == b.queue[0].number:
-            b.battle_map[TileNum1].army_id = None
-            b.battle_map[TileNum1].unit_index = None
-
-        b.battle_map[TileNum1].passing_army_id = None
-        b.battle_map[TileNum1].passing_unit_index = None
-
-        unit.position = [int(x2), int(y2)]
-        unit.direction = change_direction([x1, y1], [x2, y2])
-
-        for skill in unit.skills:
-            if skill.application == "Movement":
-                if skill.quality == "Can fly":
-                    unit.in_air = True
-                    print("1) move_figure - " + str(b.move_figure))
-                    if len(b.tile_trail) > 1:
-                        if b.move_figure == "takeoff":
-                            b.move_figure = "flying"
-                    else:
-                        if b.secondary == "Hit and fly":
-                            # Not landing yet, but striking enemy from above
-                            b.move_figure = "flying"
-                        else:
-                            b.move_figure = "landing"
-                    print("2) move_figure - " + str(b.move_figure))
-                    break
-
-        if len(b.tile_trail) == 0:
-            if b.secondary == "Hit and fly":
-                # This flying regiment is striking enemy from above
-                b.move_figure = "nosedive"
-                print("b.secondary - " + str(b.secondary) + "; b.move_figure - " + str(b.move_figure))
-            else:
-                if update_true:
-                    b.battle_map[TileNum2].unit_index = int(b.queue[0].number)
-                    b.battle_map[TileNum2].army_id = int(b.queue[0].army_id)
-
-                if unit.in_air:
-                    unit.in_air = False
-                    b.move_figure = None
-            apply_aura(unit, b, b.queue[0].army_id)
-            b.tile_trail = None
-            b.primary = None
-            if b.secondary is None:
-                battle_skills.passive_charge_track(unit)
-                b.move_destination = None
-                complete_turn(b, 1.0)
-            elif b.secondary == "Break the gates":
-                b.primary = "Rotate"
-            elif b.secondary == "Dock the wall":
-                b.primary = "Rotate"
-            elif b.secondary == "Melee attack":
-                b.primary = "Rotate"
-                print("b.primary == Rotate; b.secondary == Melee attack")
-                print("b.enemy_army_id - " + str(b.enemy_army_id))
-            elif b.secondary == "Hit and fly":
-                b.primary = "Hit from above"
-                print("b.primary == Hit from above; b.secondary == Hit and fly")
-                print("b.enemy_army_id - " + str(b.enemy_army_id))
-            elif b.secondary == "Fly back":
-                b.move_back_destination = None
-                b.primary = "Damage message"
-                b.anim_message = "Damage and kills"
-            elif b.secondary == "Route":
-                battle_skills.passive_charge_track(unit)
-                battle_ending(b)
-
-                if b.battle_stop:
-                    # Unit has routed and battle is over
-                    print("Unit has routed and battle is over")
-
-                else:
-                    b.secondary = None
-                    if not update_true:
-                        b.path = None
-                        b.movement_grid = None
-                        unit.deserted = True
-                        b.queue.pop(0)
-                        advance_queue(b)
-                    else:
-                        complete_turn(b, 1.0)
+        execute_order_funs.primary_move(b, acting_unit, acting_army, enemy_army)
 
     elif b.primary == "Wait":
-        if b.queue[0].obj_type != "Hero":
-            battle_skills.passive_charge_track(unit)
-        b.primary = "Wait message"
-        b.anim_message = "Wait"
-        # print("b.primary")
+        execute_order_funs.primary_wait(b, acting_unit)
     elif b.primary == "Wait message":
-        b.primary = "Wait message1"
-        b.anim_message = "Wait"
+        execute_order_funs.primary_wait_message(b)
     elif b.primary == "Wait message1":
-        b.primary = None
-        b.anim_message = None
-        complete_turn(b, 0.5)
+        execute_order_funs.primary_wait_message1(b)
 
     elif b.primary == "Defend":
-        unit.effects.append(effect_classes.Battle_Effect("Defend action", True,
-                                                         float(b.queue[0].time_act), float(b.queue[0].time_act + 1.0),
-                                                         [effect_classes.Buff("Armour", int(unit.armour),
-                                                                              "addition", None),
-                                                          effect_classes.Buff("Defence", int(unit.defence),
-                                                                              "addition", None)]))
-
-        battle_skills.passive_charge_track(unit)
-
-        b.primary = "Defend message"
-        b.anim_message = "Defend"
+        execute_order_funs.primary_defend(b, acting_unit)
     elif b.primary == "Defend message":
-        b.primary = "Defend message1"
-        b.anim_message = "Defend"
+        execute_order_funs.primary_defend_message(b)
     elif b.primary == "Defend message1":
-        b.primary = None
-        b.anim_message = None
-        complete_turn(b, 1.0)
+        execute_order_funs.primary_defend_message1(b)
 
     elif b.primary == "Pass":
-        print(str(b.primary) + ", b.selected_ability - " + str(b.selected_ability))
-        b.primary = "Pass1"
-        b.anim_message = str(b.selected_ability)
-
+        execute_order_funs.primary_pass(b)
     elif b.primary == "Pass1":
-        print(str(b.primary) + ", b.queue[0].obj_type - " + str(b.queue[0].obj_type))
-        b.primary = None
-        b.anim_message = None
-
-        b.list_of_schools = []
-        b.list_of_abilities = []
-        b.ability_index = 0
-        b.school_index = 0
-        b.selected_school = None
-        b.selected_ability = None
-        if b.queue[0].obj_type == "Hero":
-            complete_turn(b, acting_hero.initiative)
-        elif b.queue[0].obj_type == "Regiment":
-            for army in game_obj.game_armies:
-                if army.army_id == b.queue[0].army_id:
-                    unit = army.units[b.queue[0].number]
-                    break
-            complete_turn(b, unit.initiative)
+        execute_order_funs.primary_pass1(b, acting_army, acting_hero)
 
     elif b.primary == "Rotate":
-        # print("b.primary == Rotate")
-        # print("b.enemy_army_id - " + str(b.enemy_army_id))
-        if b.secondary == "Break the gates":
-            b.primary = "Break the gates"
-            b.secondary = None
-            for army in game_obj.game_armies:
-                if army.army_id == b.queue[0].army_id:
-                    for number in b.attacking_rotate:
-                        unit = army.units[number]
-                        unit.direction = change_direction(unit.position, b.target_destination)
-                    break
-
-        elif b.secondary == "Dock the wall":
-            b.primary = "Dock the wall"
-            b.secondary = None
-            for army in game_obj.game_armies:
-                if army.army_id == b.queue[0].army_id:
-                    for number in b.attacking_rotate:
-                        unit = army.units[number]
-                        unit.direction = change_direction(unit.position, b.target_destination)
-                    break
-
-        elif b.secondary == "Melee attack":
-            b.primary = "Melee attack"
-            b.secondary = None
-            if len(b.attacking_rotate) > 0:
-                for army in game_obj.game_armies:
-                    if army.army_id == b.queue[0].army_id:
-                        for number in b.attacking_rotate:
-                            unit = army.units[number]
-                            unit.direction = change_direction(unit.position, b.target_destination)
-
-                    if army.army_id == b.enemy_army_id:
-                        for number in b.defending_rotate:
-                            unit = army.units[number]
-                            unit.direction = change_direction(unit.position, b.queue[0].position)
-
-        elif b.secondary == "Counterattack":
-            b.primary = "Counterattack"
-            b.secondary = None
-
-            TileNum2 = (b.target_destination[1] - 1) * game_stats.battle_width + b.target_destination[0] - 1
-            for army in game_obj.game_armies:
-                if army.army_id == b.battle_map[TileNum2].army_id:
-                    b.enemy_army_id = army.army_id
-                    if not army.units[b.battle_map[TileNum2].unit_index].engaged:
-                        army.units[b.battle_map[TileNum2].unit_index].engaged = True
-
-                    b.defending_rotate.append(b.battle_map[TileNum2].unit_index)
-                    break
-
-            if len(b.attacking_rotate) > 0:
-                for army in game_obj.game_armies:
-                    if army.army_id == b.queue[0].army_id:
-                        for number in b.attacking_rotate:
-                            unit = army.units[number]
-                            unit.direction = change_direction(unit.position, b.target_destination)
-
-                    if army.army_id == b.enemy_army_id:
-                        for number in b.defending_rotate:
-                            unit = army.units[number]
-                            unit.direction = change_direction(unit.position, b.queue[0].position)
-
-        # complete_turn(b, 1.0)
-        elif b.secondary == "Ranged attack":
-            for army in game_obj.game_armies:
-                if army.army_id == b.queue[0].army_id:
-                    unit = army.units[b.queue[0].number]
-                    unit.direction = str(b.changed_direction)
-
-            b.primary = "Ranged attack"
-            b.secondary = None
+        execute_order_funs.primary_rotate(b, acting_army, acting_unit, enemy_army)
 
     elif b.primary == "Melee attack":
-        # print("b.primary == Melee attack")
-        # print("b.enemy_army_id - " + str(b.enemy_army_id))
-        TileNum2 = (b.target_destination[1] - 1) * game_stats.battle_width + b.target_destination[0] - 1
-        for army in game_obj.game_armies:
-            if army.army_id == b.queue[0].army_id:
-                unit_at = army.units[b.queue[0].number].direction
-                unit = army.units[b.queue[0].number]
-
-            elif army.army_id == b.enemy_army_id:
-                unit_df = army.units[b.battle_map[TileNum2].unit_index].direction
-                primary_target = army.units[b.battle_map[TileNum2].unit_index]
-
-        angle = attack_angle(unit_at, unit_df)
-
-        # Let AI player choose a melee attack
-        # print("b.realm_in_control - " + str(b.realm_in_control))
-        if b.realm_in_control == "Neutral":  # If enemy doesn't have a realm
-            choose_melee_attack_by_type(b, unit, primary_target)
-        else:
-            for realm in game_obj.game_powers:
-                if realm.name == b.realm_in_control:
-                    if realm.AI_player:
-                        choose_melee_attack_by_type(b, unit, primary_target)
-                    break
-
-        b.perform_attack = form_list_of_attackers(b, unit)
-        complete_melee_attack(b, unit, primary_target, angle, acting_hero, enemy_hero)
-
-        if b.battle_stop:
-            # Enemy is killed and battle is over
-            print("Enemy is killed in melee and battle is over")
-        else:
-            b.primary = "Damage message"
-            b.anim_message = "Damage and kills"
+        execute_order_funs.primary_melee_attack(b, acting_hero, acting_unit, enemy_hero, enemy_army)
 
     elif b.primary == "Hit from above":
-        print("b.primary == Hit from above")
-        print("b.enemy_army_id - " + str(b.enemy_army_id))
-        TileNum2 = (b.target_destination[1] - 1) * game_stats.battle_width + b.target_destination[0] - 1
-        for army in game_obj.game_armies:
-            if army.army_id == b.queue[0].army_id:
-                unit = army.units[b.queue[0].number]
-
-            elif army.army_id == b.enemy_army_id:
-                primary_target = army.units[b.battle_map[TileNum2].unit_index]
-
-        angle = "Above"
-        b.perform_attack = form_list_of_attackers(b, unit)
-        complete_melee_attack(b, unit, primary_target, angle, acting_hero, enemy_hero)
-
-        if b.battle_stop:
-            # Enemy is killed and battle is over
-            print("Enemy is killed in melee and battle is over")
-        else:
-            b.primary = "Move"
-            b.secondary = "Fly back"
-            b.move_destination = [int(b.move_back_destination[0]), int(b.move_back_destination[1])]
-            start = b.queue[0].position
-            MP = unit.attacks[b.attack_type_index].range_limit
-
-            b.path, b.movement_grid = algo_b_movement_range.pseudo_astar(None, start, MP, b, "Flight")
-            action_order(b, "Move", "Fly back")
+        execute_order_funs.primary_hit_from_above(b, acting_hero, acting_unit, enemy_army, enemy_hero)
 
     elif b.primary == "Break the gates":
-        TileNum2 = (b.target_destination[1] - 1) * game_stats.battle_width + b.target_destination[0] - 1
-        gates_destruction(b, TileNum2)
-        # b.anim_message either "The gate has been destroyed" or "The gate withstood the attack"
-        b.primary = "Damage message"
-
+        execute_order_funs.primary_break_the_gates(b)
     elif b.primary == "Dock the wall":
-        TileNum2 = (b.target_destination[1] - 1) * game_stats.battle_width + b.target_destination[0] - 1
-        dock_the_wall(b, TileNum2)
-        # b.anim_message either "The gate has been destroyed" or "The gate withstood the attack"
-        b.primary = "Damage message"
+        execute_order_funs.primary_dock_the_wall(b)
 
     elif b.primary == "Damage message":
-        print("b.primary == Damage message")
-        print("b.dealt_damage - " + str(b.dealt_damage))
-        print("b.killed_creatures - " + str(b.killed_creatures))
-        b.primary = "Damage message1"
-        if b.anim_message == "Damage and kills":
-            b.anim_message = "Damage and kills"
-        elif b.anim_message == "Gate busting result":
-            b.anim_message = "Gate busting result"
-        elif b.anim_message == "Docking the wall":
-            b.anim_message = "Docking the wall"
-
+        execute_order_funs.primary_damage_message(b)
     elif b.primary == "Damage message1":
-        print("b.primary == Damage message1")
-        b.primary = None
-        b.anim_message = None
-
-        attacking_unit = None
-        for army in game_obj.game_armies:
-            if army.army_id == b.queue[0].army_id:
-                attacking_unit = army.units[b.queue[0].number]
-                break
-
-        TileNum2 = (b.target_destination[1] - 1) * game_stats.battle_width + b.target_destination[0] - 1
-        if b.battle_map[TileNum2].army_id is not None:
-            for army in game_obj.game_armies:
-
-                if army.army_id == b.enemy_army_id:
-                    unit = army.units[b.battle_map[TileNum2].unit_index]
-
-            # Check if enemy unit is routing or should start routing
-            if unit.morale <= 0.0 or b.attack_name == "Hit and fly":
-                b.secondary = None
-                complete_turn(b, 1.0)
-            else:
-                # Check if attacked unit can counterattack back
-                if unit.counterattack > 0 and len(unit.crew) > 0 and b.secondary != "Ranged attack":
-                    b.primary = "Rotate"
-                    b.secondary = "Counterattack"
-                    # Decrease available counterattacks
-                    decrease = True
-                    # Check for skills with cat reflex
-                    for skill in unit.skills:
-                        if skill.application == "Counterattack":
-                            if skill.quality == "Unlimited counterattacks":
-                                decrease = False
-                    if decrease:
-                        unit.counterattack -= 1
-
-                else:
-                    b.secondary = None
-                    complete_turn(b, attacking_unit.initiative)
-        else:
-            # Defending unit has been killed before it could counterattack
-            complete_turn(b, attacking_unit.initiative)
+        execute_order_funs.primary_damage_message1(b, acting_army, acting_unit, enemy_army)
 
     elif b.primary == "Counterattack":
-        print("b.primary == Counterattack")
-
-        TileNum2 = (b.target_destination[1] - 1) * game_stats.battle_width + b.target_destination[0] - 1
-        for army in game_obj.game_armies:
-            if army.army_id == b.queue[0].army_id:
-                unit_df = army.units[b.queue[0].number].direction
-                primary_target = army.units[b.queue[0].number]
-
-            elif army.army_id == b.enemy_army_id:
-                unit_at = army.units[b.battle_map[TileNum2].unit_index].direction
-                unit = army.units[b.battle_map[TileNum2].unit_index]
-
-        angle = attack_angle(unit_at, unit_df)
-
-        choose_melee_attack_by_type(b, unit, primary_target)
-
-        b.perform_attack = form_list_of_attackers(b, unit)
-        complete_melee_attack(b, unit, primary_target, angle, enemy_hero, acting_hero)
-
-        if b.battle_stop:
-            # Enemy is killed and battle is over
-            print("Enemy is killed in counterattack and battle is over")
-
-        else:
-            b.primary = "Counterattack damage message"
-            b.anim_message = "Damage and kills"
-
+        execute_order_funs.primary_counterattack(b, acting_army, acting_hero, enemy_army, enemy_hero)
     elif b.primary == "Counterattack damage message":
-        b.primary = "Counterattack damage message1"
-        b.anim_message = "Damage and kills"
+        execute_order_funs.primary_counterattack_damage_message(b)
     elif b.primary == "Counterattack damage message1":
-        b.primary = None
-        b.anim_message = None
-
-        complete_turn(b, 1.0)
+        execute_order_funs.primary_counterattack_damage_message1(b)
 
     elif b.primary == "Ranged attack":
-        TileNum2 = (b.target_destination[1] - 1) * game_stats.battle_width + b.target_destination[0] - 1
-        # print("b.target_destination - " + str(b.target_destination) + " TileNum2 - " + str(TileNum2))
-        # print("b.enemy_army_id - " + str(b.enemy_army_id) + " b.queue[0].army_id - " + str(b.queue[0].army_id))
-
-        for army in game_obj.game_armies:
-            if army.army_id == b.queue[0].army_id:
-                # print("b.queue[0].army_id - " + str(b.queue[0].army_id) + " owner - " + str(b.queue[0].owner))
-                unit = army.units[b.queue[0].number]
-                # print("Unit object - " + str(unit) + " b.queue[0].number - " + str(b.queue[0].number))
-
-            elif army.army_id == b.enemy_army_id:
-                # print("b.queue[0].army_id - " + str(b.enemy_army_id) + " owner - " + str(army.owner))
-                primary_target = army.units[b.battle_map[TileNum2].unit_index]
-
-        # print("Again, unit object - " + str(unit) + " len(unit.crew) - " + str(len(unit.crew)))
-        complete_ranged_attack(b, unit, primary_target, acting_hero, enemy_hero)
-        # complete_ranged_attack(b, unit, primary_target)
-
-        if b.battle_stop:
-            # Enemy is killed and battle is over
-            print("Enemy is killed in ranged attack and battle is over")
-
-        else:
-            b.primary = "Damage message"
-            b.anim_message = "Damage and kills"
-            b.secondary = "Ranged attack"
+        execute_order_funs.primary_ranged_attack(b, acting_hero, acting_unit, enemy_army, enemy_hero)
 
 
 def change_direction(position1, position2):
@@ -807,9 +420,9 @@ def attack_angle(unit_at, unit_df):
                   8: "Front"}
 
     direction_angle = angle_code[step4]
-    print("unit_at - " + str(unit_at) + ", unit_df - " + str(unit_df))
+    print("Directions: unit_at - " + str(unit_at) + ", unit_df - " + str(unit_df))
     print("attacker - " + str(attacker) + ", defender - " + str(defender))
-    print("step1 - " + str(step1) + ", step2 - " + str(step2) + ", step3 - " + str(step3) + ", " + str(step4))
+    print("step1 - " + str(step1) + ", step2 - " + str(step2) + ", step3 - " + str(step3) + ", step4 - " + str(step4))
     print("attack_angle - " + str(direction_angle))
 
     return direction_angle
@@ -1081,7 +694,7 @@ def melee_hit(b, at_creature, unit, primary_target, target, acting_hero, enemy_h
     min_dmg, max_dmg = damage_value(s, acting_hero, unit)
     # print("min_dmg, max_dmg " + str(min_dmg) + ", " + str(max_dmg))
     dmg = random.randint(min_dmg, max_dmg)
-    print("Random damage is " + str(dmg))
+    # print("Random damage is " + str(dmg))
     dmg = battle_skills.charge_dmg_bonus(b, unit, dmg, primary_target, b.queue, b.primary)
     dmg = battle_skills.simple_dmg_bonus(unit, primary_target, dmg)
 
@@ -1111,9 +724,9 @@ def melee_hit(b, at_creature, unit, primary_target, target, acting_hero, enemy_h
 
     base_dmg = int(dmg)
     dmg += int(additional_damage)
-    print("Melee attack by " + str(unit.name) + " with " +
-          "mastery - " + str(total_attack) + ", total defence - " + str(total_defence) + ", damage - " + str(base_dmg) +
-          " damage with skills - " + str(dmg))
+    # print("Melee attack by " + str(unit.name) + " with " +
+    #       "mastery - " + str(total_attack) + ", total defence - " + str(total_defence) + ", damage - " + str(base_dmg) +
+    #       " damage with skills - " + str(dmg))
     # print("len(primary_target.crew) - " + str(len(primary_target.crew)) + " target - " + str(target))
     # print("Creature " + str(at_creature) + " hurt creature " + str(target) + " with " +
     #       str(primary_target.crew[target].HP) + " HP by dealing " + str(dmg) + " damage")
@@ -1338,32 +951,21 @@ def ranged_hit(b, unit, primary_target, target, acting_hero, enemy_hero):
 def perform_battle_actions(b):
     print("perform_battle_actions")
     # b = game_stats.present_battle
-    acting_hero = None
-
-    for army in game_obj.game_armies:
-        if army.army_id in [b.attacker_id, b.defender_id]:
-            if army.owner == b.realm_in_control:
-                own_units = army.units
-                if b.queue[0].obj_type != "Hero":
-                    acting_unit = own_units[b.queue[0].number]
-                    acting_hero = army.hero
-                else:
-                    acting_unit = None
-                    acting_hero = army.hero
-                own_army_id = army.army_id
-            elif army.owner == b.enemy:
-
-                enemy_units = army.units
-                enemy_army_id = army.army_id
-                # print("b.enemy - " + str(b.enemy) + " army.army_id - " + str(army.army_id) +
-                #       " enemy_army_id - " + str(enemy_army_id))
+    acting_army = common_selects.select_army_by_id(b.queue[0].army_id)
+    acting_hero = acting_army.hero
+    acting_unit = None
+    if b.queue[0].obj_type != "Hero":
+        acting_unit = acting_army.units[b.queue[0].number]
+    enemy_army_id = b.attacker_id
+    if b.attacker_id == b.queue[0].army_id:
+        enemy_army_id = b.defender_id
+    enemy_army = common_selects.select_army_by_id(enemy_army_id)
 
     if not b.battle_stop:
         # print("if not b.battle_stop")
         if b.realm_in_control != game_stats.player_power and b.AI_ready:
             print("perform_battle_actions -> manage_unit")
-            battle_logic.manage_unit(b, own_units, enemy_units, acting_unit, own_army_id, enemy_army_id,
-                                     acting_hero)
+            battle_logic.manage_unit(b, acting_army, enemy_army, acting_unit, acting_hero)
 
         if b.secondary == "Route" and b.realm_in_control == game_stats.player_power and b.primary is None:
             print('action_order(b, "Move", "Route")')
@@ -1455,7 +1057,7 @@ def melee_attack_preparation(b, TileNum, position, x2, y2):
                         # Siege tower is not deployed there
                         check = False
 
-        if b.battle_map[ApproachTile].map_object is not None:
+        if b.battle_map[ApproachTile].map_object:
             if b.battle_map[ApproachTile].map_object.obj_type == "Structure":
                 attack_direction = simple_direction([x2, y2], approach)
                 name = b.battle_map[ApproachTile].map_object.obj_name
@@ -1468,11 +1070,12 @@ def melee_attack_preparation(b, TileNum, position, x2, y2):
     print("b.attack_name - " + str(b.attack_name))
     # Standard melee attack
     if check and b.attack_name in ["Melee assault", "Dragon breath", "Drake breath"]:
-
+        acting_army = common_selects.select_army_by_id(b.queue[0].army_id)
+        enemy_army = common_selects.select_army_by_id(b.battle_map[TileNum].army_id)
         if approach in b.movement_grid:
             permitted_attack = True
             # Lets check if attack forbidden by moving onto object
-            if b.battle_map[ApproachTile].map_object is not None:
+            if b.battle_map[ApproachTile].map_object:
                 if b.battle_map[ApproachTile].map_object.obj_type == "Structure":
                     for node in b.path:
                         if node.position == [int(approach[0]), int(approach[1])]:
@@ -1495,30 +1098,32 @@ def melee_attack_preparation(b, TileNum, position, x2, y2):
                 disengage(b, b.queue[0].position)
                 b.ready_to_act = False
 
-                b.attacking_rotate.append(b.queue[0].number)
+                b.attacking_rotate.append(game_classes.Rotation_Data(b.battle_map[ApproachTile].posxy,
+                                                                     b.queue[0].number,
+                                                                     b.queue[0].army_id))
 
                 # TileNum2 = (y2 - 1) * game_stats.battle_width + x2 - 1
-                for army in game_obj.game_armies:
-                    if army.army_id == b.battle_map[TileNum].army_id:
-                        b.enemy_army_id = army.army_id
-                        print("After approach defending regiment is found")
-                        print("unit_index is " + str(b.battle_map[TileNum].unit_index) +
-                              " at TileNum " + str(TileNum) +
-                              " and engaged is " + str(army.units[b.battle_map[TileNum].unit_index].engaged))
-                        if not army.units[b.battle_map[TileNum].unit_index].engaged:
-                            print(army.units[b.battle_map[TileNum].unit_index].name + " is going to rotate")
-                            army.units[b.battle_map[TileNum].unit_index].engaged = True
-                            b.defending_rotate.append(b.battle_map[TileNum].unit_index)
+                b.enemy_army_id = enemy_army.army_id
+                enemy_unit = enemy_army.units[b.battle_map[TileNum].unit_index]
+                print("After approach defending regiment is found")
+                print("unit_index is " + str(b.battle_map[TileNum].unit_index) +
+                      " at TileNum " + str(TileNum) + " position " + str(b.battle_map[TileNum].posxy) +
+                      " and engaged is " + str(enemy_unit.engaged))
+                if not enemy_unit.engaged:
+                    print(enemy_unit.name + " is going to rotate")
+                    enemy_unit.engaged = True
+                    b.defending_rotate.append(game_classes.Rotation_Data(tuple(enemy_unit.position),
+                                                                         b.battle_map[TileNum].unit_index,
+                                                                         b.battle_map[TileNum].army_id))
 
-                    elif army.army_id == b.queue[0].army_id:
-                        if not army.units[b.queue[0].number].engaged:
-                            army.units[b.queue[0].number].engaged = True
+                if not acting_army.units[b.queue[0].number].engaged:
+                    acting_army.units[b.queue[0].number].engaged = True
 
-                print("defending_rotate set to - " + str(b.defending_rotate))
                 print("It's possible to approach from - " + str(approach))
                 b.move_destination = [int(approach[0]), int(approach[1])]
                 b.target_destination = [int(x2), int(y2)]
                 # prepare_takeoff(b)
+                print_rotating_units(b)
 
                 action_order(b, "Move", "Melee attack")
 
@@ -1526,35 +1131,36 @@ def melee_attack_preparation(b, TileNum, position, x2, y2):
             disengage(b, b.queue[0].position)
             b.ready_to_act = False
 
-            b.attacking_rotate.append(b.queue[0].number)
+            b.attacking_rotate.append(game_classes.Rotation_Data(tuple(b.queue[0].position),
+                                                                 b.queue[0].number,
+                                                                 b.queue[0].army_id))
 
             # TileNum2 = (y2 - 1) * game_stats.battle_width + x2 - 1
-            for army in game_obj.game_armies:
-                if army.army_id == b.battle_map[TileNum].army_id:
-                    b.enemy_army_id = army.army_id
-                    print("Standing next to enemy before attack ")
-                    if not army.units[b.battle_map[TileNum].unit_index].engaged:
-                        print(army.units[b.battle_map[TileNum].unit_index].name + " is going to rotate")
-                        army.units[b.battle_map[TileNum].unit_index].engaged = True
-                        b.defending_rotate.append(b.battle_map[TileNum].unit_index)
+            b.enemy_army_id = enemy_army.army_id
+            enemy_unit = enemy_army.units[b.battle_map[TileNum].unit_index]
+            print("Standing next to enemy before attack ")
+            if not enemy_unit.engaged:
+                print(enemy_unit.name + " is going to rotate")
+                enemy_unit.engaged = True
+                b.defending_rotate.append(game_classes.Rotation_Data(tuple(enemy_unit.position),
+                                                                     b.battle_map[TileNum].unit_index,
+                                                                     b.battle_map[TileNum].army_id))
 
-                elif army.army_id == b.queue[0].army_id:
-                    if not army.units[b.queue[0].number].engaged:
-                        army.units[b.queue[0].number].engaged = True
+            if not acting_army.units[b.queue[0].number].engaged:
+                acting_army.units[b.queue[0].number].engaged = True
 
-            print("attacking_rotate set to - " + str(b.attacking_rotate))
-            print("defending_rotate set to - " + str(b.defending_rotate))
+            print("attacking_rotate set to - " + str(len(b.attacking_rotate)))
+            print("defending_rotate set to - " + str(len(b.defending_rotate)))
             print("Standing in same position - " + str(approach))
             b.target_destination = [int(x2), int(y2)]
             action_order(b, "Rotate", "Melee attack")
+            rotation_direction(b, acting_army, enemy_army)
 
     # Hit and fly melee attack
     elif b.attack_name == "Hit and fly":
-        distance = 0
-        for army in game_obj.game_armies:
-            if army.army_id == b.queue[0].army_id:
-                distance = army.units[b.queue[0].number].attacks[b.attack_type_index].range_limit
-                break
+        acting_army = common_selects.select_army_by_id(b.queue[0].army_id)
+        enemy_army = common_selects.select_army_by_id(b.battle_map[TileNum].army_id)
+        distance = acting_army.units[b.queue[0].number].attacks[b.attack_type_index].range_limit
         square_distance = ((x2 - b.queue[0].position[0]) ** 2) + ((y2 - b.queue[0].position[1]) ** 2)
         print("distance - " + str(distance) + "; b.queue[0].position - " + str(b.queue[0].position) +
               "; x2, y2 - " + str(x2) + ", " + str(y2) + "; square distance - " + str(square_distance))
@@ -1562,10 +1168,7 @@ def melee_attack_preparation(b, TileNum, position, x2, y2):
         print("root distance - " + str(root_distance))
         if distance ** 2 >= ((x2 - b.queue[0].position[0]) ** 2) + ((y2 - b.queue[0].position[1]) ** 2) \
                 and root_distance > 1.5:
-            for army in game_obj.game_armies:
-                if army.army_id == b.battle_map[TileNum].army_id:
-                    b.enemy_army_id = army.army_id
-                    break
+            b.enemy_army_id = enemy_army.army_id
             disengage(b, b.queue[0].position)
             b.ready_to_act = False
             b.move_destination = [int(x2), int(y2)]
@@ -1609,9 +1212,8 @@ def ranged_attack_preparation(b, TileNum, x2, y2):
         b.changed_direction = str(new_direction)
 
         TileNum2 = (y2 - 1) * game_stats.battle_width + x2 - 1
-        for army in game_obj.game_armies:
-            if army.army_id == b.battle_map[TileNum2].army_id:
-                b.enemy_army_id = army.army_id
+        army = common_selects.select_army_by_id(b.battle_map[TileNum2].army_id)
+        b.enemy_army_id = army.army_id
 
         b.target_destination = [int(x2), int(y2)]
         b.secondary = "Ranged attack"
@@ -1621,7 +1223,7 @@ def ranged_attack_preparation(b, TileNum, x2, y2):
 def damage_value(attack, acting_hero, unit):
     dmg_bonus = 0
     max_dmg_bonus = 0
-    if acting_hero is not None:
+    if acting_hero:
         for skill in acting_hero.skills:
             for effect in skill.effects:
                 if effect.application == "Bonus damage":
@@ -1667,7 +1269,7 @@ def armour_effect(b, unit, primary_target, base_armour, acting_hero, enemy_hero)
                         division_bonus_list.append(buff.quantity)
 
     # Hero skills and battle attributes
-    if enemy_hero is not None:
+    if enemy_hero:
         # Attributes
         if len(enemy_hero.attributes_list) > 0:
             for pack in enemy_hero.attributes_list:
@@ -1748,7 +1350,7 @@ def defence_effect(primary_target, base_defence, enemy_hero):
                         division_bonus_list.append(buff.quantity)
 
     # Hero skills and battle attributes
-    if enemy_hero is not None:
+    if enemy_hero:
         # print("Defence bonus provided by " + str(enemy_hero.name))
         # Skills
         for s in enemy_hero.skills:
@@ -1876,7 +1478,7 @@ def melee_assault_effect(b, base_attack_mastery, acting_hero, unit, primary_targ
 
     # Effects on defender tile
     TileNum = (primary_target.position[1] - 1) * game_stats.battle_width + primary_target.position[0] - 1
-    if b.battle_map[TileNum].map_object is not None:
+    if b.battle_map[TileNum].map_object:
         if b.battle_map[TileNum].map_object.obj_type == "Structure":
             # print(b.battle_map[TileNum].map_object.obj_name)
             for effect in b.battle_map[TileNum].map_object.properties.effects:
@@ -1885,7 +1487,7 @@ def melee_assault_effect(b, base_attack_mastery, acting_hero, unit, primary_targ
                         if effect.method == "division":
                             division_bonus_list.append(effect.quantity)
 
-    if acting_hero is not None:
+    if acting_hero:
         # Hero skills
         print(str(acting_hero.name))
         for s in acting_hero.skills:
@@ -1967,7 +1569,7 @@ def shooting_effect(base_attack_mastery, acting_hero, unit, primary_target, b):
                     division_bonus_list.append(float(s.quantity))
                     print("skill: division_bonus_list - " + str(division_bonus_list))
 
-    if acting_hero is not None:
+    if acting_hero:
         # Hero skills
         print(str(acting_hero.name))
         for s in acting_hero.skills:
@@ -2127,8 +1729,8 @@ def reduce_morale(b, primary_target, before_HP, angle):
     total_HP = primary_target.rows * primary_target.number * primary_target.base_HP
     damage_fraction = (b.dealt_damage / 2) / before_HP + (b.dealt_damage / 2) / total_HP
     morale_hit = float(math.ceil(damage_fraction / game_stats.battle_base_morale_hit * angle_modifier[angle])) / 100
-    print("angle_modifier - " + str(angle_modifier[angle]) + " damage_fraction - " + str(damage_fraction) +
-          " morale_hit - " + str(morale_hit) + " b.dealt_damage - " + str(b.dealt_damage))
+    # print("angle_modifier - " + str(angle_modifier[angle]) + " damage_fraction - " + str(damage_fraction) +
+    #       " morale_hit - " + str(morale_hit) + " b.dealt_damage - " + str(b.dealt_damage))
     primary_target.morale -= morale_hit
     primary_target.morale = float(int(primary_target.morale * 100)) / 100
 
@@ -2405,10 +2007,7 @@ def remove_aura_effects(unit_position, b):
 
                 number += 1
 
-            if index_list:
-                index_list = sorted(index_list, reverse=True)
-                for index in index_list:
-                    del tile.aura_effects[index]
+            common_lists.reversed_list_cleaning(tile.aura_effects, index_list)
 
 
 def set_initiative(unit, acting_hero, action_type):
@@ -2453,7 +2052,7 @@ def set_initiative(unit, acting_hero, action_type):
 
         initiative = math.ceil(initiative * 100) / 100
 
-    print("initiative - " + str(initiative) + ", reduction_list - " + str(reduction_list))
+    # print("initiative - " + str(initiative) + ", reduction_list - " + str(reduction_list))
     unit.initiative = float(initiative)
 
 
@@ -2527,7 +2126,8 @@ def calculate_speed(unit, acting_hero):
 
 
 def check_if_no_one_left_alive(b):
-    print("check_if_no_one_left_alive()")
+    # print("check_if_no_one_left_alive()")
+    print("")
     alive = False
     army = common_selects.select_army_by_id(b.enemy_army_id)
     for unit in army.units:
@@ -2543,7 +2143,7 @@ def attack_range_effect(army, unit, base_range):
     final_range = int(base_range)
     addition_bonus_list = []
 
-    if army.hero is not None:
+    if army.hero:
         # Hero artifacts
         if len(army.hero.inventory) > 0:
             for artifact in army.hero.inventory:
@@ -2601,7 +2201,47 @@ def check_direction(unit, primary_target, directions):
         return False
 
 
-def change_side_direction(unit, b):
+def rotation_direction(b, acting_army, enemy_army):
+    print("rotation_direction(): b.primary - " + str(b.primary) + "; b.secondary - " + str(b.secondary))
+    if len(b.attacking_rotate) > 0:
+
+        # When defending regiment is directly facing attacking regiment, it doesn’t need to show rotating animation
+        # Therefore it only matter during primary == "Melee attack"
+        # During primary == "Counterattack" defending regiment still facing attacking regiment, but rotating animation
+        # gives and impression of performing attack in this case
+        num_list = []
+        num = 0
+        for regiment_info in b.defending_rotate:
+            unit = enemy_army.units[regiment_info.number]
+            new_direction = change_direction(unit.position, b.queue[0].position)
+            if unit.direction != new_direction:
+                print("defending_rotate: " + unit.name + " " + str(regiment_info.number)
+                      + " new direction - " + unit.direction)
+            else:
+                # Defending unit already facing attacking unit and
+                # it is attacking unit that is performing attack right now
+                if b.secondary == "Melee attack":
+                    print("defending_rotate: " + str(num) + " delete from defending_rotate (already facing attacker)")
+                    num_list.append(num)
+            num += 1
+
+        common_lists.reversed_list_cleaning(b.defending_rotate, num_list)
+        print_rotating_units(b)
+        print("")
+
+
+def print_rotating_units(b):
+    text = "attacking_rotate:"
+    for regiment_info in b.attacking_rotate:
+        text += " " + str(regiment_info.number)
+    print(text)
+    text = "defending_rotate:"
+    for regiment_info in b.defending_rotate:
+        text += " " + str(regiment_info.number)
+    print(text)
+
+
+def change_side_direction(unit, b, acting_army, enemy_army):
     if b.primary in ["Move", "Route"]:
         # The location of the regiment relative to the target tile on battle map
         direction = simple_direction(unit.position, b.tile_trail[0])
@@ -2616,39 +2256,33 @@ def change_side_direction(unit, b):
     elif b.primary == "Rotate":
         if len(b.attacking_rotate) > 0:
             # print("b.attacking_rotate - " + str(b.attacking_rotate))
-            for army in game_obj.game_armies:
-                if army.army_id == b.queue[0].army_id:
-                    for number in b.attacking_rotate:
-                        regiment = army.units[number]
-                        direction = simple_direction(regiment.position, b.target_destination)
+            for regiment_info in b.attacking_rotate:
+                regiment = acting_army.units[regiment_info.number]
+                direction = simple_direction(regiment.position, b.target_destination)
 
-                        if direction in ["NW", "W", "SW"]:
-                            if not regiment.right_side:
-                                regiment.right_side = True
+                if direction in ["NW", "W", "SW"]:
+                    if not regiment.right_side:
+                        regiment.right_side = True
 
-                        elif direction in ["NE", "E", "SE"]:
-                            if regiment.right_side:
-                                regiment.right_side = False
-                    break
+                elif direction in ["NE", "E", "SE"]:
+                    if regiment.right_side:
+                        regiment.right_side = False
 
         if len(b.defending_rotate) > 0:
             # print("b.defending_rotate - " + str(b.defending_rotate))
-            for army in game_obj.game_armies:
-                if army.army_id == b.enemy_army_id:
-                    for number in b.defending_rotate:
-                        regiment = army.units[number]
-                        direction = simple_direction(regiment.position, b.queue[0].position)
-                        print(str(regiment.position) + " - " + str(b.queue[0].position))
-                        print(regiment.name + " is standing " + str(direction) + " relative to enemy")
+            for regiment_info in b.defending_rotate:
+                regiment = enemy_army.units[regiment_info.number]
+                direction = simple_direction(regiment.position, b.queue[0].position)
+                print(str(regiment.position) + " - " + str(b.queue[0].position))
+                print(regiment.name + " is standing " + str(direction) + " relative to enemy")
 
-                        if direction in ["NW", "W", "SW"]:
-                            if not regiment.right_side:
-                                regiment.right_side = True
+                if direction in ["NW", "W", "SW"]:
+                    if not regiment.right_side:
+                        regiment.right_side = True
 
-                        elif direction in ["NE", "E", "SE"]:
-                            if regiment.right_side:
-                                regiment.right_side = False
-                    break
+                elif direction in ["NE", "E", "SE"]:
+                    if regiment.right_side:
+                        regiment.right_side = False
 
 
 def simple_direction(start_pos, finish_pos):
@@ -2697,19 +2331,16 @@ def gates_destruction(b, TileNum):
         b.anim_message = "The gate withstood the attack"
 
 
-def dock_the_wall(b, TileNum):
-    the_unit = None
-    for army in game_obj.game_armies:
-        if army.army_id == b.queue[0].army_id:
-            the_unit = army.units[b.queue[0].number]
-            break
+def dock_the_wall(b):
+    army = common_selects.select_army_by_id(b.queue[0].army_id)
+    the_unit = army.units[b.queue[0].number]
 
     the_unit.siege_engine = None
 
     x1 = int(b.queue[0].position[0])
     y1 = int(b.queue[0].position[1])
-    TileNum1 = (y1 - 1) * game_stats.battle_width + x1 - 1
-    b.battle_map[TileNum1].siege_tower_deployed = True
+    TileNum = (y1 - 1) * game_stats.battle_width + x1 - 1
+    b.battle_map[TileNum].siege_tower_deployed = True
 
 
 def open_or_close_the_gate(b, TileNum):
@@ -2729,7 +2360,7 @@ def open_or_close_the_gate(b, TileNum):
                 # print("open_or_close_the_gate")
 
                 # Open the gate
-                if Tile_Obj is not None:
+                if Tile_Obj:
                     print(Tile_Obj.obj_name)
                     if Tile_Obj.obj_name in siege_warfare_catalog.name_change_open_gates:
                         # old_name = Tile_Obj.obj_name
@@ -2747,11 +2378,9 @@ def open_or_close_the_gate(b, TileNum):
 
 def prepare_takeoff(b):
     unit = None
-    for army in game_obj.game_armies:
-        if army.army_id == b.queue[0].army_id:
-            if b.queue[0].obj_type != "Hero":
-                unit = army.units[b.queue[0].number]
-                break
+    army = common_selects.select_army_by_id(b.queue[0].army_id)
+    if b.queue[0].obj_type != "Hero":
+        unit = army.units[b.queue[0].number]
 
     for skill in unit.skills:
         if skill.application == "Movement":
@@ -2766,9 +2395,9 @@ def prepare_takeoff(b):
 
 def choose_melee_attack_by_type(b, unit, primary_target):
     # When attacking regiment has more than one attack profile, it must choose the most appropriate one
-    print("")
-    print("choose_melee_attack_by_type")
-    print("Striking regiment - " + str(unit.name))
+    # print("")
+    # print("choose_melee_attack_by_type")
+    # print("Striking regiment - " + str(unit.name))
     number_of_melee_profiles = 0
     last_melee_attack_index = 0  # Generally it is 0
     index = 0
@@ -2778,7 +2407,7 @@ def choose_melee_attack_by_type(b, unit, primary_target):
             index += 1
             number_of_melee_profiles += 1
 
-    print("number_of_melee_profiles - " + str(number_of_melee_profiles))
+    # print("number_of_melee_profiles - " + str(number_of_melee_profiles))
 
     if number_of_melee_profiles == 0:
         b.attack_type_index = int(last_melee_attack_index)
@@ -2786,8 +2415,8 @@ def choose_melee_attack_by_type(b, unit, primary_target):
         b.attack_name = unit.attacks[b.attack_type_index].name
 
     else:  # Must choose
-        print("unit.max_HP - " + str(unit.max_HP))
-        print("primary_target.max_HP - " + str(primary_target.max_HP))
+        # print("unit.max_HP - " + str(unit.max_HP))
+        # print("primary_target.max_HP - " + str(primary_target.max_HP))
         if unit.max_HP / 2 >= primary_target.max_HP:
             # Enemy creatures are more squishy
             index = 0
@@ -2806,6 +2435,6 @@ def choose_melee_attack_by_type(b, unit, primary_target):
                     b.attack_name = unit.attacks[b.attack_type_index].name
                 index += 1
 
-    print(str(b.attack_name))
-    print(str(b.attack_type_in_use))
-    print("")
+    # print(str(b.attack_name))
+    # print(str(b.attack_type_in_use))
+    # print("")

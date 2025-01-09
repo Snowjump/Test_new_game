@@ -259,15 +259,12 @@ def create_medium_armies(player, economy, medium_armies_ea, settlements_with_ded
                 settlement_with_new_army = int(city_id)
                 all_players_settlements.remove(city_id)
 
-            the_settlement = None
-            for settlement in game_obj.game_cities:
-                if settlement.city_id == settlement_with_new_army:
-                    the_settlement = settlement
-                    break
+            the_settlement = common_selects.select_settlement_by_id(settlement_with_new_army)
 
             unit_roster = []
             for plot in the_settlement.buildings:
-                if plot.status == "Built":
+                if plot.status == "Built" and plot.structure.recruitment:
+                    # print("Looking for recruitment options in " + plot.structure.name + " from " + the_settlement.name)
                     for hire_unit in plot.structure.recruitment:
                         print(str(hire_unit.unit_name) + " ready_units - " + str(hire_unit.ready_units))
                         if hire_unit.ready_units > 0:
@@ -459,34 +456,27 @@ def create_medium_armies(player, economy, medium_armies_ea, settlements_with_ded
 
 def hire_more_regiments(player, economy, LUOS):
     for TileNum in LUOS:
-        if game_obj.game_map[TileNum].army_id is not None:
+        if game_obj.game_map[TileNum].army_id:
             print(player.name + ": hire_more_regiments")
-            the_army = None
-            for army in game_obj.game_armies:
-                if army.army_id == game_obj.game_map[TileNum].army_id:
-                    the_army = army
-                    break
+            the_army = common_selects.select_army_by_id(game_obj.game_map[TileNum].army_id)
 
-            rank_sum = 0
-            for regiment in the_army.units:
-                rank_sum += int(regiment.rank)
+            if the_army.action not in ["Fighting", "Besieged"]:
+                rank_sum = 0
+                for regiment in the_army.units:
+                    rank_sum += int(regiment.rank)
 
-            the_army_size = 0
-            for army_role in player.AI_cogs.army_roles:
-                if army_role.army_id == the_army.army_id:
-                    the_army_size = int(army_role.army_size)
-                    break
-
-            if the_army_size == 2 and rank_sum < 90 and len(the_army.units) < 20:
-                the_settlement = None
-                for settlement in game_obj.game_cities:
-                    if settlement.city_id == game_obj.game_map[TileNum].city_id:
-                        the_settlement = settlement
+                the_army_size = 0
+                for army_role in player.AI_cogs.army_roles:
+                    if army_role.army_id == the_army.army_id:
+                        the_army_size = int(army_role.army_size)
                         break
 
-                hire_new_regiments(player, economy, rank_sum, 90, the_army, the_settlement)
+                if the_army_size == 2 and rank_sum < 90 and len(the_army.units) < 20:
+                    the_settlement = common_selects.select_settlement_by_id(game_obj.game_map[TileNum].city_id)
 
-            update_gf_game_board.update_regiment_sprites_from_object(the_army)
+                    hire_new_regiments(player, economy, rank_sum, 90, the_army, the_settlement)
+
+                update_gf_game_board.update_regiment_sprites_from_object(the_army)
 
 
 def hire_new_regiments(player, economy, rank_sum, rank_ea, the_army, the_settlement):
@@ -846,7 +836,7 @@ def learn_skills_settlements(player, economy, LUOS):
                             if plot.structure.name in ["KL School of magic"]:
 
                                 for new_skill in skills_curriculum.curriculum_by_school[plot.structure.name]:
-                                    enough_florins = common_transactions.sufficient_funds(resources, player.coffers)
+                                    enough_florins = common_transactions.sufficient_funds(resources, player)
 
                                     if enough_florins:
                                         add_skill = True
@@ -864,7 +854,7 @@ def learn_skills_settlements(player, economy, LUOS):
                         # print("New skill - " + str(new_skill))
 
                         # Pay for skill
-                        common_transactions.payment(resources, player.coffers)
+                        common_transactions.payment(resources, player)
 
                         # Transfer money to traders
                         for pops in the_settlement.residency:
@@ -927,7 +917,7 @@ def obtain_attributes_settlement(player, economy, LUOS):
                                 for key in key_list:
                                     attribute = dic[key]
                                     resources = [["Florins", attribute[4]]]
-                                    enough_florins = common_transactions.sufficient_funds(resources, player.coffers)
+                                    enough_florins = common_transactions.sufficient_funds(resources, player)
 
                                     if enough_florins:
                                         add_attribute = True
@@ -945,7 +935,7 @@ def obtain_attributes_settlement(player, economy, LUOS):
 
                         # Pay for attribute
                         resources = [["Florins", attribute_info[4]]]
-                        common_transactions.payment(resources, player.coffers)
+                        common_transactions.payment(resources, player)
 
                         # Learn new attribute
                         att = game_classes.Battle_Attribute(

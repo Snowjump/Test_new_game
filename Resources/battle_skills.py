@@ -72,14 +72,14 @@ def charge_dmg_bonus(b, unit, dmg, primary_target, queue, primary):
                     #                   [int(unit.position[0]), int(unit.position[1])]]
                     new_dmg = math.ceil(dmg * (1 + s.quantity))
                     crushed_status = True
-                    print("0. Heavy charge - " + str(new_dmg))
+                    # print("0. Heavy charge - " + str(new_dmg))
                 elif primary_target.position == s.keep_details[0]:
                     if unit.position == s.keep_details[2]:
                         # print(str(queue[0].time_act))
                         # print(str(s.keep_details[1]))
-                        print("queue[0].time_act - s.keep_details[1] = ? "
-                              + str(queue[0].time_act) + " - " + str(s.keep_details[1]) + " = "
-                              + str(queue[0].time_act - s.keep_details[1]))
+                        # print("queue[0].time_act - s.keep_details[1] = ? "
+                        #       + str(queue[0].time_act) + " - " + str(s.keep_details[1]) + " = "
+                        #       + str(queue[0].time_act - s.keep_details[1]))
                         if (queue[0].time_act - s.keep_details[1]) <= 1.0:
                             pass
                         else:
@@ -88,7 +88,7 @@ def charge_dmg_bonus(b, unit, dmg, primary_target, queue, primary):
                             #                   [int(unit.position[0]), int(unit.position[1])]]
                             new_dmg = math.ceil(dmg * (1 + s.quantity))
                             crushed_status = True
-                            print("Heavy charge - " + str(new_dmg))
+                            # print("Heavy charge - " + str(new_dmg))
 
                     else:
                         # s.keep_details = [[int(primary_target.position[0]), int(primary_target.position[1])],
@@ -96,7 +96,7 @@ def charge_dmg_bonus(b, unit, dmg, primary_target, queue, primary):
                         #                   [int(unit.position[0]), int(unit.position[1])]]
                         new_dmg = math.ceil(dmg * (1 + s.quantity))
                         crushed_status = True
-                        print("Heavy charge - " + str(new_dmg))
+                        # print("Heavy charge - " + str(new_dmg))
 
                 else:
                     # s.keep_details = [[int(primary_target.position[0]), int(primary_target.position[1])],
@@ -104,7 +104,7 @@ def charge_dmg_bonus(b, unit, dmg, primary_target, queue, primary):
                     #                   [int(unit.position[0]), int(unit.position[1])]]
                     new_dmg = math.ceil(dmg * (1 + s.quantity))
                     crushed_status = True
-                    print("Heavy charge - " + str(new_dmg))
+                    # print("Heavy charge - " + str(new_dmg))
 
     if crushed_status:
 

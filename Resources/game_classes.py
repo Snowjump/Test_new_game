@@ -292,7 +292,9 @@ class Land_Battle:  # class keeps information about outgoing battle
         self.move_back_destination = None  # Where unit is returning after hit and run or hit and fly attack
         self.changed_direction = None  # Unit changes its direction when it has to shoot
         self.attacking_rotate = []  # List of units from army whose unit is attacking in melee right now
+        # filled with Rotation_Data objects
         self.defending_rotate = []  # List of units from army whose unit is being attacked in melee right now
+        # filled with Rotation_Data objects
         self.perform_attack = []  # List of indexes that indicates which creatures from regiment will perform attack
         self.dealt_damage = 0  # Total amount of damage dealt during one attack by regiment
         self.killed_creatures = 0
@@ -345,9 +347,16 @@ class Land_Battle:  # class keeps information about outgoing battle
         self.battle_last_change = 0
 
 
+class Rotation_Data:  # information for attacking_rotate and defending_rotate lists
+    def __init__(self, position, number, army_id):
+        self.posxy = position
+        self.number = number  # Index of unit in army
+        self.army_id = army_id
+
+
 class Battle_Tile:  # main class for tile cells in battlefield
     def __init__(self, position, terrain, conditions):
-        self.posxy = position
+        self.posxy = position  # tuple ()
         self.terrain = terrain
         self.conditions = conditions
         self.unit_index = None
@@ -399,16 +408,17 @@ class Queue_Card:  # class for tracking position of regiment in time queue
 
 
 class Regiment_Info_Card:  # Contains information about regiment that was clicked on with right mouse button
-    def __init__(self, regiment_name, first_color, second_color, amount, total_HP, morale, health, experience, speed,
-                 leadership, engaged, deserted, attacks_amount, armour, final_armour, defence, final_defence, reg_tags,
-                 magic_power, mana_reserve, max_mana_reserve, abilities):
+    def __init__(self, regiment_name, first_color, second_color, amount, total_HP, morale, health, base_health,
+                 experience, speed, leadership, engaged, deserted, attacks_amount, armour, final_armour, defence,
+                 final_defence, reg_tags, magic_power, mana_reserve, max_mana_reserve, abilities):
         self.regiment_name = regiment_name
         self.first_color = first_color
         self.second_color = second_color
         self.amount = amount
         self.total_HP = total_HP
         self.morale = morale
-        self.health = health
+        self.health = health  # Max health after applying effects
+        self.base_health = base_health
         self.experience = experience
         self.speed = speed
         self.leadership = leadership

@@ -34,9 +34,10 @@ def border_blipping(color):
 
 def damage_dealt_red(screen, b, owner, unit_index, current_position):
     TileNum2 = (b.target_destination[1] - 1) * game_stats.battle_width + b.target_destination[0] - 1
-    if ((b.primary == "Melee attack" or b.primary == "Ranged attack") and unit_index == b.battle_map[
-        TileNum2].unit_index and owner == b.enemy) or (
-            b.primary == "Counterattack" and unit_index in b.attacking_rotate and owner == b.realm_in_control):
+    tile = b.battle_map[TileNum2]
+    if ((b.primary == "Melee attack" or b.primary == "Ranged attack") and unit_index == tile.unit_index and
+        owner == b.enemy) or (
+            b.primary == "Counterattack" and unit_index == tile.unit_index and owner == b.realm_in_control):
         # print("defending_rotate now is - " + str(b.defending_rotate) + " and unit_index is - " + str(unit_index))
         spread = (b.battle_display_time / 1000 - b.battle_last_change) / 1
         alpha = (abs((spread * 1000) % 1000 - 500)) / 5 * 2

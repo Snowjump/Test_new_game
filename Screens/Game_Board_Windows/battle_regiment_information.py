@@ -83,7 +83,10 @@ def regiment_information_draw(screen, b):
     screen.blit(text_panel, [646, 165])
 
     # Base health of single creature
-    text_panel = arial_font16.render("Base health - " + str(b.unit_info.health), True, TitleText)
+    text = "Max health - " + str(b.unit_info.health)
+    if game_stats.detailed_regiment_info:
+        text += "   (" + str(b.unit_info.base_health) + " + " + str(b.unit_info.health - b.unit_info.base_health) + ")"
+    text_panel = arial_font16.render(text, True, TitleText)
     screen.blit(text_panel, [646, 185])
 
     # Leadership

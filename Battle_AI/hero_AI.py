@@ -10,7 +10,7 @@ from Resources import game_battle
 from Content import ability_catalog
 
 
-def manage_hero(b, acting_hero, own_units, enemy_units, own_army_id, enemy_army_id):
+def manage_hero(b, acting_hero, acting_army, enemy_army, own_units):
     print("manage_hero: " + acting_hero.hero_class + " " + acting_hero.name)
     # WIP, therefore only Direct order ability would be used
     sf_battle.open_hero_ability_menu_but(b)
@@ -35,7 +35,7 @@ def manage_hero(b, acting_hero, own_units, enemy_units, own_army_id, enemy_army_
         # Use ability
         b.AI_ready = False
         for action in ability_catalog.ability_cat[b.selected_ability].action:
-            battle_abilities_hero.script_cat[action.script](b, TileNum, acting_hero)
+            battle_abilities_hero.script_cat[action.script](b, TileNum, acting_army, enemy_army)
         game_battle.action_order(b, "Pass", None)
 
     else:

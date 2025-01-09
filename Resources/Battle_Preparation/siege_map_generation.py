@@ -16,6 +16,8 @@ from Content import terrain_seasons
 
 
 def generate_map(attacker, defender):
+    print("")
+    print("siege_map_generation.generate_map()")
     # Create battle
     game_stats.battle_id_counter += 1
 
@@ -71,11 +73,7 @@ def generate_map(attacker, defender):
                                                                             False, None)
         number_of_obstacles -= 1
 
-    settlement = None
-    for city in game_obj.game_cities:
-        if city.city_id == game_stats.selected_settlement:
-            settlement = city
-            break
+    settlement = common_selects.select_settlement_by_id(game_stats.selected_settlement)
 
     # Add settlements defensive structures to battle map
     add_defences(new_battle_map, settlement)

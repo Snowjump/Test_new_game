@@ -698,10 +698,10 @@ def add_misc_sprites(img_list):
 
 
 def open_settlement_building_sprites():
+    settlement = common_selects.select_settlement_by_id(game_stats.selected_settlement)
     if game_stats.game_board_panel == "settlement panel":
-        settlement = common_selects.select_settlement_by_id(game_stats.selected_settlement)
         for plot in settlement.buildings:
-            if plot.structure is not None:
+            if plot.structure:
                 print("plot.screen_position - " + str(plot.screen_position))
                 print("type(plot.structure) - " + str(type(plot.structure)))
                 print(str(plot.structure))
@@ -720,10 +720,15 @@ def open_settlement_building_sprites():
             misc_img = pygame.image.load('img/Icons/paper_2_square_50_x_40.png').convert()
             game_stats.gf_misc_img_dict["Icons/paper_2_square_50_x_40"] = misc_img
 
-        settlement = common_selects.select_settlement_by_id(game_stats.selected_settlement)
+        if "Icons/duration_icon" not in game_stats.gf_misc_img_dict:
+            # Icon - Siege duration
+            misc_img = pygame.image.load('img/Icons/duration_icon.png').convert_alpha()
+            misc_img.set_colorkey(WhiteColor)
+            game_stats.gf_misc_img_dict["Icons/duration_icon"] = misc_img
+
         for plot in settlement.buildings:
-            if plot.structure is not None:
-                if plot.status == "Built" and plot.structure.defensive_structure is not None:
+            if plot.structure:
+                if plot.status == "Built" and plot.structure.defensive_structure:
                     building_img = pygame.image.load(plot.structure.img).convert_alpha()
                     building_img.set_colorkey(WhiteColor)
                     game_stats.gf_building_dict[plot.structure.name] = building_img

@@ -6,6 +6,13 @@ import math
 from Resources import game_obj
 
 
+def reversed_list_cleaning(target_list, index_list):
+    if index_list:  # If index list is filled with indexes of elements to be deleted
+        index_list = sorted(index_list, reverse=True)
+        for index in index_list:
+            del target_list[index]
+
+
 def legitimate_settlement_targets(realm):
     targets = []
     at_war_list = realms_at_war(realm)

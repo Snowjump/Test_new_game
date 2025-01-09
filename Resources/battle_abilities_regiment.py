@@ -1,4 +1,5 @@
 ## Among Myth and Wonder
+## battle_abilities_regiment
 
 import math
 import random

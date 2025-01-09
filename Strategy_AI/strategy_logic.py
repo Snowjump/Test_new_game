@@ -286,6 +286,7 @@ def war_orders_AI(realm, friendly_cities, hostile_cities, at_war_list):
                 #     role.army_role = "Nothing to do"  # Preemptively
 
                 army = common_selects.select_army_by_id(role.army_id)
+                print("Army " + str(army.army_id) + " is " + army.action.lower())
                 new_war_order = False
                 if army.shattered == "Shattered":
                     # Shouldn't go to adventure
@@ -293,7 +294,7 @@ def war_orders_AI(realm, friendly_cities, hostile_cities, at_war_list):
                     pass
                 elif army.action in ["Fighting", "Besieged", "Besieging"]:
                     # Shouldn't go to adventure due to fighting
-                    print("Army " + str(army.army_id) + " is busy fighting")
+                    print("Army " + str(army.army_id) + " is busy " + army.action.lower())
                     if army.action == "Besieging" and role.status == "Start":
                         print("Army " + str(army.army_id) + " is besieging a settlement")
                         print("Role - " + str(role.army_role) + "; role.status - " + str(role.status))
@@ -366,20 +367,29 @@ def adventure_orders(realm, friendly_cities, hostile_cities, at_war_list):
     all_finished = True
     for role in realm.AI_cogs.army_roles:
         print("adventure_orders - role: " + str(role.army_id) + ", " + str(role.army_role))
-        if role in ["Idle", "Nothing to do"]:
-            print("role: " + str(role.army_id) + ", " + str(role.army_role))
+        army = common_selects.select_army_by_id(role.army_id)
+        busy_fighting = False
+        if army.action in ["Fighting", "Besieged", "Besieging"]:
+            # Shouldn't go to adventure due to fighting
+            print("Army " + str(army.army_id) + " is busy " + army.action.lower())
+            busy_fighting = True
 
-        if role.army_role not in ["Nothing to do"] and role.status != "Finished":
-            all_finished = False
+        if not busy_fighting:
+            if role.army_role in ["Idle", "Nothing to do"]:
+                print("role: " + str(role.army_id) + ", " + str(role.army_role))
 
-            if role.army_role == "Idle" or role.army_role == "Adventure":
-                if role.army_role == "Idle":
-                    role.army_role = "Nothing to do"  # Preemptively
+            if role.army_role not in ["Nothing to do"] and role.status != "Finished":
+                all_finished = False
+                print("Could do something")
 
-                adventure_role_AI.solution(realm, role, friendly_cities, hostile_cities, at_war_list)
+                if role.army_role == "Idle" or role.army_role == "Adventure":
+                    if role.army_role == "Idle":
+                        role.army_role = "Nothing to do"  # Preemptively
 
-            if role.army_role == "Nothing to do" or role.army_role == "Exploration":
-                explore_neutral_lands.solution(realm, role, friendly_cities, hostile_cities, at_war_list)
+                    adventure_role_AI.solution(realm, role, friendly_cities, hostile_cities, at_war_list, army)
+
+                if role.army_role == "Nothing to do" or role.army_role == "Exploration":
+                    explore_neutral_lands.solution(realm, role, friendly_cities, hostile_cities, at_war_list, army)
 
     if all_finished:
         print("adventure_role_AI: cognition_stage = Finished turn")

@@ -534,12 +534,7 @@ def movement_action(army):
             if TileObj.lot == "City":
                 # print("TileObj.city_id - " + str(TileObj.city_id))
                 if TileObj.travel:
-                    settlement = None
-                    for city in game_obj.game_cities:
-                        if city.city_id == TileObj.city_id:
-                            settlement = city
-                            break
-
+                    settlement = common_selects.select_settlement_by_id(TileObj.city_id)
                     # print("Settlement " + str(settlement.name))
 
                     if settlement.owner == army.owner:
@@ -560,7 +555,6 @@ def movement_action(army):
                                     game_stats.second_army_exchange_list = []
 
                                     # Select settlement
-                                    print("Moved to neutral settlement")
                                     game_stats.selected_object = "Settlement"
                                     game_stats.selected_settlement = int(game_obj.game_map[TileNum].city_id)
                                     game_stats.settlement_area = "Building"
@@ -576,11 +570,7 @@ def movement_action(army):
                                     update_gf_game_board.open_settlement_building_sprites()
 
                             else:
-                                enemy_army = None
-                                for found_army in game_obj.game_armies:
-                                    if found_army.army_id == TileObj.army_id:
-                                        enemy_army = found_army
-                                        break
+                                enemy_army = common_selects.select_army_by_id(TileObj.army_id)
                                 print("Blockade own settlement captured by enemy")
                                 blockade_settlement(army, enemy_army, settlement, own_realm)
 
@@ -661,11 +651,7 @@ def movement_action(army):
                                 update_gf_game_board.open_settlement_building_sprites()
 
                         else:
-                            enemy_army = None
-                            for found_army in game_obj.game_armies:
-                                if found_army.army_id == TileObj.army_id:
-                                    enemy_army = found_army
-                                    break
+                            enemy_army = common_selects.select_army_by_id(TileObj.army_id)
                             print("Blockade neutral settlement")
                             blockade_settlement(army, enemy_army, settlement, own_realm)
 
@@ -728,7 +714,6 @@ def movement_action(army):
                                     game_stats.second_army_exchange_list = []
 
                                     # Select settlement
-                                    print("Moved to neutral settlement")
                                     game_stats.selected_object = "Settlement"
                                     game_stats.selected_settlement = int(game_obj.game_map[TileNum].city_id)
                                     game_stats.settlement_area = "Building"
@@ -744,11 +729,7 @@ def movement_action(army):
                                     update_gf_game_board.open_settlement_building_sprites()
 
                             else:
-                                enemy_army = None
-                                for found_army in game_obj.game_armies:
-                                    if found_army.army_id == TileObj.army_id:
-                                        enemy_army = found_army
-                                        break
+                                enemy_army = common_selects.select_army_by_id(TileObj.army_id)
                                 print("Blockade enemy settlement")
                                 blockade_settlement(army, enemy_army, settlement, own_realm)
 
@@ -1047,11 +1028,9 @@ def blockade_settlement(attacker, defender, settlement, attacker_realm):
                                                  battering_rams_max_quantity)
 
         human_attacker = True
-        for realm in game_obj.game_powers:
-            if realm.name == attacker.owner:
-                if realm.AI_player:
-                    human_attacker = False
-                break
+        realm = common_selects.select_realm_by_name(attacker.owner)
+        if realm.AI_player:
+            human_attacker = False
 
         if human_attacker:
             game_stats.blockaded_settlement_name = str(settlement.name)
@@ -1279,17 +1258,7 @@ def exchange_armies(approaching_army, standing_army):
 
 
 def enough_resources_to_hire(unit_name, settlement):
-    # settlement = None
-    # for city in game_obj.game_cities:
-    #     if city.city_id == game_stats.selected_settlement:
-    #         settlement = city
-    #         break
-
-    treasury = None
-    for realm in game_obj.game_powers:
-        if realm.name == settlement.owner:
-            treasury = realm.coffers
-            break
+    treasury = common_selects.select_treasury_by_realm_name(settlement.owner)
 
     # Check available resources to pay a cost of regiment
     enough_resources = True
@@ -1316,10 +1285,7 @@ def enough_resources_to_hire(unit_name, settlement):
 def enough_resources_to_hire_hero(hero_for_hire, realm_treasury=None):
     treasury = realm_treasury
     if treasury is None:
-        for realm in game_obj.game_powers:
-            if realm.name == game_stats.player_power:
-                treasury = realm.coffers
-                break
+        treasury = common_selects.select_treasury_by_realm_name(game_stats.player_power)
 
     # Check available resources to pay a cost of hero
     enough_resources = True
@@ -1364,13 +1330,6 @@ def enough_resources_to_pay(cost_list, realm_treasury=None):
 
 
 def realm_payment_for_object(unit_name, settlement):
-    # For regiment
-    # settlement = None
-    # for city in game_obj.game_cities:
-    #     if city.city_id == game_stats.selected_settlement:
-    #         settlement = city
-    #         break
-
     treasury = common_selects.select_treasury_by_realm_name(settlement.owner)
 
     # Deduct resources
@@ -1396,17 +1355,10 @@ def realm_payment(realm_source, cost_list):
     treasury = None
     if realm_source == "settlement":
         settlement = common_selects.select_settlement_by_id(game_stats.selected_settlement)
-
-        for realm in game_obj.game_powers:
-            if realm.name == settlement.owner:
-                treasury = realm.coffers
-                break
+        treasury = common_selects.select_treasury_by_realm_name(settlement.owner)
 
     else:  # "player"
-        for realm in game_obj.game_powers:
-            if realm.name == realm_source:
-                treasury = realm.coffers
-                break
+        treasury = common_selects.select_treasury_by_realm_name(realm_source)
 
     # Deduct resources
     for cost in cost_list:

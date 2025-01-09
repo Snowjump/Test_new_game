@@ -788,7 +788,7 @@ def game_board_surface_m1(position):
                         select_settlement()
 
                     # Select army
-                    elif game_obj.game_map[TileNum].army_id is not None:
+                    elif game_obj.game_map[TileNum].army_id:
                         print("Select army - gf_misc_img_dict: " + str(game_stats.gf_misc_img_dict))
                         print("There is an army")
                         game_stats.selected_object = "Army"
@@ -1865,23 +1865,18 @@ def plot_row_down():
 
 def build_new_structure(x_axis, y_axis):
     # Order to build a new structure
-    power_name = None
-    the_settlement = None
+    the_settlement = common_selects.select_settlement_by_id(game_stats.selected_settlement)
     cost = None
     the_plot = None
-    for city in game_obj.game_cities:
-        if city.city_id == game_stats.selected_settlement:
-            power_name = city.owner
-            the_settlement = city
-            for plot in city.buildings:
-                if plot.upgrade is not None:
-                    if plot.screen_position == [x_axis, y_axis + game_stats.building_row_index]:
-                        the_plot = plot
-                        cost = plot.upgrade.construction_cost
-                        break
-            break
+    power_name = the_settlement.owner
+    for plot in the_settlement.buildings:
+        if plot.upgrade:
+            if plot.screen_position == [x_axis, y_axis + game_stats.building_row_index]:
+                the_plot = plot
+                cost = plot.upgrade.construction_cost
+                break
 
-    if cost is not None:
+    if cost:
         treasury = common_selects.select_treasury_by_realm_name(power_name)
         # print(str(power_name) + ", treasury " + str(treasury) + ", cost " + str(cost))
         if algo_building.check_available_resources(treasury, cost) \
@@ -1897,17 +1892,15 @@ def build_new_structure(x_axis, y_axis):
 
 def show_building_upgrade_information(x_axis, y_axis):
     the_plot = None
-    for city in game_obj.game_cities:
-        if city.city_id == game_stats.selected_settlement:
-            for plot in city.buildings:
-                if plot.upgrade is not None:
-                    if plot.screen_position == [x_axis, y_axis + game_stats.building_row_index]:
-                        the_plot = plot
-                        print("Position - " + str(plot.screen_position))
-                        break
-            break
+    settlement = common_selects.select_settlement_by_id(game_stats.selected_settlement)
+    for plot in settlement.buildings:
+        if plot.upgrade:
+            if plot.screen_position == [x_axis, y_axis + game_stats.building_row_index]:
+                the_plot = plot
+                print("Position - " + str(plot.screen_position))
+                break
 
-    if the_plot is not None:
+    if the_plot:
         game_stats.right_window = "Building upgrade information"
         game_stats.rw_object = the_plot.upgrade
         # Update visuals
@@ -1932,7 +1925,7 @@ def settlement_regiment_information():
 
     print("Morale - " + str(u.morale) + ", Leadership - " + str(u.leadership))
     game_stats.rw_unit_info = game_classes.Regiment_Info_Card(u.name, f_color, s_color, len(u.crew), total_HP, u.morale,
-                                                              u.base_HP, u.experience, u.speed, u.base_leadership,
+                                                              u.base_HP, None, u.experience, u.speed, u.base_leadership,
                                                               u.engaged, u.deserted, len(u.attacks), u.armour, None,
                                                               u.defence, None,
                                                               u.reg_tags, u.magic_power, u.mana_reserve,

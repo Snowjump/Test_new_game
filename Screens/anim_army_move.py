@@ -1,4 +1,5 @@
-## Miracle battles
+## Among Myth and Wonder
+## anim_army_move
 
 from Resources import game_stats
 import math
