@@ -21,6 +21,8 @@ from Resources import common_selects
 from Screens import anim_battle_effects
 from Screens import anim_battle_unit_action
 
+from Screens.Interface_Elements import flags
+
 from Screens.Game_Board_Windows import battle_regiment_information
 
 pygame.init()
@@ -638,51 +640,27 @@ def draw_creatures(screen, unit, x, y, owner, unit_index, b, current_position):
             index -= 1
 
     if owner != "Neutral":  # Draw flag
-        for power in game_obj.game_powers:
-            if owner == power.name:
-                xy_animation = [0, 0]  # Temporary, delete this when animation would be implemented
+        power = common_selects.select_realm_by_name(owner)
+        xy_animation = [0, 0]  # Temporary, delete this when animation would be implemented
 
-                if b.tile_trail is not None and unit.position == b.queue[0].position:
-                    # print("x - " + str(x) + ", y - " + str(y))
-                    spread = (b.battle_display_time / 1000 - b.battle_last_change) / 1
-                    new_x = int(b.tile_trail[0][0]) - int(b.battle_pov[0])
-                    new_y = int(b.tile_trail[0][1]) - int(b.battle_pov[1])
-                    xy_animation[0] = (new_x - int(x)) * spread
-                    xy_animation[1] = (new_y - int(y)) * spread
-                    # print("b.tile_trail - " + str(b.tile_trail))
-                    # print("xy_animation - " + str(xy_animation))
+        if b.tile_trail is not None and unit.position == b.queue[0].position:
+            # print("x - " + str(x) + ", y - " + str(y))
+            spread = (b.battle_display_time / 1000 - b.battle_last_change) / 1
+            new_x = int(b.tile_trail[0][0]) - int(b.battle_pov[0])
+            new_y = int(b.tile_trail[0][1]) - int(b.battle_pov[1])
+            xy_animation[0] = (new_x - int(x)) * spread * 96
+            xy_animation[1] = (new_y - int(y)) * spread * 96
+            # print("b.tile_trail - " + str(b.tile_trail))
+            # print("xy_animation - " + str(xy_animation))
 
-                pygame.draw.polygon(screen, FlagpoleColor,
-                                    ([(x - 1 + xy_animation[0]) * 96 + 3,
-                                      (y - 1 + xy_animation[1]) * 96 + 80],
-                                     [(x - 1 + xy_animation[0]) * 96 + 4,
-                                      (y - 1 + xy_animation[1]) * 96 + 80],
-                                     [(x - 1 + xy_animation[0]) * 96 + 4,
-                                      (y - 1 + xy_animation[1]) * 96 + 96],
-                                     [(x - 1 + xy_animation[0]) * 96 + 3,
-                                      (y - 1 + xy_animation[1]) * 96 + 96]))
-                pygame.draw.polygon(screen, FlagColors[power.f_color],
-                                    ([(x - 1 + xy_animation[0]) * 96 + 5,
-                                      (y - 1 + xy_animation[1]) * 96 + 80],
-                                     [(x - 1 + xy_animation[0]) * 96 + 11,
-                                      (y - 1 + xy_animation[1]) * 96 + 80],
-                                     [(x - 1 + xy_animation[0]) * 96 + 11,
-                                      (y - 1 + xy_animation[1]) * 96 + 84],
-                                     [(x - 1 + xy_animation[0]) * 96 + 5,
-                                      (y - 1 + xy_animation[1]) * 96 + 84]))
-                pygame.draw.polygon(screen, FlagColors[power.s_color],
-                                    ([(x - 1 + xy_animation[0]) * 96 + 5,
-                                      (y - 1 + xy_animation[1]) * 96 + 84],
-                                     [(x - 1 + xy_animation[0]) * 96 + 11,
-                                      (y - 1 + xy_animation[1]) * 96 + 84],
-                                     [(x - 1 + xy_animation[0]) * 96 + 11,
-                                      (y - 1 + xy_animation[1]) * 96 + 89],
-                                     [(x - 1 + xy_animation[0]) * 96 + 5,
-                                      (y - 1 + xy_animation[1]) * 96 + 89]))
+        xb = (x - 1) * 96
+        yb = (y - 1) * 96
+        flags.battlefield_flag(screen, xb, yb, xy_animation[0], xy_animation[1], FlagpoleColor,
+                               FlagColors[power.f_color], FlagColors[power.s_color])
 
     # Blink red color over unit during fight
-    if b.primary == "Melee attack" or b.primary == "Counterattack" or b.primary == "Ranged attack":
-        anim_battle_effects.damage_dealt_red(screen, b, owner, unit_index, current_position)
+    if b.primary in ["Melee attack", "Counterattack", "Ranged attack"]:
+        anim_battle_effects.damage_dealt_red(screen, b, current_position)
 
     # Blink white during buffing cast
     elif b.primary == "Pass" or b.primary == "Pass1":
@@ -1679,7 +1657,7 @@ def battle_screen(screen):
         else:
             pygame.mouse.set_visible(True)
 
-        if b.anim_message is not None:
+        if b.anim_message:
             anim_battle_effects.message_float(screen, b)
 
     # Draw additional window

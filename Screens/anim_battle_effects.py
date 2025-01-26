@@ -32,13 +32,12 @@ def border_blipping(color):
     return color
 
 
-def damage_dealt_red(screen, b, owner, unit_index, current_position):
-    TileNum2 = (b.target_destination[1] - 1) * game_stats.battle_width + b.target_destination[0] - 1
-    tile = b.battle_map[TileNum2]
-    if ((b.primary == "Melee attack" or b.primary == "Ranged attack") and unit_index == tile.unit_index and
-        owner == b.enemy) or (
-            b.primary == "Counterattack" and unit_index == tile.unit_index and owner == b.realm_in_control):
-        # print("defending_rotate now is - " + str(b.defending_rotate) + " and unit_index is - " + str(unit_index))
+def damage_dealt_red(screen, b, current_position):
+    # print("current_position - " + str(current_position) +
+    #       " in b.damage_dealt_positions: " + str(b.damage_dealt_positions))
+    if current_position in b.damage_dealt_positions:
+        # print("current_position - " + str(current_position) +
+        #       " in b.damage_dealt_positions: " + str(b.damage_dealt_positions))
         spread = (b.battle_display_time / 1000 - b.battle_last_change) / 1
         alpha = (abs((spread * 1000) % 1000 - 500)) / 5 * 2
         color = [255, 20, 20, 20 + alpha]
@@ -63,9 +62,8 @@ def white_buff_effect(screen, b, current_position):
 def message_float(screen, b):
     msg1 = ""
     k2 = 0
-    if b.queue[0].obj_type == "Regiment":
-        x = b.queue[0].position[0]
-        y = b.queue[0].position[1]
+    x = b.queue[0].position[0]
+    y = b.queue[0].position[1]
 
     if b.primary in ["Wait message1", "Defend message1", "Damage message1", "Counterattack damage message1"]:
         k2 = 20
@@ -100,7 +98,7 @@ def message_float(screen, b):
             screen.blit(text_NewGame2, [x * 96 + 10, (y - 1) * 96 - k - k2 + 20])
 
     elif b.queue[0].obj_type == "Hero":
-        if b.selected_ability is not None:  # Spell message
+        if b.selected_ability:  # Spell message
             x = int(b.selected_tile[0]) - int(b.battle_pov[0])
             y = int(b.selected_tile[1]) - int(b.battle_pov[1])
             text_NewGame1 = ArialFont16.render(msg, True, DarkText)

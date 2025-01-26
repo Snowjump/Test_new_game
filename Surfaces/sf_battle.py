@@ -1338,12 +1338,7 @@ def pick_up_siege_equipment(b, position):
 
 def end_battle_but():
     print("end_battle_but()")
-    b = None
-    for battle in game_obj.game_battles:
-        if battle.attacker_realm == game_stats.player_power or \
-                battle.defender_realm == game_stats.player_power:
-            b = battle
-            break
+    b = game_stats.present_battle
 
     # print("battle_type - " + b.battle_type)
     loser = None
@@ -1387,11 +1382,8 @@ def end_battle_but():
             if army.army_id == b.defender_id:
                 if game_obj.game_map[army.location].lot is not None:
                     if game_obj.game_map[army.location].lot == "City":
-                        for city in game_obj.game_cities:
-                            if city.city_id == game_obj.game_map[army.location].city_id:
-                                settlement = city
-                                print(settlement.name + " - siege settlement")
-                                break
+                        settlement = common_selects.select_settlement_by_id(game_obj.game_map[army.location].city_id)
+                        print(settlement.name + " - siege settlement")
             # if b.battle_type == "Siege" and settlement is None:
             #     if game_obj.game_map[army.location].lot is not None:
             #         if game_obj.game_map[army.location].lot == "City":

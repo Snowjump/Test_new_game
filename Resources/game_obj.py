@@ -10,6 +10,9 @@ bin_realms = []
 # level tiles - use Tile class
 game_map = []
 
+# Contains information about realm borders on map tiles - use Realm_Borders class
+borders_map = []
+
 # cities - use Settlement class
 game_cities = []
 

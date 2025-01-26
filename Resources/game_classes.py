@@ -9,8 +9,8 @@ from Strategy_AI import strategy_AI_classes
 class Realm:  # player's information
     def __init__(self, name, f_color, s_color, alignment, coffers, leader):
         self.name = name
-        self.f_color = f_color
-        self.s_color = s_color
+        self.f_color = f_color  # str
+        self.s_color = s_color  # str
         self.alignment = alignment
         self.status = True
         self.known_map = []  # List of lists [int x, int y]
@@ -147,12 +147,12 @@ class Army:  # main class for armies that consist of from 1 up to 20 units and c
     def __init__(self, position, location, army_id, owner, right_side):
         self.posxy = position  # [x, y]
         self.location = location  # int(TileNum)
-        self.army_id = army_id
-        self.owner = owner
+        self.army_id = army_id  # int value
+        self.owner = owner  # str name of realm this army belong to
         self.right_side = right_side  # True or False
         self.hero = None
-        self.units = []
-        self.leader = None
+        self.units = []  # contains regiments as objects of Regiment class
+        self.leader = None  # int number of regiment in self.units
         self.route = []
         self.path_arrows = []
         self.action = "Stand"  # Stand, Ready to move, Moving, Routing, Fighting, Besieging, Besieged
@@ -288,7 +288,7 @@ class Land_Battle:  # class keeps information about outgoing battle
         self.move_figure = None  # For flying
         self.anim_message = None  # Text on battlefield
         self.move_destination = None  # Where unit is going
-        self.target_destination = None  # Whom unit going to hit
+        self.target_destination = None  # Whom unit going to hit - [int, int]
         self.move_back_destination = None  # Where unit is returning after hit and run or hit and fly attack
         self.changed_direction = None  # Unit changes its direction when it has to shoot
         self.attacking_rotate = []  # List of units from army whose unit is attacking in melee right now
@@ -298,7 +298,9 @@ class Land_Battle:  # class keeps information about outgoing battle
         self.perform_attack = []  # List of indexes that indicates which creatures from regiment will perform attack
         self.dealt_damage = 0  # Total amount of damage dealt during one attack by regiment
         self.killed_creatures = 0
-        self.damage_msg_position = []  # Around which unit should message pop up
+        self.damage_msg_position = []  # Around which unit should message pop up - singular position - [int, int]
+        self.damage_dealt_positions = []  # List of positions of all units hit by an attack
+        # - [...] list consist of lists [int, int] with positions
 
         self.battle_stop = False  # Turn to True when battle is over
         self.battle_end_message = ""  # Illustrated on Battle end window

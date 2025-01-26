@@ -218,12 +218,19 @@ def primary_rotate(b, acting_army, acting_unit, enemy_army):
         primary_target = enemy_army.units[b.battle_map[TileNum2].unit_index]
         primary_target.direction = game_battle.change_direction(primary_target.position, acting_unit.position)
 
+        b.damage_dealt_positions.append(tuple(primary_target.position))
+        print("b.damage_dealt_positions: " + str(b.damage_dealt_positions))
+
         game_battle.print_rotating_units(b)
         print("")
 
     elif b.secondary == "Counterattack":
         b.primary = "Counterattack"
         b.secondary = None
+
+        b.damage_dealt_positions.append(tuple(b.queue[0].position))
+        print("b.damage_dealt_positions: " + str(b.damage_dealt_positions))
+
         game_battle.print_rotating_units(b)
         print("")
 
@@ -232,6 +239,11 @@ def primary_rotate(b, acting_army, acting_unit, enemy_army):
 
         b.primary = "Ranged attack"
         b.secondary = None
+
+        b.damage_dealt_positions.append(tuple(b.target_destination))
+        print("b.damage_dealt_positions: " + str(b.damage_dealt_positions))
+
+        print("")
 
 
 def primary_melee_attack(b, acting_hero, acting_unit, enemy_hero, enemy_army):
@@ -319,6 +331,9 @@ def primary_damage_message1(b, acting_army, acting_unit, enemy_army):
     print("b.primary == Damage message1")
     b.primary = None
     b.anim_message = None
+    b.damage_dealt_positions = []
+    b.dealt_damage = 0
+    b.killed_creatures = 0
 
     TileNum2 = (b.target_destination[1] - 1) * game_stats.battle_width + b.target_destination[0] - 1
     if b.battle_map[TileNum2].army_id:
@@ -369,6 +384,7 @@ def primary_counterattack(b, acting_army, acting_hero, enemy_army, enemy_hero):
     TileNum2 = (b.target_destination[1] - 1) * game_stats.battle_width + b.target_destination[0] - 1
     primary_target = acting_army.units[b.queue[0].number]
     unit_df = primary_target.direction
+    print(str(TileNum2) + " - " + str(b.target_destination))
 
     unit = enemy_army.units[b.battle_map[TileNum2].unit_index]
     unit_at = unit.direction
@@ -392,11 +408,15 @@ def primary_counterattack(b, acting_army, acting_hero, enemy_army, enemy_hero):
 def primary_counterattack_damage_message(b):
     b.primary = "Counterattack damage message1"
     b.anim_message = "Damage and kills"
+    print("")
 
 
 def primary_counterattack_damage_message1(b):
     b.primary = None
     b.anim_message = None
+    b.damage_dealt_positions = []
+    b.dealt_damage = 0
+    b.killed_creatures = 0
     game_battle.complete_turn(b, 1.0)
 
 

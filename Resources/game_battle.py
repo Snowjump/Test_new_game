@@ -302,7 +302,7 @@ def execute_order(b):
     # print("Execution for " + str(b.queue[0].obj_type))
     if b.queue[0].obj_type != "Hero":
         acting_unit = acting_army.units[b.queue[0].number]
-        print(acting_unit.name + " - not a hero")
+        print(str(b.queue[0].position) + " " + acting_unit.name + " - not a hero")
         if b.primary in ["Rotate", "Move", "Route"]:
             if b.tile_trail:
                 change_side_direction(acting_unit, b, acting_army, enemy_army)
@@ -511,6 +511,9 @@ def complete_melee_attack(b, unit, primary_target, angle, acting_hero, enemy_her
     # Set initiative after performed action
     if b.primary != "Counterattack":
         set_initiative(unit, acting_hero, "Melee")
+
+    b.damage_dealt_positions.append(primary_target.position)
+    print("b.damage_dealt_positions: " + str(b.damage_dealt_positions))
 
     check_if_no_one_left_alive(b)
 

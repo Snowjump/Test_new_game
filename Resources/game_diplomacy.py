@@ -1,4 +1,5 @@
 ## Among Myth and Wonder
+## game_diplomacy
 
 import math
 
@@ -6,6 +7,7 @@ from Resources import game_obj
 from Resources import game_stats
 from Resources import game_basic
 from Resources import diplomacy_classes
+from Resources import common_selects
 
 from Surfaces import sf_game_board
 
@@ -1026,20 +1028,14 @@ def accept_peace_agreement(diplomatic_messages, message):
         # Transfer province ownership
         for demand in message.contents:
             if demand[0] == "Conquest":
-                for settlement in game_obj.game_cities:
-                    if settlement.city_id == demand[3]:
-                        settlement.military_occupation = None
-                        settlement.owner = str(message.dm_from)
+                game_basic.transfer_settlement(demand[3], message.dm_from)
 
     elif message.subject == "Capitulation offer":
         ## Enforcing concessions
         # Transfer province ownership
         for demand in message.contents:
             if demand[0] == "Conquest":
-                for settlement in game_obj.game_cities:
-                    if settlement.city_id == demand[3]:
-                        # settlement.military_occupation = None
-                        settlement.owner = str(message.dm_to)
+                game_basic.transfer_settlement(demand[3], message.dm_to)
 
     # Remove occupation
     for settlement in game_obj.game_cities:
@@ -1377,9 +1373,7 @@ def accept_threat_demand(diplomatic_messages, message):
     for demand in message.contents:
         print("demand: " + str(demand))
         if demand[2] == "Territory concession":
-            for settlement in game_obj.game_cities:
-                if settlement.city_id == demand[1]:
-                    settlement.owner = str(message.dm_from)
+            game_basic.transfer_settlement(demand[1], message.dm_from)
 
     # Remove message
     num = 0

@@ -1,4 +1,5 @@
 ## Among Myth and Wonder
+## diplomacy_classes
 
 class Realm_Relations:  # Keep information about diplomatic relations
     def __init__(self):

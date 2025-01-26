@@ -45,9 +45,8 @@ class Resource_Ribbon(graphics_classes.Panel):
                 text = "+" + text
             elif resource.delta < 0:
                 text_color = CancelElementsColor
-                text = "-" + text
+                text = text
             text_line = tnr_font14.render(text, True, text_color)
             screen.blit(text_line, (69 + x_shift * x_points, 16))
 
             x_points += 1
-

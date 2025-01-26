@@ -13,19 +13,14 @@ from Resources import game_classes
 from Resources import game_obj
 from Resources import game_pathfinding
 from Resources import game_stats
-from Resources import level_save
 from Resources import algo_building
 from Resources import skill_classes
-from Resources import ability_classes
 from Resources import update_gf_game_board
-from Resources import update_gf_battle
 from Resources import update_gf_menus
 from Resources import algo_path_arrows
 from Resources import game_diplomacy
-from Resources import diplomacy_classes
 from Resources import game_autobattle
 from Resources import common_selects
-
 
 from Resources.Battle_Preparation import battle_map_generation
 from Resources.Battle_Preparation import siege_map_generation
@@ -46,6 +41,9 @@ from Content.Quests import knight_lords_dilemma_det
 from Content import diplomatic_messages_text
 from Content import diplomatic_messages_det
 
+from Surfaces.Sf_Game_Board import game_board_navigation
+from Surfaces.Sf_Game_Board import army_exchange
+
 yVar = game_stats.game_window_height - 800
 
 button_zone = [[1240, 5, 1258, 37],
@@ -55,7 +53,9 @@ button_zone = [[1240, 5, 1258, 37],
                [3, 28, 27, 47],
                [3, 53, 27, 72],
                [1, 761 + yVar, 14, 793 + yVar],
-               [186, 761 + yVar, 218, 793 + yVar]]
+               [186, 761 + yVar, 218, 793 + yVar],
+               [1259, 779 + yVar, 1278, 798 + yVar],
+               [1235, 779 + yVar, 1254, 798 + yVar]]
 
 begin_battle_panel_zone = [[590, 138, 690, 160],
                            [590, 168, 690, 190]]
@@ -115,7 +115,7 @@ settlement_lower_panel_zone = [[303, 684 + yVar, 393, 706 + yVar],
 
 army_lower_panel_zone = [[203, 776 + yVar, 253, 794 + yVar]]
 
-army_exchange_panel_zone = [[203, 595 + yVar, 290, 617 + yVar]]
+army_exchange_panel_zone = [[203, 595 + yVar, 280, 617 + yVar]]
 
 quest_log_panel_zone = [[655, 85, 674, 104],
                         [37, 85, 179, 104],
@@ -165,17 +165,17 @@ autobattle_conclusion_panel_zone = [[590, 135, 690, 157]]
 
 def game_board_keys(key_action):
     if key_action == 119:
-        game_stats.pov_pos[1] -= 1
-        update_gf_game_board.update_sprites()
+        game_board_navigation.move_pov_up()
     elif key_action == 115:
-        game_stats.pov_pos[1] += 1
-        update_gf_game_board.update_sprites()
+        game_board_navigation.move_pov_down()
     elif key_action == 97:
-        game_stats.pov_pos[0] -= 1
-        update_gf_game_board.update_sprites()
+        game_board_navigation.move_pov_left()
     elif key_action == 100:
-        game_stats.pov_pos[0] += 1
-        update_gf_game_board.update_sprites()
+        game_board_navigation.move_pov_right()
+
+    elif key_action == 98:  # key - b
+        # Switch border vision mode
+        switch_border_vision_but()
 
     elif key_action == 32:  # key - space
         if not game_stats.pause_status:
@@ -311,17 +311,15 @@ def game_board_surface_m1(position):
                         print("Building - information: " + str(x_axis) + ", " + str(y_axis))
 
                         the_plot = None
-                        for city in game_obj.game_cities:
-                            if city.city_id == game_stats.selected_settlement:
-                                for plot in city.buildings:
-                                    if plot.structure is not None:
-                                        if plot.screen_position == [x_axis, y_axis + game_stats.building_row_index]:
-                                            the_plot = plot
-                                            print("Position - " + str(plot.screen_position))
-                                            break
-                                break
+                        settlement = common_selects.select_settlement_by_id(game_stats.selected_settlement)
+                        for plot in settlement.buildings:
+                            if plot.structure is not None:
+                                if plot.screen_position == [x_axis, y_axis + game_stats.building_row_index]:
+                                    the_plot = plot
+                                    print("Position - " + str(plot.screen_position))
+                                    break
 
-                        if the_plot is not None:
+                        if the_plot:
                             print('game_stats.right_window = "Building information"')
                             game_stats.right_window = "Building information"
                             game_stats.rw_object = the_plot.structure
@@ -450,39 +448,7 @@ def game_board_surface_m1(position):
                     game_stats.faction_screen_index = int(y_axis - 1)
 
         elif game_stats.game_board_panel == "army exchange panel":
-
-            square = [380, 380 + yVar, 639, 607 + yVar]
-            if square[0] < position[0] < square[2] and square[1] < position[1] < square[3]:
-                game_stats.button_pressed = True
-                # print(str(position[0]) + ", " + str(position[1]))
-                x_axis, y_axis = position[0], position[1]
-                x_axis -= 380
-                y_axis -= (380 + yVar)
-                print(str(x_axis) + ", " + str(y_axis))
-                x_axis = math.ceil(x_axis / 52)
-                y_axis = math.ceil(y_axis / 57)
-                print(str(x_axis) + ", " + str(y_axis))
-
-                # Add new units to exchange list
-                number = int(y_axis - 1) * 5 + int(x_axis) - 1
-                print("number - " + str(number))
-                approaching_army = None
-                standing_army = None
-                for army in game_obj.game_armies:
-                    if army.army_id == game_stats.selected_army:
-                        approaching_army = army
-                    elif army.army_id == game_stats.selected_second_army:
-                        standing_army = army
-
-                if number not in game_stats.second_army_exchange_list:
-                    if len(approaching_army.units) - len(game_stats.first_army_exchange_list) + \
-                            len(game_stats.second_army_exchange_list) < 20:
-                        game_stats.second_army_exchange_list.append(number)
-                        game_stats.second_army_exchange_list = sorted(game_stats.second_army_exchange_list,
-                                                                      reverse=True)
-                        print("second_army_exchange_list: " + str(game_stats.second_army_exchange_list))
-                else:
-                    game_stats.second_army_exchange_list.remove(number)
+            army_exchange.army_exchange_panel(position, yVar)
 
         elif game_stats.game_board_panel == "quest log panel":
             if game_stats.event_panel_det is not None:
@@ -715,36 +681,7 @@ def game_board_surface_m1(position):
 
         elif game_stats.details_panel_mode == "army lower panel" \
                 and game_stats.game_board_panel == "army exchange panel":
-            if 654 + yVar <= position[1] < 768 + yVar and 430 <= position[0] < 949:
-
-                x_axis, y_axis = position[0], position[1]
-                x_axis -= 430
-                y_axis -= (654 + yVar)
-                print(str(x_axis) + ", " + str(y_axis))
-                x_axis = math.ceil(x_axis / 52)
-                y_axis = math.ceil(y_axis / 57)
-                print(str(x_axis) + ", " + str(y_axis))
-
-                # Add new units to exchange list
-                number = int(y_axis - 1) * 10 + int(x_axis) - 1
-                print("number - " + str(number))
-                approaching_army = None
-                standing_army = None
-                for army in game_obj.game_armies:
-                    if army.army_id == game_stats.selected_army:
-                        approaching_army = army
-                    elif army.army_id == game_stats.selected_second_army:
-                        standing_army = army
-
-                if number not in game_stats.first_army_exchange_list:
-                    if len(standing_army.units) - len(game_stats.second_army_exchange_list) + \
-                            len(game_stats.first_army_exchange_list) < 20:
-                        game_stats.first_army_exchange_list.append(number)
-                        game_stats.first_army_exchange_list = sorted(game_stats.first_army_exchange_list,
-                                                                     reverse=True)
-                        print("first_army_exchange_list: " + str(game_stats.first_army_exchange_list))
-                else:
-                    game_stats.first_army_exchange_list.remove(number)
+            army_exchange.army_exchange_lower_panel(position, yVar)
 
     if not game_stats.button_pressed and game_stats.game_board_panel:
         game_stats.button_pressed = True
@@ -1108,10 +1045,7 @@ def diplomacy_but():
 
     # print("dip_summary - " + str(game_stats.dip_summary))
 
-    for power in game_obj.game_powers:
-        if power.name == game_stats.player_power:
-            game_stats.realm_inspection = power
-            break
+    game_stats.realm_inspection = common_selects.select_realm_by_name(game_stats.player_power)
 
     for power in game_obj.game_powers:
         if power.name in game_stats.realm_inspection.contacts:
@@ -1163,15 +1097,11 @@ def select_war_notification(position):
                             or war.respondent == opponent[2]:
                         game_stats.war_inspection = war
 
-                        for realm in game_obj.game_powers:
-                            if realm.name == war.initiator:
-                                game_stats.realm_inspection = realm
-                                break
+                        initiator_realm = common_selects.select_realm_by_name(war.initiator)
+                        game_stats.realm_inspection = initiator_realm
 
-                        for realm in game_obj.game_powers:
-                            if realm.name == war.respondent:
-                                game_stats.contact_inspection = realm
-                                break
+                        respondent_realm = common_selects.select_realm_by_name(war.respondent)
+                        game_stats.contact_inspection = respondent_realm
 
                         game_diplomacy.prepare_war_summary()
                         break
@@ -1179,17 +1109,6 @@ def select_war_notification(position):
 
 def play_battle_but():
     battle_map_generation.create_battle_map()
-
-    # # New visuals
-    # game_stats.gf_settlement_dict = {}
-    # game_stats.gf_facility_dict = {}
-    # game_stats.gf_exploration_dict = {}
-    # game_stats.gf_misc_img_dict = {}
-    #
-    # # Update visuals for battle
-    # update_gf_battle.battle_update_sprites()
-    # update_gf_battle.update_misc_sprites()
-    # game_stats.gf_battle_effects_dict = {}
 
     click_sound = pygame.mixer.Sound("Sound/Interface/Minimalist2.ogg")
     click_sound.play()
@@ -1227,18 +1146,8 @@ def autobattle_but():
 
 def close_autobattle_results():
     print("close_autobattle_results()")
-    attacker_realm = None
-    defender_realm = None
-
-    for realm in game_obj.game_powers:
-        if realm.name == game_stats.attacker_army.owner:
-            attacker_realm = realm
-            break
-
-    for realm in game_obj.game_powers:
-        if realm.name == game_stats.defender_army.owner:
-            defender_realm = realm
-            break
+    attacker_realm = common_selects.select_realm_by_name(game_stats.attacker_army.owner)
+    defender_realm = common_selects.select_realm_by_name(game_stats.defender_army.owner)
 
     # game_board_panel is set to default before after_battle_processing()
     # in case this is special battle thus after_battle_processing() could launch battle_result_scripts
@@ -1341,21 +1250,15 @@ def encircle_but():
 
 def retreat_but():
     if game_stats.besieged_by_human:
-        for army in game_obj.game_armies:
-            if army.army_id == game_stats.attacker_army_id:
-                army.action = "Stand"
-                break
+        assaulting_army = common_selects.select_army_by_id(game_stats.attacker_army_id)
+        assaulting_army.action = "Stand"
 
         if game_stats.defender_army_id != 0:
-            for army in game_obj.game_armies:
-                if army.army_id == game_stats.defender_army_id:
-                    army.action = "Stand"
-                    break
+            besieged_army = common_selects.select_army_by_id(game_stats.defender_army_id)
+            besieged_army.action = "Stand"
 
-        for settlement in game_obj.game_cities:
-            if settlement.city_id == game_stats.selected_settlement:
-                settlement.siege = None
-                break
+        settlement = common_selects.select_settlement_by_id(game_stats.selected_settlement)
+        settlement.siege = None
 
         game_stats.attacker_army_id = 0
         game_stats.attacker_realm = ""
@@ -1377,11 +1280,8 @@ def retreat_but():
 def build_trebuchet():
     if game_stats.besieged_by_human:
         print("build_trebuchet()")
-        the_siege = None
-        for city in game_obj.game_cities:
-            if city.city_id == game_stats.selected_settlement:
-                the_siege = city.siege
-                break
+        city = common_selects.select_settlement_by_id(game_stats.selected_settlement)
+        the_siege = city.siege
 
         print("trebuchets_max_quantity - " + str(the_siege.trebuchets_max_quantity))
 
@@ -1401,11 +1301,8 @@ def build_trebuchet():
 def cancel_building_trebuchet():
     if game_stats.besieged_by_human:
         print("cancel_building_trebuchet()")
-        the_siege = None
-        for city in game_obj.game_cities:
-            if city.city_id == game_stats.selected_settlement:
-                the_siege = city.siege
-                break
+        city = common_selects.select_settlement_by_id(game_stats.selected_settlement)
+        the_siege = city.siege
 
         if the_siege.trebuchets_ordered > 0:
             the_siege.trebuchets_ordered -= 1
@@ -1430,11 +1327,8 @@ def cancel_building_trebuchet():
 def build_siege_tower():
     if game_stats.besieged_by_human:
         print("build_siege_tower()")
-        the_siege = None
-        for city in game_obj.game_cities:
-            if city.city_id == game_stats.selected_settlement:
-                the_siege = city.siege
-                break
+        city = common_selects.select_settlement_by_id(game_stats.selected_settlement)
+        the_siege = city.siege
 
         print("siege_towers_max_quantity - " + str(the_siege.siege_towers_max_quantity))
 
@@ -1455,11 +1349,8 @@ def build_siege_tower():
 def cancel_building_siege_tower():
     if game_stats.besieged_by_human:
         print("cancel_building_siege_tower()")
-        the_siege = None
-        for city in game_obj.game_cities:
-            if city.city_id == game_stats.selected_settlement:
-                the_siege = city.siege
-                break
+        city = common_selects.select_settlement_by_id(game_stats.selected_settlement)
+        the_siege = city.siege
 
         if the_siege.siege_towers_ordered > 0:
             the_siege.siege_towers_ordered -= 1
@@ -1485,11 +1376,8 @@ def cancel_building_siege_tower():
 def build_battering_ram():
     if game_stats.besieged_by_human:
         print("build_battering_ram()")
-        the_siege = None
-        for city in game_obj.game_cities:
-            if city.city_id == game_stats.selected_settlement:
-                the_siege = city.siege
-                break
+        city = common_selects.select_settlement_by_id(game_stats.selected_settlement)
+        the_siege = city.siege
 
         print("battering_rams_max_quantity - " + str(the_siege.battering_rams_max_quantity))
 
@@ -1510,11 +1398,8 @@ def build_battering_ram():
 def cancel_building_battering_ram():
     if game_stats.besieged_by_human:
         print("cancel_building_battering_ram()")
-        the_siege = None
-        for city in game_obj.game_cities:
-            if city.city_id == game_stats.selected_settlement:
-                the_siege = city.siege
-                break
+        city = common_selects.select_settlement_by_id(game_stats.selected_settlement)
+        the_siege = city.siege
 
         if the_siege.battering_rams_ordered > 0:
             the_siege.battering_rams_ordered -= 1
@@ -1587,7 +1472,6 @@ def open_blockade_panel(settlement):
         game_stats.defender_army_id = int(game_obj.game_map[settlement.location].army_id)
         army = common_selects.select_army_by_id(game_obj.game_map[settlement.location].army_id)
         game_stats.defender_realm = str(army.owner)
-
 
     # Update visuals
     update_gf_game_board.update_misc_sprites()
@@ -1688,9 +1572,7 @@ def select_stationed_army_but():
 
 
 def open_building_area():
-    if game_stats.settlement_area == "Building":
-        pass
-    else:
+    if game_stats.settlement_area != "Building":
         game_stats.settlement_area = "Building"
         game_stats.right_window = ""
         game_stats.rw_object = None
@@ -1701,9 +1583,7 @@ def open_building_area():
 
 
 def open_recruiting_area():
-    if game_stats.settlement_area == "Recruiting":
-        pass
-    else:
+    if game_stats.settlement_area != "Recruiting":
         game_stats.settlement_area = "Recruiting"
         game_stats.right_window = ""
         game_stats.rw_object = None
@@ -1719,9 +1599,7 @@ def open_recruiting_area():
 
 
 def open_heroes_area():
-    if game_stats.settlement_area == "Heroes":
-        pass
-    else:
+    if game_stats.settlement_area != "Heroes":
         game_stats.settlement_area = "Heroes"
         game_stats.right_window = ""
         game_stats.rw_object = None
@@ -1737,9 +1615,7 @@ def open_heroes_area():
 
 
 def open_economy_area():
-    if game_stats.settlement_area == "Economy":
-        pass
-    else:
+    if game_stats.settlement_area != "Economy":
         # print("game_stats.settlement_area = 'Economy'")
         game_stats.settlement_area = "Economy"
         game_stats.settlement_subsection = "Overview"
@@ -1755,9 +1631,7 @@ def open_economy_area():
 
 
 def open_factions_area():
-    if game_stats.settlement_area == "Factions":
-        pass
-    else:
+    if game_stats.settlement_area != "Factions":
         game_stats.settlement_area = "Factions"
         game_stats.right_window = ""
         game_stats.rw_object = None
@@ -1800,41 +1674,6 @@ def close_right_panel_but():
     update_gf_game_board.remove_settlement_misc_sprites(img_list)
     game_stats.gf_skills_dict = {}
     game_stats.gf_artifact_dict = {}
-
-
-def complete_army_exchange_but():
-    game_stats.game_board_panel = ""
-
-    approaching_army = None
-    standing_army = None
-    approaching_army_ID = None
-    standing_army_ID = None
-
-    for army in game_obj.game_armies:
-        if army.army_id == game_stats.selected_army:
-            army.action = "Stand"
-            approaching_army = army
-            approaching_army_ID = int(army.army_id)
-        elif army.army_id == game_stats.selected_second_army:
-            army.action = "Stand"
-            standing_army = army
-            standing_army_ID = int(army.army_id)
-
-    for number in game_stats.first_army_exchange_list:
-        standing_army.units.append(approaching_army.units.pop(number))
-
-    for number in game_stats.second_army_exchange_list:
-        approaching_army.units.append(standing_army.units.pop(number))
-
-    # game_stats.selected_army = -1
-    game_stats.selected_second_army = -1
-    game_stats.first_army_exchange_list = []
-    game_stats.second_army_exchange_list = []
-    # game_stats.selected_object = ""
-    # game_stats.details_panel_mode = ""
-
-    game_basic.establish_leader(approaching_army_ID, "Game")
-    game_basic.establish_leader(standing_army_ID, "Game")
 
 
 def plot_row_up():
@@ -2309,9 +2148,7 @@ def next_second_starting_skill():
 
 
 def open_overview_section():
-    if game_stats.settlement_subsection == "Overview":
-        pass
-    else:
+    if game_stats.settlement_subsection != "Overview":
         game_stats.settlement_subsection = "Overview"
         game_stats.right_window = ""
         game_stats.rw_object = None
@@ -2324,9 +2161,7 @@ def open_overview_section():
 
 
 def open_population_section():
-    if game_stats.settlement_subsection == "Population":
-        pass
-    else:
+    if game_stats.settlement_subsection != "Population":
         game_stats.settlement_subsection = "Population"
         game_stats.right_window = ""
         game_stats.rw_object = None
@@ -2407,9 +2242,7 @@ def down_faction_pops_index():
 
 
 def open_local_market_section():
-    if game_stats.settlement_subsection == "Local market":
-        pass
-    else:
+    if game_stats.settlement_subsection != "Local market":
         # print("Local market")
         game_stats.settlement_subsection = "Local market"
         game_stats.right_window = ""
@@ -2421,9 +2254,7 @@ def open_local_market_section():
 
 
 def open_trade_routes_section():
-    if game_stats.settlement_subsection == "Trade routes":
-        pass
-    else:
+    if game_stats.settlement_subsection != "Trade routes":
         game_stats.settlement_subsection = "Trade routes"
         game_stats.right_window = ""
         game_stats.rw_object = None
@@ -2470,16 +2301,11 @@ def open_hero_information():
 
     # Selected army
     if game_stats.selected_army != -1:
-        for army in game_obj.game_armies:
-            if army.army_id == game_stats.selected_army:
-                game_stats.rw_object = army.hero
+        army = common_selects.select_army_by_id(game_stats.selected_army)
+        game_stats.rw_object = army.hero
 
-                for realm in game_obj.game_powers:
-                    if realm.name == army.owner:
-                        game_stats.realm_artifact_collection = realm.artifact_collection
-                        break
-
-                break
+        realm = common_selects.select_realm_by_name(army.owner)
+        game_stats.realm_artifact_collection = realm.artifact_collection
 
     # Selected settlement
     elif game_stats.selected_settlement != -1:
@@ -2491,15 +2317,11 @@ def open_hero_information():
         TileObj = game_obj.game_map[TileNum]
         print("army_id - " + str(TileObj.army_id))
 
-        for army in game_obj.game_armies:
-            if army.army_id == TileObj.army_id:
-                game_stats.rw_object = army.hero
-                break
+        army = common_selects.select_army_by_id(TileObj.army_id)
+        game_stats.rw_object = army.hero
 
-        for realm in game_obj.game_powers:
-            if realm.name == settlement.owner:
-                game_stats.realm_artifact_collection = realm.artifact_collection
-                break
+        realm = common_selects.select_realm_by_name(settlement.owner)
+        game_stats.realm_artifact_collection = realm.artifact_collection
 
     # Update visuals
     img_list = ['Icons/paper_2_square_48', 'Icons/paper_square_40']
@@ -2580,12 +2402,10 @@ def open_quest_messages_area():
     game_stats.selected_diplomatic_notifications = None
     game_stats.diplomatic_message_index = None
     game_stats.diplomatic_message_panel = None
-    for realm in game_obj.game_powers:
-        # print(str(realm.name))
-        # print(str(game_stats.player_power))
-        if realm.name == game_stats.player_power:
-            game_stats.selected_quest_messages = realm.quests_messages
-            break
+    realm = common_selects.select_realm_by_name(game_stats.player_power)
+    # print(str(realm.name))
+    # print(str(game_stats.player_power))
+    game_stats.selected_quest_messages = realm.quests_messages
 
 
 def open_diplomatic_messages_area():
@@ -2594,10 +2414,8 @@ def open_diplomatic_messages_area():
     game_stats.quest_message_index = None
     game_stats.quest_message_panel = None
     game_stats.event_panel_det = None
-    for realm in game_obj.game_powers:
-        if realm.name == game_stats.player_power:
-            game_stats.selected_diplomatic_notifications = realm.diplomatic_messages
-            break
+    realm = common_selects.select_realm_by_name(game_stats.player_power)
+    game_stats.selected_diplomatic_notifications = realm.diplomatic_messages
 
 
 def select_quest_message(index):
@@ -2688,19 +2506,17 @@ def select_contact(position):
     if y_axis <= len(game_stats.explored_contacts):
         realm_name = game_stats.explored_contacts[y_axis + game_stats.contact_index - 1][2]
         # print(str(realm_name))
-
-        for realm in game_obj.game_powers:
-            if realm.name == realm_name:
-                game_stats.contact_inspection = realm
-                # print("Selected " + str(realm.name))
-                # print(str(game_stats.contact_inspection.name))
-                break
+        realm = common_selects.select_realm_by_name(realm_name)
+        game_stats.contact_inspection = realm
+        # print("Selected " + str(realm.name))
+        # print(str(game_stats.contact_inspection.name))
 
         # game_diplomacy.prepare_summary()
         return_to_diplomatic_actions_area_but()
 
 
 def declare_war_or_sue_for_peace_action_but():
+    print("declare_war_or_sue_for_peace_action_but()")
     if game_stats.dip_summary.ongoing_war:
         game_stats.diplomacy_area = "Sue for peace"
         game_diplomacy.prepare_war_summary()
@@ -2710,7 +2526,7 @@ def declare_war_or_sue_for_peace_action_but():
 
 
 def return_to_diplomatic_actions_area_but():
-    # print("return_to_diplomatic_actions_area_but")
+    print("return_to_diplomatic_actions_area_but()")
     game_stats.diplomacy_area = "Diplomatic actions"
     game_stats.casus_bellis = []
     game_stats.cb_details = []
@@ -3013,23 +2829,34 @@ def close_war_panel_but():
 def war_sue_for_peace_but():
     if game_stats.realm_inspection.name == game_stats.player_power \
             or game_stats.contact_inspection.name == game_stats.player_power:
-        realm_name = None
+        realm_name = str(game_stats.contact_inspection.name)
         if game_stats.realm_inspection.name != game_stats.player_power:
             realm_name = str(game_stats.realm_inspection.name)
-        else:
-            realm_name = str(game_stats.contact_inspection.name)
+
         close_war_panel_but()
         diplomacy_but()
 
-        for realm in game_obj.game_powers:
-            if realm.name == realm_name:
-                game_stats.contact_inspection = realm
-                break
+        realm = common_selects.select_realm_by_name(realm_name)
+        game_stats.contact_inspection = realm
 
         # print("1. game_stats.dip_summary - " + str(game_stats.dip_summary))
         return_to_diplomatic_actions_area_but()
         # print("2. game_stats.dip_summary - " + str(game_stats.dip_summary))
         declare_war_or_sue_for_peace_action_but()
+
+
+def switch_border_vision_but():
+    if game_stats.border_vision:
+        game_stats.border_vision = False
+    else:
+        game_stats.border_vision = True
+
+
+def switch_grid_vision_but():
+    if game_stats.grid_vision:
+        game_stats.grid_vision = False
+    else:
+        game_stats.grid_vision = True
 
 
 button_funs = {1: exit_but,
@@ -3039,7 +2866,9 @@ button_funs = {1: exit_but,
                5: quest_log_but,
                6: diplomacy_but,
                7: previous_war_notification_but,
-               8: next_war_notification_but}
+               8: next_war_notification_but,
+               9: switch_border_vision_but,
+               10: switch_grid_vision_but}
 
 click_zone = {"begin battle panel": [380, 100, 900, 440],
               "settlement panel": [1, 80, 639, 540],
@@ -3092,7 +2921,7 @@ settlement_lower_panel_funs = {1: select_stationed_army_but,
 
 army_lower_panel_funs = {1: open_hero_information}
 
-army_exchange_funs = {1: complete_army_exchange_but}
+army_exchange_funs = {1: army_exchange.complete_army_exchange_but}
 
 quest_log_funs = {1: close_quest_log_panel_but,
                   2: open_quest_messages_area,

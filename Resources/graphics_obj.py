@@ -11,3 +11,5 @@ resource_ribbon = []
 # resource_ribbon_panel = None
 game_board_objects = []
 
+#
+level_editor_objects = []

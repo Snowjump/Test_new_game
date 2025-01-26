@@ -1,4 +1,5 @@
-## Miracle battles
+## Among Myth and Wonder
+## effect_classes
 
 
 class Battle_Effect:

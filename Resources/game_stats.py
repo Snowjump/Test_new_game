@@ -3,8 +3,8 @@
 
 # Software versioning
 version_major = 0
-version_minor = 1
-version_micro = 24
+version_minor = 2
+version_micro = 0
 
 time_counted = 0
 fps = 0.0
@@ -73,6 +73,7 @@ active_starting_month_field = False
 
 # Level editor
 level_map = []  # Contains tiles objects
+LE_borders_map = []  # Contains information about realm borders on map tiles
 LE_year = 0
 LE_month = 5
 LE_level_type = "Skirmish"
@@ -161,6 +162,9 @@ cur_level_width = 0
 cur_level_height = 0
 map_positions = []
 
+# vision mode
+border_vision = False
+grid_vision = True
 
 current_level_name = ""
 player_power = ""

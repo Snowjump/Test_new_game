@@ -31,9 +31,11 @@ def select_settlement_by_id(given_settlement_id, report=None, location="game_cit
     return selected_settlement
 
 
-def select_army_by_id(given_army_id, report=None):
+def select_army_by_id(given_army_id, report=None, location="game_armies"):
+    army_location = {"game_armies": game_obj.game_armies,
+                     "editor_armies": game_stats.editor_armies}
     selected_army = None
-    for army in game_obj.game_armies:
+    for army in army_location[location]:
         if army.army_id == given_army_id:
             selected_army = army
             break
@@ -44,9 +46,11 @@ def select_army_by_id(given_army_id, report=None):
     return selected_army
 
 
-def select_realm_by_name(given_realm_name):
+def select_realm_by_name(given_realm_name, location="game_powers"):
+    realm_location = {"game_powers": game_obj.game_powers,
+                      "editor_powers": game_stats.editor_powers}
     selected_realm = None
-    for realm in game_obj.game_powers:
+    for realm in realm_location[location]:
         if realm.name == given_realm_name:
             selected_realm = realm
             break

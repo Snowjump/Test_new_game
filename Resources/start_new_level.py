@@ -9,9 +9,10 @@ from Resources import game_obj
 from Resources import update_gf_game_board
 from Resources import prepare_level
 from Resources import game_start
+from Resources import common_selects
 
 
-# This function needed to load level, when player is starting new game or proceed to next level
+# This function is needed to load a level, when a player is starting a new game or proceed to a next level
 
 def begin_new_level(folder, level_to_load):
     shelfFile = shelve.open(str(Path('levels/' + folder)) + '/' + level_to_load)
@@ -44,7 +45,7 @@ def begin_new_level(folder, level_to_load):
 
     game_start.nullify_level_editor_variables()
 
-    pov_pos = [0, 0]
+    # pov_pos = [0, 0]
     # print("Level name is " + game_stats.current_level_name)
     # print(str(game_stats.game_month) + " month " + str(game_stats.game_year) + " year")
     # print("Playable faction is " + assign_parameters[game_stats.current_level_name])
@@ -56,10 +57,8 @@ def begin_new_level(folder, level_to_load):
     game_stats.turn_hourglass = False
 
     # Human player
-    for realm in game_obj.game_powers:
-        if realm.name == game_stats.player_power:
-            realm.AI_player = False
-            break
+    realm = common_selects.select_realm_by_name(game_stats.player_power)
+    realm.AI_player = False
 
     count_x = 0
     count_y = 0
@@ -72,6 +71,10 @@ def begin_new_level(folder, level_to_load):
     game_stats.cur_level_width = int(count_x)
     game_stats.cur_level_height = int(count_y)
     game_stats.selected_object = ""
+
+    # Realm borders
+    game_obj.borders_map = []
+    prepare_level.prepare_realm_borders()
 
     game_stats.map_positions = list(prepare_level.map_all_tiles())
     prepare_level.prepare_known_map(game_stats.player_power)

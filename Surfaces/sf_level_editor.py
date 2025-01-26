@@ -1,5 +1,5 @@
 ## Among Myth and Wonder
-## sf_battle_editor
+## sf_level_editor
 
 import copy
 import sys, pygame, math, random
@@ -15,6 +15,7 @@ from Resources import game_road_img
 from Resources import game_basic
 from Resources import algo_circle_range
 from Resources import algo_square_range
+from Resources import algo_borders
 from Resources import common_selects
 
 from Content import objects_img_catalog
@@ -55,7 +56,9 @@ button_zone = [[1150, 10, 1250, 32],
                [126, 1, 146, 18],
                [156, 1, 176, 18],
                [186, 1, 206, 18],
-               [216, 1, 246, 18]]
+               [216, 1, 246, 18],
+               [1259, 779 + yVar, 1278, 798 + yVar],
+               [1235, 779 + yVar, 1254, 798 + yVar]]
 
 brush_panel_zone = [[1044, 104, 1111, 126],
                     [1121, 104, 1188, 126],
@@ -155,8 +158,11 @@ def level_editor_keys(key_action):
             game_stats.pov_pos[0] += 1
             update_gf_level_editor.update_sprites()
 
-    ##    print("Key pressed " + str(key_action))
-    pass
+        elif key_action == 98:  # key - b
+            # Switch border vision mode
+            switch_border_vision_but()
+
+        print("Key pressed " + str(key_action))
 
 
 def level_editor_surface_m1(position):
@@ -165,8 +171,9 @@ def level_editor_surface_m1(position):
     button_numb = 0
     for square in button_zone:
         button_numb += 1
-        ##        print("Level editor surface button " + str(button_numb))
+        # print("Level editor surface button " + str(button_numb) + "; square " + str(square))
         if square[0] < position[0] < square[2] and square[1] < position[1] < square[3]:
+            # print("Button in button_zone pressed")
             button_funs[button_numb]()
             button_pressed = True
             break
@@ -402,8 +409,8 @@ def level_editor_surface_m1(position):
                     if game_stats.brush == "Remove object":
                         if game_stats.level_map[TileNum].lot is not None:
                             if game_stats.level_map[TileNum].lot != "City":
-                                if game_stats.level_map[
-                                    TileNum].lot.obj_typ in exploration_catalog.exploration_objects_groups_cat:
+                                if game_stats.level_map[TileNum].lot.obj_typ in \
+                                        exploration_catalog.exploration_objects_groups_cat:
                                     if game_stats.level_map[TileNum].lot.properties.army_id is not None:
                                         for army in game_stats.editor_armies:
                                             if army.army_id == game_stats.level_map[TileNum].lot.properties.army_id:
@@ -442,6 +449,10 @@ def level_editor_surface_m1(position):
 
                 if game_stats.edit_instrument == "create army":
                     game_stats.level_editor_panel = "create army panel"
+                    if game_stats.level_map[TileNum].army_id:
+                        game_stats.lower_panel = "create army lower panel"
+                    else:
+                        game_stats.lower_panel = ""
 
                 elif game_stats.edit_instrument == "road":
                     if game_stats.brush == "Remove road":
@@ -750,11 +761,9 @@ def create_new_city_but():
             alin = alinement_info.alinements_list[game_stats.option_box_alinement_index]
             facil = "Settlement"
             # residents = faction_classes.fac_groups_for_pop[alin][facil]
-            settlement = None
-            for city in game_stats.editor_cities:
-                if city.city_id == game_stats.LE_cities_id_counter:
-                    settlement = city
-                    break
+            settlement = common_selects.select_settlement_by_id(game_stats.LE_cities_id_counter,
+                                                                location="editor_cities")
+
             for pops in faction_classes.fac_groups_for_pop[alin][facil]:
                 game_stats.LE_population_id_counter += 1
                 population_id = int(game_stats.LE_population_id_counter)
@@ -773,6 +782,10 @@ def create_new_city_but():
 
             settlement.control_zone.append(int(TileNum))
             print("control_zone: " + str(settlement.control_zone))
+
+            # Refresh borders on settlement tile and around it
+            tiles = algo_square_range.within_square_range(game_stats.selected_tile, 1, True)
+            algo_borders.refresh_borders(tiles)
 
             # game_stats.editor_cities[game_stats.LE_cities_id_counter - 1].residency = residents
 
@@ -899,6 +912,8 @@ def create_development_plots(alignment):
 
 
 def delete_city_but():
+    print("")
+    print("delete_city_but()")
     # Index of selected tile in map list
     x = int(game_stats.selected_tile[0])
     y = int(game_stats.selected_tile[1])
@@ -919,6 +934,10 @@ def delete_city_but():
     game_stats.editor_cities.remove(city)
 
     game_stats.lower_panel = ""
+
+    # Refresh borders around settlement territory
+    tiles_list = algo_borders.collect_surrounding_tiles(control_zone_list)
+    algo_borders.refresh_borders(tiles_list, True)
 
     click_sound = pygame.mixer.Sound("Sound/Interface/Abstract1.ogg")
     click_sound.play()
@@ -1004,8 +1023,10 @@ def draw_control_zone():
             tile_list = algo_circle_range.within_circle_range(game_stats.selected_tile, game_stats.brush_size - 1)
             print(tile_list)
 
+    control_zone_list = []
     for tile in tile_list:
         TileNum = (tile[1] - 1) * game_stats.new_level_width + tile[0] - 1
+        control_zone_list.append(int(TileNum))
         print("draw_control_zone() tile - " + str(tile) + "; TileNum - " + str(TileNum))
         if game_stats.level_map[TileNum].lot != "City":
             if game_stats.edit_instrument == "draw control zone":
@@ -1021,6 +1042,10 @@ def draw_control_zone():
                 if game_stats.level_map[TileNum].city_id == game_stats.last_city_id:
                     print("Scenario 3 - remove control zone")
                     remove_control_zone(TileNum)
+
+    # Refresh borders around control zone
+    border_tiles_list = algo_borders.collect_surrounding_tiles(control_zone_list)
+    algo_borders.refresh_borders(border_tiles_list, True)
 
 
 def put_neutral_land_in_control_zone(TileNum):
@@ -1073,7 +1098,7 @@ def plot_row_up():
 
 
 def plot_row_down():
-    settlement = common_selects.select_settlement_by_id(game_stats.selected_city_id)
+    settlement = common_selects.select_settlement_by_id(game_stats.selected_city_id, location="editor_cities")
 
     list_of_rows = []
     for plot in settlement.buildings:
@@ -1276,8 +1301,10 @@ def next_power_but():
 
 
 def delete_country_but():
+    print("delete_country_but()")
     del game_stats.editor_powers[game_stats.powers_l_p_index]
     game_stats.power_short_index = 0
+    game_stats.powers_l_p_index = 0
     game_stats.white_index = None
     if len(game_stats.editor_powers) == 0:
         game_stats.lower_panel = ""
@@ -1361,39 +1388,35 @@ def add_unit_to_army():
 
     if game_stats.level_map[TileNum].army_id is not None:
         focus = game_stats.level_map[TileNum].army_id
+        army = common_selects.select_army_by_id(focus, location="editor_armies")
+        if len(army.units) < 20:
+            alignment = str(alinement_info.advanced_alinements_list[game_stats.option_box_alinement_index])
+            units_list = list(create_unit.LE_units_dict_by_alignment[alignment])
 
-        for army in game_stats.editor_armies:
-            if army.army_id == focus:
-                if len(army.units) < 20:
-                    alignment = str(alinement_info.advanced_alinements_list[game_stats.option_box_alinement_index])
-                    units_list = list(create_unit.LE_units_dict_by_alignment[alignment])
+            print("white_index - " + str(game_stats.white_index) + "; alignment - " + str(alignment) +
+                  "; len(units_list) - " + str(len(units_list)))
+            print("Added to army new unit - " + units_list[game_stats.white_index].name)
+            print("Img - " + units_list[game_stats.white_index].img)
 
-                    print("white_index - " + str(game_stats.white_index) + "; alignment - " + str(alignment) +
-                          "; len(units_list) - " + str(len(units_list)))
-                    print("Added to army new unit - " + units_list[game_stats.white_index].name)
-                    print("Img - " + units_list[game_stats.white_index].img)
+            # Old code
+            # Now instead of copying an unit, a regiment card with minimum necessary information would be
+            # created
+            # army.units.append(copy.deepcopy(units_list[game_stats.white_index]))
+            unit_info = units_list[game_stats.white_index]
+            army.units.append(game_classes.LE_regiment_card(str(unit_info.name),
+                                                            str(unit_info.img_source),
+                                                            str(unit_info.img),
+                                                            int(unit_info.x_offset),
+                                                            int(unit_info.y_offset),
+                                                            int(unit_info.rank)))
 
-                    # Old code
-                    # Now instead of copying an unit, a regiment card with minimum necessary information would be
-                    # created
-                    # army.units.append(copy.deepcopy(units_list[game_stats.white_index]))
-                    unit_info = units_list[game_stats.white_index]
-                    army.units.append(game_classes.LE_regiment_card(str(unit_info.name),
-                                                                    str(unit_info.img_source),
-                                                                    str(unit_info.img),
-                                                                    int(unit_info.x_offset),
-                                                                    int(unit_info.y_offset),
-                                                                    int(unit_info.rank)))
+            # for unit in army.units:
+            #     print(str(unit.img))
 
-                    # for unit in army.units:
-                    #     print(str(unit.img))
+            game_basic.establish_leader(focus, "Editor")
 
-                    game_basic.establish_leader(focus, "Editor")
-
-                    # Update visuals
-                    update_gf_level_editor.add_regiment_sprites(TileNum)
-
-                break
+            # Update visuals
+            update_gf_level_editor.add_regiment_sprites(TileNum)
 
 
 def delete_army_but():
@@ -1402,14 +1425,12 @@ def delete_army_but():
     y = int(game_stats.selected_tile[1])
     TileNum = (y - 1) * game_stats.new_level_width + x - 1
 
-    if game_stats.level_map[TileNum].army_id is not None:
+    if game_stats.level_map[TileNum].army_id:
         focus = game_stats.level_map[TileNum].army_id
-        for army in game_stats.editor_armies:
-            if army.army_id == focus:
-                game_stats.editor_armies.remove(army)
-                game_stats.lower_panel = ""
-                game_stats.level_map[TileNum].army_id = None
-                break
+        army = common_selects.select_army_by_id(focus, location="editor_armies")
+        game_stats.editor_armies.remove(army)
+        game_stats.lower_panel = ""
+        game_stats.level_map[TileNum].army_id = None
 
 
 def up_unit_scroll_but():
@@ -1442,27 +1463,27 @@ def delete_unit_but():
 
 def delete_selected_unit(position):
     # If game_stats.delete_option == True, then user could click on unit's name to delete it
-    x_numb = math.floor((position[0] - 430) / 160)
-    y_numb = math.ceil((position[1] - (604 + yVar)) / 26)
-    print("position x - " + str(x_numb) + " position y - " + str(y_numb))
-    index = x_numb * 5 + y_numb - 1
+    if game_stats.delete_option:
+        x_numb = math.floor((position[0] - 430) / 160)
+        y_numb = math.ceil((position[1] - (604 + yVar)) / 26)
+        print("position x - " + str(x_numb) + " position y - " + str(y_numb))
+        index = x_numb * 5 + y_numb - 1
 
-    # Index of selected tile in map list
-    x = int(game_stats.selected_tile[0])
-    y = int(game_stats.selected_tile[1])
-    TileNum = (y - 1) * game_stats.new_level_width + x - 1
+        # Index of selected tile in map list
+        x = int(game_stats.selected_tile[0])
+        y = int(game_stats.selected_tile[1])
+        TileNum = (y - 1) * game_stats.new_level_width + x - 1
 
-    focus = game_stats.level_map[TileNum].army_id
+        focus = game_stats.level_map[TileNum].army_id
 
-    for army in game_stats.editor_armies:
-        if army.army_id == focus:
-            if len(army.units) - 1 >= index:
-                del army.units[index]
+        army = common_selects.select_army_by_id(focus, location="editor_armies")
+        if len(army.units) - 1 >= index:
+            del army.units[index]
 
-    game_basic.establish_leader(focus, "Editor")
+        game_basic.establish_leader(focus, "Editor")
 
-    # Update visuals
-    update_gf_level_editor.add_regiment_sprites(TileNum)
+        # Update visuals
+        update_gf_level_editor.add_regiment_sprites(TileNum)
 
 
 def objects_but():
@@ -2077,6 +2098,20 @@ def second_behavior_trait_but():
             game_stats.realm_leader_traits_list.remove(trait)
 
 
+def switch_border_vision_but():
+    if game_stats.border_vision:
+        game_stats.border_vision = False
+    else:
+        game_stats.border_vision = True
+
+
+def switch_grid_vision_but():
+    if game_stats.grid_vision:
+        game_stats.grid_vision = False
+    else:
+        game_stats.grid_vision = True
+
+
 button_funs = {1: return_to_main_menu_but,
                2: roads_but,
                3: brush_but,
@@ -2092,7 +2127,9 @@ button_funs = {1: return_to_main_menu_but,
                13: brush_size_1,
                14: brush_size_2,
                15: brush_size_3,
-               16: brush_size_4}
+               16: brush_size_4,
+               17: switch_border_vision_but,
+               18: switch_grid_vision_but}
 
 brush_panel_funs = {1: brush_1x1_but,
                     2: brush_3x3_but,

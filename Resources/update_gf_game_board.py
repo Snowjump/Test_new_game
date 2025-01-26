@@ -143,6 +143,18 @@ def update_misc_sprites():
     misc_img.set_colorkey(WhiteColor)
     game_stats.gf_misc_img_dict["Icons/cancel_icon"] = misc_img
 
+    ## Vision modes
+    # Vision mode - border vision mode
+    misc_img = pygame.image.load('img/Icons/border_vision_mode.png').convert_alpha()
+    misc_img.set_colorkey(WhiteColor)
+    game_stats.gf_misc_img_dict["Icons/border_vision_mode"] = misc_img
+
+    # Vision mode - grid vision mode
+    misc_img = pygame.image.load('img/Icons/grid_vision_mode.png').convert_alpha()
+    misc_img.set_colorkey(WhiteColor)
+    game_stats.gf_misc_img_dict["Icons/grid_vision_mode"] = misc_img
+
+    ## Diplomacy notifications
     # Icon - ongoing war
     misc_img = pygame.image.load('img/Icons/sword_and_axe_icon.png').convert_alpha()
     misc_img.set_colorkey(WhiteColor)

@@ -25,6 +25,12 @@ def update_sprites():
     game_stats.gf_exploration_dict = {}
     game_stats.gf_regiment_dict = {}
     game_stats.gf_hero_dict = {}
+    game_stats.gf_misc_img_dict = {}
+
+    # Terrain border 48x48
+    misc_img = pygame.image.load('img/Terrains/border_48_48_250.png').convert_alpha()
+    # misc_img.set_colorkey(WhiteColor)
+    game_stats.gf_terrain_dict["Terrains/border_48_48_250"] = misc_img
 
     for x in range(0, 28):
         for y in range(0, math.ceil(game_stats.game_window_height / 48) + 1):
@@ -136,6 +142,21 @@ def update_sprites():
                             break
 
     # print(str(game_stats.gf_terrain_dict))
+    update_misc_sprites()
+
+
+def update_misc_sprites():
+    game_stats.gf_misc_img_dict = {}
+
+    # Vision mode - border vision mode
+    misc_img = pygame.image.load('img/Icons/border_vision_mode.png').convert_alpha()
+    misc_img.set_colorkey(WhiteColor)
+    game_stats.gf_misc_img_dict["Icons/border_vision_mode"] = misc_img
+
+    # Vision mode - grid vision mode
+    misc_img = pygame.image.load('img/Icons/grid_vision_mode.png').convert_alpha()
+    misc_img.set_colorkey(WhiteColor)
+    game_stats.gf_misc_img_dict["Icons/grid_vision_mode"] = misc_img
 
 
 def add_terrain_sprites(TileNum):

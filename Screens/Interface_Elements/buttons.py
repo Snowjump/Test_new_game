@@ -4,7 +4,9 @@
 from Screens.colors_catalog import *
 from Screens.fonts_catalog import *
 
-font_dic = {"tnr_font16" : tnr_font16,
+font_dic = {"tnr_font20" : tnr_font20,
+            "tnr_font18" : tnr_font18,
+            "tnr_font16" : tnr_font16,
             "arial_font16" : arial_font16,
             "arial_font14" : arial_font14}
 

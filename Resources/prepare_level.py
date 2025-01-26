@@ -11,6 +11,8 @@ from Resources import game_basic
 from Resources import game_classes
 from Resources import algo_circle_range
 from Resources import faction_classes
+from Resources import common_selects
+from Resources import algo_borders
 
 from Strategy_AI import strategy_AI_classes
 
@@ -27,6 +29,7 @@ def prepare_known_map(player_power):
         # print("power.name - " + str(power.name))
         power.known_map = []
         tiles_pool = []
+
         for city in game_obj.game_cities:
             # print("Settlement " + str(city.name) + " location is " + str(city.location) + " owned by "
             #       + str(city.owner))
@@ -64,8 +67,6 @@ def prepare_known_map(player_power):
 
                         # if power.name == "Seventeenth":
                         #     print("Seventeenth - " + str(tile))
-
-                # break
 
         for army in game_obj.game_armies:
             print("Army location is " + str(army.location))
@@ -347,32 +348,28 @@ def prepare_AI_army_roles():
             for army in game_obj.game_armies:
                 if army.owner == realm.name:
                     if game_obj.game_map[army.location].city_id is not None:
-                        for settlement in game_obj.game_cities:
-                            if settlement.city_id == game_obj.game_map[army.location].city_id:
-                                for army_role in realm.AI_cogs.army_roles:
-                                    if army_role.army_id == army.army_id:
-                                        army_role.base_of_operation = int(settlement.city_id)
-                                        break
+                        settlement = common_selects.select_settlement_by_id(game_obj.game_map[army.location].city_id)
+                        for army_role in realm.AI_cogs.army_roles:
+                            if army_role.army_id == army.army_id:
+                                army_role.base_of_operation = int(settlement.city_id)
                                 break
 
 
 def prepare_population_reserves():
     for tile in game_obj.game_map:
         if tile.lot == "City":
-            for settlement in game_obj.game_cities:
-                if settlement.city_id == tile.city_id:
-                    for population in settlement.residency:
-                        place_group = faction_classes.fac_groups_for_pop[settlement.alignment]
-                        pop_group = place_group["Settlement"]
-                        for pop_type in pop_group:
-                            if pop_type[0] == population.name:
-                                basket = list(pop_type[1])
-                                # print(str(list(pop_type[1])))
-                                for item in basket:
-                                    # population.reserve = list(pop_type[1])
-                                    population.reserve.append([str(item[0]), int(item[1])])
-                                break
-                    break
+            settlement = common_selects.select_settlement_by_id(tile.city_id)
+            for population in settlement.residency:
+                place_group = faction_classes.fac_groups_for_pop[settlement.alignment]
+                pop_group = place_group["Settlement"]
+                for pop_type in pop_group:
+                    if pop_type[0] == population.name:
+                        basket = list(pop_type[1])
+                        # print(str(list(pop_type[1])))
+                        for item in basket:
+                            # population.reserve = list(pop_type[1])
+                            population.reserve.append([str(item[0]), int(item[1])])
+                        break
 
         elif tile.lot is not None:
             if tile.lot.obj_typ == "Facility":
@@ -412,3 +409,19 @@ def map_all_tiles():
         map_positions.append([int(tile.posxy[0]), int(tile.posxy[1])])
 
     return map_positions
+
+
+def prepare_realm_borders():
+    print("")
+    print("prepare_realm_borders()")
+    tile_cells = game_stats.cur_level_width * game_stats.cur_level_height
+    print("Number of tile cells - " + str(tile_cells) + " with width "
+          + str(game_stats.cur_level_width) + " and height " + str(game_stats.cur_level_height))
+    tile_number = 1
+
+    while tile_number <= tile_cells:
+        # Create empty realm borders map
+        game_obj.borders_map.append(None)
+        tile_number += 1
+
+    algo_borders.refresh_borders(range(0, tile_cells))

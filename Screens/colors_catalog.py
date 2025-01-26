@@ -74,6 +74,8 @@ TribesTide = [0x00, 0x64, 0x00]
 ForestGreen = [0x22, 0x8B, 0x22]
 MaroonColor = [0x80, 0x00, 0x00]
 SlateGray = [0x70, 0x80, 0x90]
+NeutralDarkRedColor = [0x80, 0x40, 0x40]  # for borders of neutral settlements
+NeutralDarkGreyColor = [0x49, 0x49, 0x49]  # for borders of neutral settlements
 
 FlagColors = {"Scarlet": ScarletColor,
               "Copper": CopperColor,
@@ -86,7 +88,9 @@ FlagColors = {"Scarlet": ScarletColor,
               "TribesTide": TribesTide,
               "ForestGreen": ForestGreen,
               "MaroonColor": MaroonColor,
-              "SlateGray": SlateGray}
+              "SlateGray": SlateGray,
+              "NeutralDarkRed": NeutralDarkRedColor,
+              "NeutralDarkGrey": NeutralDarkGreyColor}
 
 Plain_Summer_Color = [0x4C, 0x99, 0x00]
 Plain_Autumn_Color = [0xFD, 0xE1, 0x2A]

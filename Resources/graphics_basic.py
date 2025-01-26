@@ -16,6 +16,7 @@ from Screens.Game_Board_Windows import panel_save_game
 from Screens.Game_Board_Windows import panel_calendar
 from Screens.Game_Board_Windows import panel_resource_ribbon
 from Screens.Game_Board_Windows import panel_left_ribbon_menu
+from Screens.Game_Board_Windows import panel_vision_mode
 from Screens.Game_Board_Windows import info_panel_army
 from Screens.Game_Board_Windows import info_panel_settlement
 from Screens.Game_Board_Windows import info_panel_tile_obj
@@ -28,16 +29,21 @@ def init_game_board_graphics():
     prepare_calendar()
     prepare_resource_ribbon()
     prepare_left_ribbon_menu()
+    prepare_vision_mode_buttons()
 
 
-def refresh_graphics_object(new_object):
-    for obj in graphics_obj.game_board_objects:
+def init_level_editor_graphics():
+    prepare_vision_mode_buttons()
+
+
+def refresh_graphics_object(new_object, objects_list):
+    for obj in objects_list:
         # print(obj.name)
         if obj.name == new_object.name:
-            graphics_obj.game_board_objects.remove(obj)
+            objects_list.remove(obj)
             break
 
-    graphics_obj.game_board_objects.append(new_object)
+    objects_list.append(new_object)
 
 
 def remove_specific_objects(names_of_objects):
@@ -57,22 +63,22 @@ def remove_selected_objects():
 
 def prepare_exit_to_menu():
     new_object = panel_exit_to_menu.Exit_To_Menu_Panel("Exit to menu")
-    refresh_graphics_object(new_object)
+    refresh_graphics_object(new_object, graphics_obj.game_board_objects)
 
 
 def prepare_save_game():
     new_object = panel_save_game.Save_Game_Panel("Save game")
-    refresh_graphics_object(new_object)
+    refresh_graphics_object(new_object, graphics_obj.game_board_objects)
 
 
 def prepare_calendar():
     new_object = panel_calendar.Calendar_Panel("Calendar")
-    refresh_graphics_object(new_object)
+    refresh_graphics_object(new_object, graphics_obj.game_board_objects)
 
 
 def prepare_left_ribbon_menu():
     new_object = panel_left_ribbon_menu.Left_Ribbon_Menu("Left ribbon menu")
-    refresh_graphics_object(new_object)
+    refresh_graphics_object(new_object, graphics_obj.game_board_objects)
 
 
 def prepare_resource_ribbon():
@@ -124,7 +130,7 @@ def prepare_resource_ribbon():
 
     new_object = panel_resource_ribbon.Resource_Ribbon("Resource ribbon")
     # graphics_obj.resource_ribbon_panel = new_object
-    refresh_graphics_object(new_object)
+    refresh_graphics_object(new_object, graphics_obj.game_board_objects)
 
 
 def estimate_taxes_by_pop(pops, building_plots, facility, total_taxes):
@@ -172,14 +178,23 @@ def estimate_expenses(total_expenses):
 
 def prepare_army_panel():
     new_object = info_panel_army.Army_Panel("Info panel army")
-    refresh_graphics_object(new_object)
+    refresh_graphics_object(new_object, graphics_obj.game_board_objects)
 
 
 def prepare_settlement_info_panel():
     new_object = info_panel_settlement.Settlement_Info_Panel("Info panel settlement")
-    refresh_graphics_object(new_object)
+    refresh_graphics_object(new_object, graphics_obj.game_board_objects)
 
 
 def prepare_tile_obj_info_panel():
     new_object = info_panel_tile_obj.Tile_Obj_Panel("Info panel tile object")
-    refresh_graphics_object(new_object)
+    refresh_graphics_object(new_object, graphics_obj.game_board_objects)
+
+
+def prepare_vision_mode_buttons():
+    new_object = panel_vision_mode.Vision_Mode_Panel("Vision mode panel")
+    print("prepare_vision_mode_buttons(): " + str(game_stats.current_screen))
+    if game_stats.current_screen == "Game Board":
+        refresh_graphics_object(new_object, graphics_obj.game_board_objects)
+    elif game_stats.current_screen in ["Create Level", "Load Level Into Editor"]:
+        refresh_graphics_object(new_object, graphics_obj.level_editor_objects)

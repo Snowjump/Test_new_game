@@ -31,6 +31,9 @@ from Resources import algo_path_arrows
 from Resources import siege_warfare
 from Resources import game_autobattle
 from Resources import common_selects
+from Resources import algo_borders
+
+from Resources.Game_Basic import objs_selects
 
 from Content.Quests import knight_lords_cond
 from Content.Quests import knight_lords_quest_result_scripts
@@ -45,39 +48,34 @@ from Strategy_AI.Logic_Solutions import exploration_targets
 
 
 def establish_leader(focus, mode):
-    obj_list = None
+    location = "editor_armies"
     if mode == "Game":
-        obj_list = game_obj.game_armies
-    else:
-        obj_list = game_stats.editor_armies
-    for army in obj_list:
-        if army.army_id == focus:
-            # Check if army has a hero
-            if army.hero is None:
-                # Check if army has any units
-                if len(army.units) == 0:
-                    army.leader = None
-                else:
-                    # List all units and their ranks
-                    ledger = []
-                    index = 0
-                    for unit in army.units:
-                        ledger.append([index, unit.rank])
-                        index += 1
+        location = "game_armies"
+    army = common_selects.select_army_by_id(focus, location=location)
+    # Check if army has a hero
+    if army.hero is None:
+        # Check if army has any units
+        if len(army.units) == 0:
+            army.leader = None
+        else:
+            # List all units and their ranks
+            ledger = []
+            index = 0
+            for unit in army.units:
+                ledger.append([index, unit.rank])
+                index += 1
 
-                    # Find unit with highest rank
-                    leader = None
-                    for item in ledger:
-                        if leader is None:
-                            leader = list(item)
-                        elif item[1] > leader[1]:
-                            leader = list(item)
+            # Find unit with highest rank
+            leader = None
+            for item in ledger:
+                if leader is None:
+                    leader = list(item)
+                elif item[1] > leader[1]:
+                    leader = list(item)
 
-                    # Set army's leader unit
-                    army.leader = int(leader[0])
-                    print("Army ID - " + str(focus) + ", leader - " + str(leader))
-
-            break
+            # Set army's leader unit
+            army.leader = int(leader[0])
+            print("Army ID - " + str(focus) + ", leader - " + str(leader))
 
 
 def open_tiles(condition, the_army, location, next_point, own_realm):
@@ -445,14 +443,10 @@ def movement_action(army):
     TileObj = game_obj.game_map[TileNum]
 
     at_war_list = []
-    own_realm = None
+    own_realm = common_selects.select_realm_by_name(army.owner)
 
-    for realm in game_obj.game_powers:
-        if realm.name == army.owner:
-            own_realm = realm
-            for enemy in realm.relations.at_war:
-                at_war_list.append(enemy[2])
-            break
+    for enemy in own_realm.relations.at_war:
+        at_war_list.append(enemy[2])
 
     if army.action == "Ready to move":
         army.action = "Move"
@@ -501,7 +495,7 @@ def movement_action(army):
             army.action = "Stand"
             army.route = []
             army.path_arrows = []
-            reset_cognition_stage(realm)
+            reset_cognition_stage(own_realm)
             return
 
         # change_direction(army)
@@ -546,28 +540,10 @@ def movement_action(army):
                                 change_position(army, own_realm)
                                 # If player has had selected an army, then it get deselected
                                 if game_stats.selected_object == "Army" and army.owner == game_stats.player_power:
-                                    game_stats.selected_object = ""
-                                    game_stats.selected_army = -1
-                                    game_stats.selected_second_army = -1
-                                    game_stats.details_panel_mode = ""
-                                    game_stats.game_board_panel = ""
-                                    game_stats.first_army_exchange_list = []
-                                    game_stats.second_army_exchange_list = []
+                                    objs_selects.deselect_army()
 
                                     # Select settlement
-                                    game_stats.selected_object = "Settlement"
-                                    game_stats.selected_settlement = int(game_obj.game_map[TileNum].city_id)
-                                    game_stats.settlement_area = "Building"
-                                    game_stats.building_row_index = 0
-                                    game_stats.game_board_panel = "settlement panel"
-                                    game_stats.details_panel_mode = "settlement lower panel"
-                                    algo_building.check_requirements()
-                                    graphics_basic.remove_selected_objects()
-                                    graphics_basic.prepare_settlement_info_panel()
-
-                                    # Update visuals
-                                    update_gf_game_board.update_settlement_misc_sprites()
-                                    update_gf_game_board.open_settlement_building_sprites()
+                                    objs_selects.select_settlement(settlement)
 
                             else:
                                 enemy_army = common_selects.select_army_by_id(TileObj.army_id)
@@ -580,75 +556,28 @@ def movement_action(army):
                                 change_position(army, own_realm)
                                 # If player has had selected an army, then it get deselected
                                 if game_stats.selected_object == "Army" and army.owner == game_stats.player_power:
-                                    game_stats.selected_object = ""
-                                    game_stats.selected_army = -1
-                                    game_stats.selected_second_army = -1
-                                    game_stats.details_panel_mode = ""
-                                    game_stats.game_board_panel = ""
-                                    game_stats.first_army_exchange_list = []
-                                    game_stats.second_army_exchange_list = []
+                                    objs_selects.deselect_army()
 
                                     # Select settlement
-                                    print("Moved to settlement")
-                                    game_stats.selected_object = "Settlement"
-                                    game_stats.selected_settlement = int(game_obj.game_map[TileNum].city_id)
-                                    game_stats.settlement_area = "Building"
-                                    game_stats.building_row_index = 0
-                                    game_stats.game_board_panel = "settlement panel"
-                                    game_stats.details_panel_mode = "settlement lower panel"
-                                    algo_building.check_requirements()
-                                    graphics_basic.remove_selected_objects()
-                                    graphics_basic.prepare_settlement_info_panel()
-
-                                    list_of_rows = []
-                                    for plot in settlement.buildings:
-                                        if int(plot.screen_position[1]) not in list_of_rows:
-                                            list_of_rows.append(int(plot.screen_position[1]))
-
-                                    game_stats.building_rows_amount = max(list_of_rows)
-
-                                    # Update visuals
-                                    update_gf_game_board.update_settlement_misc_sprites()
-                                    update_gf_game_board.open_settlement_building_sprites()
+                                    objs_selects.select_settlement(settlement)
 
                             else:
-                                for found_army in game_obj.game_armies:
-                                    if found_army.army_id == TileObj.army_id:
-                                        print("Meeting ally army stationed in your settlement")
-                                        exchange_armies(army, found_army)
-                                        break
+                                found_army = common_selects.select_army_by_id(TileObj.army_id)
+                                print("Meeting ally army stationed in your settlement")
+                                exchange_armies(army, found_army)
 
                     elif settlement.owner == "Neutral":
                         if TileObj.army_id is None:
                             print("Moving to capture empty neutral settlement")
-                            settlement.owner = str(army.owner)
+                            transfer_settlement(settlement.city_id, own_realm.name)
 
                             change_position(army, own_realm)
                             # If player has had selected an army, then it get deselected
                             if game_stats.selected_object == "Army" and army.owner == game_stats.player_power:
-                                game_stats.selected_object = ""
-                                game_stats.selected_army = -1
-                                game_stats.selected_second_army = -1
-                                game_stats.details_panel_mode = ""
-                                game_stats.game_board_panel = ""
-                                game_stats.first_army_exchange_list = []
-                                game_stats.second_army_exchange_list = []
+                                objs_selects.deselect_army()
 
                                 # Select settlement
-                                print("Moved to neutral settlement")
-                                game_stats.selected_object = "Settlement"
-                                game_stats.selected_settlement = int(game_obj.game_map[TileNum].city_id)
-                                game_stats.settlement_area = "Building"
-                                game_stats.building_row_index = 0
-                                game_stats.game_board_panel = "settlement panel"
-                                game_stats.details_panel_mode = "settlement lower panel"
-                                algo_building.check_requirements()
-                                graphics_basic.remove_selected_objects()
-                                graphics_basic.prepare_settlement_info_panel()
-
-                                # Update visuals
-                                update_gf_game_board.update_settlement_misc_sprites()
-                                update_gf_game_board.open_settlement_building_sprites()
+                                objs_selects.select_settlement(settlement)
 
                         else:
                             enemy_army = common_selects.select_army_by_id(TileObj.army_id)
@@ -665,36 +594,15 @@ def movement_action(army):
                                     change_position(army, own_realm)
                                     # If player has had selected an army, then it get deselected
                                     if game_stats.selected_object == "Army" and army.owner == game_stats.player_power:
-                                        game_stats.selected_object = ""
-                                        game_stats.selected_army = -1
-                                        game_stats.selected_second_army = -1
-                                        game_stats.details_panel_mode = ""
-                                        game_stats.game_board_panel = ""
-                                        game_stats.first_army_exchange_list = []
-                                        game_stats.second_army_exchange_list = []
+                                        objs_selects.deselect_army()
 
                                         # Select settlement
-                                        print("Moved to settlement")
-                                        game_stats.selected_object = "Settlement"
-                                        game_stats.selected_settlement = int(game_obj.game_map[TileNum].city_id)
-                                        game_stats.settlement_area = "Building"
-                                        game_stats.building_row_index = 0
-                                        game_stats.game_board_panel = "settlement panel"
-                                        game_stats.details_panel_mode = "settlement lower panel"
-                                        algo_building.check_requirements()
-                                        graphics_basic.remove_selected_objects()
-                                        graphics_basic.prepare_settlement_info_panel()
-
-                                        # Update visuals
-                                        update_gf_game_board.update_settlement_misc_sprites()
-                                        update_gf_game_board.open_settlement_building_sprites()
+                                        objs_selects.select_settlement(settlement)
 
                                 else:
-                                    for found_army in game_obj.game_armies:
-                                        if found_army.army_id == TileObj.army_id:
-                                            print("Meeting ally army stationed in occupied settlement")
-                                            exchange_armies(army, found_army)
-                                            break
+                                    found_army = common_selects.select_army_by_id(TileObj.army_id)
+                                    print("Meeting ally army stationed in occupied settlement")
+                                    exchange_armies(army, found_army)
 
                         else:
                             if TileObj.army_id is None:
@@ -705,28 +613,10 @@ def movement_action(army):
                                 change_position(army, own_realm)
                                 # If player has had selected an army, then it get deselected
                                 if game_stats.selected_object == "Army" and army.owner == game_stats.player_power:
-                                    game_stats.selected_object = ""
-                                    game_stats.selected_army = -1
-                                    game_stats.selected_second_army = -1
-                                    game_stats.details_panel_mode = ""
-                                    game_stats.game_board_panel = ""
-                                    game_stats.first_army_exchange_list = []
-                                    game_stats.second_army_exchange_list = []
+                                    objs_selects.deselect_army()
 
                                     # Select settlement
-                                    game_stats.selected_object = "Settlement"
-                                    game_stats.selected_settlement = int(game_obj.game_map[TileNum].city_id)
-                                    game_stats.settlement_area = "Building"
-                                    game_stats.building_row_index = 0
-                                    game_stats.game_board_panel = "settlement panel"
-                                    game_stats.details_panel_mode = "settlement lower panel"
-                                    algo_building.check_requirements()
-                                    graphics_basic.remove_selected_objects()
-                                    graphics_basic.prepare_settlement_info_panel()
-
-                                    # Update visuals
-                                    update_gf_game_board.update_settlement_misc_sprites()
-                                    update_gf_game_board.open_settlement_building_sprites()
+                                    objs_selects.select_settlement(settlement)
 
                             else:
                                 enemy_army = common_selects.select_army_by_id(TileObj.army_id)
@@ -736,21 +626,18 @@ def movement_action(army):
             elif TileObj.army_id is not None:
                 # Army standing on object
                 if len(army.route) == 1:
-                    for found_army in game_obj.game_armies:
-                        if found_army.army_id == TileObj.army_id:
-                            if army.owner == found_army.owner:
-                                print("Meeting ally army")
-                                exchange_armies(army, found_army)
+                    found_army = common_selects.select_army_by_id(TileObj.army_id)
+                    if army.owner == found_army.owner:
+                        print("Meeting ally army")
+                        exchange_armies(army, found_army)
 
-                            else:
-                                if found_army.owner == "Neutral":
-                                    print("Engage neutral enemy army")
-                                else:
-                                    print("Engaging " + str(found_army.owner) + "'s army")
-                                # print("TileObj.conditions " + str(TileObj.conditions))
-                                engage_army(army, found_army, TileObj.terrain, TileObj.conditions, "Attack")
-
-                            break
+                    else:
+                        if found_army.owner == "Neutral":
+                            print("Engage neutral enemy army")
+                        else:
+                            print("Engaging " + str(found_army.owner) + "'s army")
+                        # print("TileObj.conditions " + str(TileObj.conditions))
+                        engage_army(army, found_army, TileObj.terrain, TileObj.conditions, "Attack")
 
             elif TileObj.lot.obj_typ == "Obstacle":
                 if TileObj.travel:
@@ -764,7 +651,7 @@ def movement_action(army):
             elif TileObj.lot.obj_typ in exploration_catalog.exploration_objects_groups_cat:
                 print("Moving to " + str(TileObj.lot.obj_name))
                 change_position(army, own_realm)
-                if army.hero is not None:
+                if army.hero:
                     if own_realm.AI_player:
                         AI_exploration_scripts.event_scripts[TileObj.lot.properties.obj_script](TileObj.lot, army)
                     else:
@@ -784,14 +671,9 @@ def routing_action(army):
     TileNum = (next_point[1] - 1) * game_stats.cur_level_width + next_point[0] - 1
     TileObj = game_obj.game_map[TileNum]
 
-    own_realm = None
+    own_realm = common_selects.select_realm_by_name(army.owner)
 
-    for realm in game_obj.game_powers:
-        if realm.name == army.owner:
-            own_realm = realm
-            break
-
-    if TileObj.army_id is not None:
+    if TileObj.army_id:
         # Someone stays in the way
         army.action = "Stand"
         army.route = []
@@ -1197,11 +1079,8 @@ def find_siege(army):
                     break
 
     defender_army = None
-    if defender_id is not None:
-        for army in game_obj.game_armies:
-            if army.army_id == defender_id:
-                defender_army = army
-                break
+    if defender_id:
+        defender_army = common_selects.select_army_by_id(defender_id)
 
     return the_settlement, defender_army
 
@@ -1216,11 +1095,7 @@ def perform_actions():
     # Next set of checks exist to prevent armies from performing unnecessary animations
     for army in game_obj.game_armies:
         if len(army.route) > 1 and army.owner != "Neutral":
-            own_realm = None
-            for realm in game_obj.game_powers:
-                if realm.name == army.owner:
-                    own_realm = realm
-                    break
+            own_realm = common_selects.select_realm_by_name(army.owner)
 
             # print("The rest of the route: " + str(army.route))
             for role in own_realm.AI_cogs.army_roles:
@@ -1388,16 +1263,10 @@ def realm_income(realm_source, earnings_list):
     if realm_source == "settlement":
         settlement = common_selects.select_settlement_by_id(game_stats.selected_settlement)
 
-        for realm in game_obj.game_powers:
-            if realm.name == settlement.owner:
-                treasury = realm.coffers
-                break
+        treasury = common_selects.select_treasury_by_realm_name(settlement.owner)
 
     else:  # "player"
-        for realm in game_obj.game_powers:
-            if realm.name == realm_source:
-                treasury = realm.coffers
-                break
+        treasury = common_selects.select_treasury_by_realm_name(realm_source)
 
     # Accumulate resources
     print("1) treasury: " + str(treasury))
@@ -2039,17 +1908,19 @@ def remove_army(id_list):
 
 
 def capture_settlement(settlement, attacker_realm, winner_alive, winner):
-    print("settlement_captured")
+    print("")
+    print("capture_settlement()")
     settlement.siege = None
     if settlement.owner == "Neutral":
         settlement.owner = str(winner.owner)
+        # Refresh borders around settlement territory
+        tiles_list = algo_borders.collect_surrounding_tiles(settlement.control_zone)
+        algo_borders.refresh_borders(tiles_list)
     elif settlement.owner == attacker_realm:
         settlement.military_occupation = None
     else:
-        for realm in game_obj.game_powers:
-            if realm.name == attacker_realm:
-                settlement.military_occupation = [str(realm.f_color), str(realm.s_color), str(realm.name)]
-                break
+        realm = common_selects.select_realm_by_name(attacker_realm)
+        settlement.military_occupation = [str(realm.f_color), str(realm.s_color), str(realm.name)]
 
     print("military_occupation - " + str(settlement.military_occupation))
 
@@ -2059,6 +1930,15 @@ def capture_settlement(settlement, attacker_realm, winner_alive, winner):
         game_obj.game_map[settlement.location].army_id = int(winner.army_id)
         winner.location = int(settlement.location)
         winner.posxy = list(settlement.posxy)
+
+
+def transfer_settlement(city_id, new_owner):
+    settlement = common_selects.select_settlement_by_id(city_id)
+    settlement.owner = str(new_owner)
+
+    # Refresh borders around settlement territory
+    tiles_list = algo_borders.collect_surrounding_tiles(settlement.control_zone)
+    algo_borders.refresh_borders(tiles_list)
 
 
 def reset_cognition_stage(realm):
