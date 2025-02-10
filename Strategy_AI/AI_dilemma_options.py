@@ -1,4 +1,4 @@
-## Miracle battles
+## Among Myth and Wonder
 ## AI_dilemma_options
 
 import random
@@ -10,6 +10,7 @@ from Resources import game_stats
 from Resources import game_classes
 from Resources import campaign_effect_classes
 from Resources import update_gf_game_board
+from Resources import common_selects
 
 from Content import recruitment_structures
 
@@ -97,19 +98,17 @@ def AI_forrest_law_lenient(realm, message):
 
         # print("Number of armies - " + str(len(game_obj.game_armies)))
         # print("game_stats.army_id_counter - " + str(game_stats.army_id_counter))
-        units_list = list(create_unit.LE_units_dict_by_alignment["Neutrals"])
+        units_list = create_unit.LE_units_dict_by_alignment["Neutrals"]
         # Add regiments to created army
-        for army in game_obj.game_armies:
-            if army.army_id == game_stats.army_id_counter:
-                # Add bandit archers
-                army.units.append(copy.deepcopy(units_list[1]))
+        army = common_selects.select_army_by_id(game_stats.army_id_counter)
+        # Add bandit archers
+        army.units.append(units_list["Bandit archers"]())
 
-                game_basic.establish_leader(game_stats.army_id_counter, "Game")
+        game_basic.establish_leader(game_stats.army_id_counter, "Game")
 
-                army.event = game_classes.Post_Battle_Event("Poachers in Royal forest",
-                                                            int(message.settlement_location),
-                                                            str(realm.name))
-                break
+        army.event = game_classes.Post_Battle_Event("Poachers in Royal forest",
+                                                    int(message.settlement_location),
+                                                    str(realm.name))
 
         # Add new quest to eliminate rogue army
         realm.quests_messages.append(game_classes.Quest_Message("Poachers in Royal forest",
@@ -303,19 +302,17 @@ def AI_track_the_dragon(realm, message):
 
         # print("Number of armies - " + str(len(game_obj.game_armies)))
         # print("game_stats.army_id_counter - " + str(game_stats.army_id_counter))
-        units_list = list(create_unit.LE_units_dict_by_alignment["Neutrals"])
+        units_list = create_unit.LE_units_dict_by_alignment["Neutrals"]
         # Add regiments to created army
-        for army in game_obj.game_armies:
-            if army.army_id == game_stats.army_id_counter:
-                # Add grey dragon
-                army.units.append(copy.deepcopy(units_list[4]))
+        army = common_selects.select_army_by_id(game_stats.army_id_counter)
+        # Add grey dragon
+        army.units.append(units_list["Grey dragon"]())
 
-                game_basic.establish_leader(game_stats.army_id_counter, "Game")
+        game_basic.establish_leader(game_stats.army_id_counter, "Game")
 
-                army.event = game_classes.Post_Battle_Event("Slay the Grey dragon",
-                                                            int(message.settlement_location),
-                                                            str(realm.name))
-                break
+        army.event = game_classes.Post_Battle_Event("Slay the Grey dragon",
+                                                    int(message.settlement_location),
+                                                    str(realm.name))
 
         # Add new quest to eliminate rogue army
         realm.quests_messages.append(game_classes.Quest_Message("Slay the Grey dragon",

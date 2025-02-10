@@ -270,39 +270,35 @@ def create_medium_armies(player, economy, medium_armies_ea, settlements_with_ded
                         if hire_unit.ready_units > 0:
                             if game_basic.enough_resources_to_hire(hire_unit.unit_name, the_settlement):
                                 alignment = unit_alignment_catalog.alignment_dict[hire_unit.unit_name]
-                                unit_list = list(create_unit.LE_units_dict_by_alignment[alignment])
+                                unit_list = create_unit.LE_units_dict_by_alignment[alignment]
                                 affordable = True
-                                for unit in unit_list:
-                                    if unit.name == hire_unit.unit_name:
-                                        for expense in unit.cost:
-                                            if expense[0] == "Florins":
-                                                if economy.florins_expenses + expense[1] > economy.florins_income * 0.8:
-                                                    affordable = False
-                                            elif expense[0] == "Food":
-                                                if economy.food_expenses + expense[1] > economy.food_income * 0.8:
-                                                    affordable = False
-                                            elif expense[0] == "Armament":
-                                                if economy.armament_expenses + expense[
-                                                    1] > economy.armament_income * 0.8:
-                                                    affordable = False
-                                            elif expense[0] == "Ingredients":
-                                                if economy.ingredients_expenses + expense[
-                                                    1] > economy.ingredients_income * 0.8:
-                                                    affordable = False
-                                            elif expense[0] == "Wood":
-                                                if economy.wood_expenses + expense[1] > economy.wood_income * 0.8:
-                                                    affordable = False
-                                            elif expense[0] == "Stone":
-                                                if economy.stone_expenses + expense[1] > economy.stone_income * 0.8:
-                                                    affordable = False
-                                            elif expense[0] == "Metals":
-                                                if economy.metals_expenses + expense[1] > economy.metals_income * 0.8:
-                                                    affordable = False
-                                            elif expense[0] == "Tools":
-                                                if economy.tools_expenses + expense[1] > economy.tools_income * 0.8:
-                                                    affordable = False
-
-                                        break
+                                # for unit in unit_list:
+                                unit = unit_list[hire_unit.unit_name]()
+                                for expense in unit.cost:
+                                    if expense[0] == "Florins":
+                                        if economy.florins_expenses + expense[1] > economy.florins_income * 0.8:
+                                            affordable = False
+                                    elif expense[0] == "Food":
+                                        if economy.food_expenses + expense[1] > economy.food_income * 0.8:
+                                            affordable = False
+                                    elif expense[0] == "Armament":
+                                        if economy.armament_expenses + expense[1] > economy.armament_income * 0.8:
+                                            affordable = False
+                                    elif expense[0] == "Ingredients":
+                                        if economy.ingredients_expenses + expense[1] > economy.ingredients_income * 0.8:
+                                            affordable = False
+                                    elif expense[0] == "Wood":
+                                        if economy.wood_expenses + expense[1] > economy.wood_income * 0.8:
+                                            affordable = False
+                                    elif expense[0] == "Stone":
+                                        if economy.stone_expenses + expense[1] > economy.stone_income * 0.8:
+                                            affordable = False
+                                    elif expense[0] == "Metals":
+                                        if economy.metals_expenses + expense[1] > economy.metals_income * 0.8:
+                                            affordable = False
+                                    elif expense[0] == "Tools":
+                                        if economy.tools_expenses + expense[1] > economy.tools_income * 0.8:
+                                            affordable = False
 
                                 if affordable:
                                     # print("Could afford " + str(hire_unit.unit_name))
@@ -331,37 +327,34 @@ def create_medium_armies(player, economy, medium_armies_ea, settlements_with_ded
                     # Recruiting cost check
                     enough_resources = game_basic.enough_resources_to_hire(new_unit.unit_name, the_settlement)
                     # Expenses check
-                    unit_list = list(create_unit.LE_units_dict_by_alignment[alignment])
+                    unit_list = create_unit.LE_units_dict_by_alignment[alignment]
                     affordable = True
-                    for unit in unit_list:
-                        if unit.name == new_unit.unit_name:
-                            for expense in unit.cost:
-                                if expense[0] == "Florins":
-                                    if economy.florins_expenses + expense[1] > economy.florins_income * 0.8:
-                                        affordable = False
-                                elif expense[0] == "Food":
-                                    if economy.food_expenses + expense[1] > economy.food_income * 0.8:
-                                        affordable = False
-                                elif expense[0] == "Armament":
-                                    if economy.armament_expenses + expense[1] > economy.armament_income * 0.8:
-                                        affordable = False
-                                elif expense[0] == "Ingredients":
-                                    if economy.ingredients_expenses + expense[1] > economy.ingredients_income * 0.8:
-                                        affordable = False
-                                elif expense[0] == "Wood":
-                                    if economy.wood_expenses + expense[1] > economy.wood_income * 0.8:
-                                        affordable = False
-                                elif expense[0] == "Stone":
-                                    if economy.stone_expenses + expense[1] > economy.stone_income * 0.8:
-                                        affordable = False
-                                elif expense[0] == "Metals":
-                                    if economy.metals_expenses + expense[1] > economy.metals_income * 0.8:
-                                        affordable = False
-                                elif expense[0] == "Tools":
-                                    if economy.tools_expenses + expense[1] > economy.tools_income * 0.8:
-                                        affordable = False
-
-                            break
+                    unit = unit_list[new_unit.unit_name]()
+                    for expense in unit.cost:
+                        if expense[0] == "Florins":
+                            if economy.florins_expenses + expense[1] > economy.florins_income * 0.8:
+                                affordable = False
+                        elif expense[0] == "Food":
+                            if economy.food_expenses + expense[1] > economy.food_income * 0.8:
+                                affordable = False
+                        elif expense[0] == "Armament":
+                            if economy.armament_expenses + expense[1] > economy.armament_income * 0.8:
+                                affordable = False
+                        elif expense[0] == "Ingredients":
+                            if economy.ingredients_expenses + expense[1] > economy.ingredients_income * 0.8:
+                                affordable = False
+                        elif expense[0] == "Wood":
+                            if economy.wood_expenses + expense[1] > economy.wood_income * 0.8:
+                                affordable = False
+                        elif expense[0] == "Stone":
+                            if economy.stone_expenses + expense[1] > economy.stone_income * 0.8:
+                                affordable = False
+                        elif expense[0] == "Metals":
+                            if economy.metals_expenses + expense[1] > economy.metals_income * 0.8:
+                                affordable = False
+                        elif expense[0] == "Tools":
+                            if economy.tools_expenses + expense[1] > economy.tools_income * 0.8:
+                                affordable = False
 
                     if rank_sum + rank_list[new_unit.unit_name] > 90 or not affordable:
                         keep_building = False
@@ -489,37 +482,35 @@ def hire_new_regiments(player, economy, rank_sum, rank_ea, the_army, the_settlem
                 if hire_unit.ready_units > 0:
                     if game_basic.enough_resources_to_hire(hire_unit.unit_name, the_settlement):
                         alignment = unit_alignment_catalog.alignment_dict[hire_unit.unit_name]
-                        unit_list = list(create_unit.LE_units_dict_by_alignment[alignment])
+                        unit_list = create_unit.LE_units_dict_by_alignment[alignment]
                         affordable = True
-                        for unit in unit_list:
-                            if unit.name == hire_unit.unit_name:
-                                for expense in unit.cost:
-                                    if expense[0] == "Florins":
-                                        if economy.florins_expenses + expense[1] > economy.florins_income * 0.8:
-                                            affordable = False
-                                    elif expense[0] == "Food":
-                                        if economy.food_expenses + expense[1] > economy.food_income * 0.8:
-                                            affordable = False
-                                    elif expense[0] == "Armament":
-                                        if economy.armament_expenses + expense[1] > economy.armament_income * 0.8:
-                                            affordable = False
-                                    elif expense[0] == "Ingredients":
-                                        if economy.ingredients_expenses + expense[1] > economy.ingredients_income * 0.8:
-                                            affordable = False
-                                    elif expense[0] == "Wood":
-                                        if economy.wood_expenses + expense[1] > economy.wood_income * 0.8:
-                                            affordable = False
-                                    elif expense[0] == "Stone":
-                                        if economy.stone_expenses + expense[1] > economy.stone_income * 0.8:
-                                            affordable = False
-                                    elif expense[0] == "Metals":
-                                        if economy.metals_expenses + expense[1] > economy.metals_income * 0.8:
-                                            affordable = False
-                                    elif expense[0] == "Tools":
-                                        if economy.tools_expenses + expense[1] > economy.tools_income * 0.8:
-                                            affordable = False
-
-                                break
+                        # for unit in unit_list:
+                        unit = unit_list[hire_unit.unit_name]()
+                        for expense in unit.cost:
+                            if expense[0] == "Florins":
+                                if economy.florins_expenses + expense[1] > economy.florins_income * 0.8:
+                                    affordable = False
+                            elif expense[0] == "Food":
+                                if economy.food_expenses + expense[1] > economy.food_income * 0.8:
+                                    affordable = False
+                            elif expense[0] == "Armament":
+                                if economy.armament_expenses + expense[1] > economy.armament_income * 0.8:
+                                    affordable = False
+                            elif expense[0] == "Ingredients":
+                                if economy.ingredients_expenses + expense[1] > economy.ingredients_income * 0.8:
+                                    affordable = False
+                            elif expense[0] == "Wood":
+                                if economy.wood_expenses + expense[1] > economy.wood_income * 0.8:
+                                    affordable = False
+                            elif expense[0] == "Stone":
+                                if economy.stone_expenses + expense[1] > economy.stone_income * 0.8:
+                                    affordable = False
+                            elif expense[0] == "Metals":
+                                if economy.metals_expenses + expense[1] > economy.metals_income * 0.8:
+                                    affordable = False
+                            elif expense[0] == "Tools":
+                                if economy.tools_expenses + expense[1] > economy.tools_income * 0.8:
+                                    affordable = False
 
                         if affordable:
                             # print("Could afford " + str(hire_unit.unit_name))
@@ -536,37 +527,34 @@ def hire_new_regiments(player, economy, rank_sum, rank_ea, the_army, the_settlem
             # Recruiting cost check
             enough_resources = game_basic.enough_resources_to_hire(new_unit.unit_name, the_settlement)
             # Expenses check
-            unit_list = list(create_unit.LE_units_dict_by_alignment[alignment])
+            unit_list = create_unit.LE_units_dict_by_alignment[alignment]
             affordable = True
-            for unit in unit_list:
-                if unit.name == new_unit.unit_name:
-                    for expense in unit.cost:
-                        if expense[0] == "Florins":
-                            if economy.florins_expenses + expense[1] > economy.florins_income * 0.8:
-                                affordable = False
-                        elif expense[0] == "Food":
-                            if economy.food_expenses + expense[1] > economy.food_income * 0.8:
-                                affordable = False
-                        elif expense[0] == "Armament":
-                            if economy.armament_expenses + expense[1] > economy.armament_income * 0.8:
-                                affordable = False
-                        elif expense[0] == "Ingredients":
-                            if economy.ingredients_expenses + expense[1] > economy.ingredients_income * 0.8:
-                                affordable = False
-                        elif expense[0] == "Wood":
-                            if economy.wood_expenses + expense[1] > economy.wood_income * 0.8:
-                                affordable = False
-                        elif expense[0] == "Stone":
-                            if economy.stone_expenses + expense[1] > economy.stone_income * 0.8:
-                                affordable = False
-                        elif expense[0] == "Metals":
-                            if economy.metals_expenses + expense[1] > economy.metals_income * 0.8:
-                                affordable = False
-                        elif expense[0] == "Tools":
-                            if economy.tools_expenses + expense[1] > economy.tools_income * 0.8:
-                                affordable = False
-
-                    break
+            unit = unit_list[new_unit.unit_name]()
+            for expense in unit.cost:
+                if expense[0] == "Florins":
+                    if economy.florins_expenses + expense[1] > economy.florins_income * 0.8:
+                        affordable = False
+                elif expense[0] == "Food":
+                    if economy.food_expenses + expense[1] > economy.food_income * 0.8:
+                        affordable = False
+                elif expense[0] == "Armament":
+                    if economy.armament_expenses + expense[1] > economy.armament_income * 0.8:
+                        affordable = False
+                elif expense[0] == "Ingredients":
+                    if economy.ingredients_expenses + expense[1] > economy.ingredients_income * 0.8:
+                        affordable = False
+                elif expense[0] == "Wood":
+                    if economy.wood_expenses + expense[1] > economy.wood_income * 0.8:
+                        affordable = False
+                elif expense[0] == "Stone":
+                    if economy.stone_expenses + expense[1] > economy.stone_income * 0.8:
+                        affordable = False
+                elif expense[0] == "Metals":
+                    if economy.metals_expenses + expense[1] > economy.metals_income * 0.8:
+                        affordable = False
+                elif expense[0] == "Tools":
+                    if economy.tools_expenses + expense[1] > economy.tools_income * 0.8:
+                        affordable = False
 
             if len(the_army.units) >= 5:
                 if rank_sum + rank_list[new_unit.unit_name] > rank_ea:

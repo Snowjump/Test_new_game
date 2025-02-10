@@ -1,4 +1,4 @@
-## Miracle battles
+## Among Myth and Wonder
 ## AI_battle_result_scripts
 
 import copy
@@ -112,12 +112,10 @@ def recruit_new_regiments(army, reward_list):
     for reward in reward_list:
         if reward[0] == "Regiment":
             if len(army.units) < 20:
-                units_list = list(create_unit.LE_units_dict_by_alignment[reward[2]])
-                for new_unit in units_list:
-                    if new_unit.name == reward[1]:
-                        army.units.append(copy.deepcopy(new_unit))
-                        print("Added to army new unit - " + new_unit.name)
-                        break
+                units_list = create_unit.LE_units_dict_by_alignment[reward[2]]
+                new_unit = units_list[reward[1]]()
+                army.units.append(new_unit)
+                print("Added to army new unit - " + new_unit.name)
             else:
                 break
 

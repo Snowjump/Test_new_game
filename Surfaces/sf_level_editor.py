@@ -1391,18 +1391,16 @@ def add_unit_to_army():
         army = common_selects.select_army_by_id(focus, location="editor_armies")
         if len(army.units) < 20:
             alignment = str(alinement_info.advanced_alinements_list[game_stats.option_box_alinement_index])
-            units_list = list(create_unit.LE_units_dict_by_alignment[alignment])
+            # units_list = list(create_unit.LE_units_dict_by_alignment[alignment])
+            units_list = create_unit.LE_units_dict_by_alignment[alignment]
+            key = list(units_list)[game_stats.white_index]
+            unit_info = units_list[key]()
 
             print("white_index - " + str(game_stats.white_index) + "; alignment - " + str(alignment) +
                   "; len(units_list) - " + str(len(units_list)))
-            print("Added to army new unit - " + units_list[game_stats.white_index].name)
-            print("Img - " + units_list[game_stats.white_index].img)
+            print("Added to army new unit - " + key)
+            print("Img - " + unit_info.img)
 
-            # Old code
-            # Now instead of copying an unit, a regiment card with minimum necessary information would be
-            # created
-            # army.units.append(copy.deepcopy(units_list[game_stats.white_index]))
-            unit_info = units_list[game_stats.white_index]
             army.units.append(game_classes.LE_regiment_card(str(unit_info.name),
                                                             str(unit_info.img_source),
                                                             str(unit_info.img),

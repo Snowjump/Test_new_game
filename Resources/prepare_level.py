@@ -394,11 +394,8 @@ def prepare_regiments():
         army.units = []
         for card in temp_list:
             alignment = unit_alignment_catalog.alignment_dict[card.name]
-            units_list = list(create_unit.LE_units_dict_by_alignment[alignment])
-            for new_unit in units_list:
-                if new_unit.name == card.name:
-                    army.units.append(copy.deepcopy(new_unit))
-                    break
+            dictionary = create_unit.LE_units_dict_by_alignment[alignment]
+            army.units.append(dictionary[card.name]())
 
         game_basic.establish_leader(army.army_id, "Game")
 

@@ -361,10 +361,12 @@ def game_board_surface_m1(position):
                                     game_stats.unit_for_hire = unit_card
                                     break
 
-                for unit_card in create_unit.LE_units_dict_by_alignment[the_settlement.alignment]:
-                    if unit_card.name == game_stats.unit_for_hire.unit_name:
-                        game_stats.rw_object = unit_card
-                        break
+                # for unit_card in create_unit.LE_units_dict_by_alignment[the_settlement.alignment]:
+                #     if unit_card.name == game_stats.unit_for_hire.unit_name:
+                #         game_stats.rw_object = unit_card
+                #         break
+                dictionary = create_unit.LE_units_dict_by_alignment[the_settlement.alignment]
+                game_stats.rw_object = dictionary[game_stats.unit_for_hire.unit_name]()
 
                 game_stats.enough_resources_to_pay = game_basic.enough_resources_to_hire(game_stats.unit_for_hire.unit_name,
                                                                                          the_settlement)
@@ -1908,22 +1910,19 @@ def hire_regiment():
     if permit_unit_creation:
         army = common_selects.select_army_by_id(game_obj.game_map[TileNum].army_id)
         if len(army.units) < 20:
-            units_list = list(create_unit.LE_units_dict_by_alignment[settlement.alignment])
+            units_list = create_unit.LE_units_dict_by_alignment[settlement.alignment]
+            new_unit = units_list[game_stats.unit_for_hire.unit_name]()
+            army.units.append(new_unit)
+            print("Added to army " + str(army.army_id) + " new unit - " + new_unit.name)
+            print("Img - " + new_unit.img)
+            game_basic.establish_leader(army.army_id, "Game")
 
-            for new_unit in units_list:
-                if new_unit.name == game_stats.unit_for_hire.unit_name:
-                    army.units.append(copy.deepcopy(new_unit))
-                    print("Added to army " + str(army.army_id) + " new unit - " + new_unit.name)
-                    print("Img - " + new_unit.img)
-                    game_basic.establish_leader(army.army_id, "Game")
-
-                    game_stats.unit_for_hire.ready_units -= 1
-                    game_basic.realm_payment_for_object(game_stats.rw_object.name, settlement)
-                    game_stats.enough_resources_to_pay = game_basic.enough_resources_to_hire(game_stats.rw_object.name,
-                                                                                             settlement)
-                    # game_basic.enough_resources_to_hire()
-                    graphics_basic.prepare_resource_ribbon()
-                    break
+            game_stats.unit_for_hire.ready_units -= 1
+            game_basic.realm_payment_for_object(game_stats.rw_object.name, settlement)
+            game_stats.enough_resources_to_pay = game_basic.enough_resources_to_hire(game_stats.rw_object.name,
+                                                                                     settlement)
+            # game_basic.enough_resources_to_hire()
+            graphics_basic.prepare_resource_ribbon()
 
 
 def new_hero_skill_tree():

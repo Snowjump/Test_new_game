@@ -8,7 +8,7 @@ from Resources import game_classes
 from Resources import game_stats
 
 
-def additional_attack_skill(unit):
+def additional_damage_skill(unit):
     bonus = 0
     if len(unit.skills) > 0:
         for s in unit.skills:
@@ -18,8 +18,11 @@ def additional_attack_skill(unit):
     return bonus
 
 
-def penetration_skill(unit, armor_value, attack_type):
-    final_armor = armor_value
+def penetration_skill(unit, armor_value, attack_type, dmg):
+    excess_armour = int(armor_value)
+    final_dmg = int(dmg)
+    penetration_value = 0
+    used_penetration = -0
     if len(unit.skills) > 0:
         for s in unit.skills:
             if s.application == "penetration":
@@ -28,12 +31,27 @@ def penetration_skill(unit, armor_value, attack_type):
                 for skill_tag in s.skill_tags:
                     # print("skill_tag - " + str(skill_tag))
                     if skill_tag == attack_type:
-                        if armor_value - s.quantity >= 0:
-                            final_armor = int(armor_value - s.quantity)
+                        penetration_value += s.quantity
                         # print("skill_tag == attack_type - " + str(attack_type))
                         break
 
-    return int(final_armor)
+    if final_dmg - excess_armour < 1:
+        excess_armour = excess_armour - final_dmg + 1
+        final_dmg = 1
+    else:
+        final_dmg -= excess_armour
+        excess_armour = 0
+
+    if final_dmg + penetration_value > dmg:
+        penetration_value = penetration_value - (dmg - final_dmg)
+        used_penetration = int(dmg - final_dmg)
+        final_dmg = int(dmg)
+    else:
+        final_dmg += penetration_value
+        used_penetration = int(penetration_value)
+        penetration_value = 0
+
+    return final_dmg, excess_armour, penetration_value, used_penetration
 
 
 def charge_dmg_bonus(b, unit, dmg, primary_target, queue, primary):
@@ -49,7 +67,7 @@ def charge_dmg_bonus(b, unit, dmg, primary_target, queue, primary):
 
     # Effects on defender tile
     TileNum = (primary_target.position[1] - 1) * game_stats.battle_width + primary_target.position[0] - 1
-    if b.battle_map[TileNum].map_object is not None:
+    if b.battle_map[TileNum].map_object:
         if b.battle_map[TileNum].map_object.obj_type == "Structure":
             print(b.battle_map[TileNum].map_object.obj_name)
             for effect in b.battle_map[TileNum].map_object.properties.effects:
@@ -223,23 +241,12 @@ def simple_dmg_bonus(unit, primary_target, dmg):
 
 
 def big_shields_bonus(primary_target, division_bonus_list):
-    # Obsolete now
-    # final_attack = attack_value
-    # division_bonus_list = []
     if len(primary_target.skills) > 0:
         for s in primary_target.skills:
             if s.application == "missile protection":
                 if s.method == "Division":
                     division_bonus_list.append(float(s.quantity))
 
-        # if len(division_bonus_list) > 0:
-        #     for division in division_bonus_list:
-        #         final_attack /= float(division)
-
-            # final_attack = int(math.floor(final_attack))
-            # print("Modified attack is " + str(final_attack))
-
-    # return final_attack
     return division_bonus_list
 
 

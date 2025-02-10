@@ -1624,7 +1624,7 @@ def battle_screen(screen):
 
                 attack_method = b.attack_name
                 text_NewGame1 = tnr_font20.render(attack_method, True, TitleText)
-                screen.blit(text_NewGame1, [980, 755 + yVar])
+                screen.blit(text_NewGame1, [982, 755 + yVar])
 
                 attack_img = game_stats.gf_misc_img_dict["Icons/" + attack_method]
                 screen.blit(attack_img, (925, 742 + yVar))

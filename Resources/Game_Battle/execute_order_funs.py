@@ -151,7 +151,7 @@ def primary_wait_message1(b):
 def primary_defend(b, unit):
     unit.effects.append(effect_classes.Battle_Effect("Defend action", True,
                                                      float(b.queue[0].time_act), float(b.queue[0].time_act + 1.0),
-                                                     [effect_classes.Buff("Armour", int(unit.armour),
+                                                     [effect_classes.Buff("Missile defence", 1,
                                                                           "addition", None),
                                                       effect_classes.Buff("Defence", int(unit.defence),
                                                                           "addition", None)]))

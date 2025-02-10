@@ -1,4 +1,4 @@
-## Miracle battles
+## Among Myth and Wonder
 ## battle_result_scripts
 
 import math
@@ -74,13 +74,12 @@ def lair_of_grey_dragons_result_close():
 
     for number in game_stats.second_army_exchange_list:
         unit_info = game_stats.reward_for_demonstration[number]
-        units_list = list(create_unit.LE_units_dict_by_alignment[unit_info[2]])
-        for new_unit in units_list:
-            if new_unit.name == unit_info[1]:
-                the_army.units.append(copy.deepcopy(new_unit))
-                print("Added to army new unit - " + new_unit.name)
-                print("Img - " + new_unit.img)
-                break
+        units_list = create_unit.LE_units_dict_by_alignment[unit_info[2]]
+        # for new_unit in units_list:
+        new_unit = units_list[unit_info[1]]()
+        the_army.units.append(new_unit)
+        print("Added to army new unit - " + new_unit.name)
+        print("Img - " + new_unit.img)
 
     game_stats.second_army_exchange_list = []
 

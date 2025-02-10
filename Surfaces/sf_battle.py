@@ -19,7 +19,6 @@ from Resources import update_gf_game_board
 from Resources import update_gf_battle
 from Resources import game_pathfinding
 from Resources import common_selects
-from Resources import game_battle
 
 from Content import ability_catalog
 from Content import ability_desc_cat_hero
@@ -444,15 +443,11 @@ def battle_surface_m1(position):
                         print(b.selected_ability)
                         correct_target = False
                         for action in ability_catalog.ability_cat[b.selected_ability].action:
-                            the_unit = None
                             army = common_selects.select_army_by_id(b.queue[0].army_id)
                             if b.queue[0].obj_type == "Regiment":
                                 the_unit = army.units[b.queue[0].number]
-
-                            if b.queue[0].obj_type == "Regiment":
                                 correct_target = battle_abilities_regiment.script_cat[action.script](b, TileNum,
-                                                                                                     player_army,
-                                                                                                     opponent_army,
+                                                                                                     army.hero,
                                                                                                      the_unit)
                             elif b.queue[0].obj_type == "Hero":
                                 correct_target = battle_abilities_hero.script_cat[action.script](b, TileNum,
@@ -467,16 +462,12 @@ def battle_surface_m1(position):
 
 
 def battle_surface_m3(position):
-    for battle in game_obj.game_battles:
-        if battle.attacker_realm == game_stats.player_power or \
-                battle.defender_realm == game_stats.player_power:
-            b = battle
-
+    b = game_stats.present_battle
     b.button_pressed = False
 
     if b.stage == "Fighting":
         # Window
-        if b.battle_window is not None:
+        if b.battle_window:
             square = [640, 70, 1270, 600]
             if square[0] < position[0] < square[2] and square[1] < position[1] < square[3]:
                 b.button_pressed = True
@@ -1138,14 +1129,9 @@ def prepare_opening_ability_menu():
 
 
 def prepare_change_attack_method():
-    for battle in game_obj.game_battles:
-        if battle.attacker_realm == game_stats.player_power or \
-                battle.defender_realm == game_stats.player_power:
-            b = battle
-            if b.queue[0].obj_type == "Regiment":
-                change_attack_method_but(b)
-
-            break
+    b = game_stats.present_battle
+    if b.queue[0].obj_type == "Regiment":
+        change_attack_method_but(b)
 
 
 # def choose_attack_method_or_hero_ability():
@@ -1165,21 +1151,20 @@ def prepare_change_attack_method():
 def change_attack_method_but(b):
     print("change_attack_method_but")
 
-    for army in game_obj.game_armies:
-        if army.army_id == b.queue[0].army_id:
-            if b.attack_type_index + 1 == len(army.units[b.queue[0].number].attacks):
-                b.attack_type_index = 0
-            else:
-                b.attack_type_index += 1
+    army = common_selects.select_army_by_id(b.queue[0].army_id)
+    if b.attack_type_index + 1 == len(army.units[b.queue[0].number].attacks):
+        b.attack_type_index = 0
+    else:
+        b.attack_type_index += 1
 
-            unit = army.units[b.queue[0].number]
+    unit = army.units[b.queue[0].number]
 
-            b.attack_type_in_use = unit.attacks[b.attack_type_index].attack_type
-            b.attack_name = unit.attacks[b.attack_type_index].name
-            b.cur_effective_range = unit.attacks[b.attack_type_index].effective_range
-            # b.cur_range_limit = unit.attacks[b.attack_type_index].range_limit
-            b.cur_range_limit = game_battle.attack_range_effect(army, unit,
-                                                                unit.attacks[b.attack_type_index].range_limit)
+    b.attack_type_in_use = unit.attacks[b.attack_type_index].attack_type
+    b.attack_name = unit.attacks[b.attack_type_index].name
+    b.cur_effective_range = unit.attacks[b.attack_type_index].effective_range
+    # b.cur_range_limit = unit.attacks[b.attack_type_index].range_limit
+    b.cur_range_limit = game_battle.attack_range_effect(army, unit,
+                                                        unit.attacks[b.attack_type_index].range_limit)
 
 
 def open_hero_ability_menu_but(b):
@@ -1237,38 +1222,37 @@ def open_hero_ability_menu_but(b):
 def open_regiment_ability_menu_but(b):
     print("open_regiment_ability_menu_but")
 
-    b.battle_window = "Ability menu"
-    b.cursor_function = None
-    b.ability_index = 0
-    b.school_index = 0
-    b.list_of_abilities = []
-    b.list_of_schools = []
+    army = common_selects.select_army_by_id(b.queue[0].army_id)
+    the_unit = army.units[b.queue[0].number]
 
-    for army in game_obj.game_armies:
-        if army.army_id == b.queue[0].army_id:
-            the_unit = army.units[b.queue[0].number]
+    if b.attack_name == "Abilities":
+        b.battle_window = "Ability menu"
+        b.cursor_function = None
+        b.ability_index = 0
+        b.school_index = 0
+        b.list_of_abilities = []
+        b.list_of_schools = []
 
-            b.available_mana_reserve = int(the_unit.mana_reserve)
-            b.list_of_schools.append("Overall")
-            b.selected_school = "Overall"
+        b.available_mana_reserve = int(the_unit.mana_reserve)
+        b.list_of_schools.append("Overall")
+        b.selected_school = "Overall"
+        # Update visuals
+        update_gf_battle.add_school_misc_sprites("Overall")
+
+        for ability in the_unit.abilities:
+            b.list_of_abilities.append(str(ability))
+
+            school = ability_catalog.ability_cat[ability].school
+
+            if school not in b.list_of_schools:
+                b.list_of_schools.append(str(school))
+
             # Update visuals
-            update_gf_battle.add_school_misc_sprites("Overall")
-            for ability in the_unit.abilities:
-                b.list_of_abilities.append(str(ability))
+            update_gf_battle.add_school_misc_sprites(school)
+            update_gf_battle.add_ability_misc_sprites(ability)
 
-                school = ability_catalog.ability_cat[ability].school
-
-                if school not in b.list_of_schools:
-                    b.list_of_schools.append(str(school))
-
-                # Update visuals
-                update_gf_battle.add_school_misc_sprites(school)
-                update_gf_battle.add_ability_misc_sprites(ability)
-
-            b.selected_ability = str(the_unit.abilities[0])
-            b.ability_description = ability_desc_cat_regiment.script_cat[b.selected_ability](the_unit)
-
-            break
+        b.selected_ability = str(the_unit.abilities[0])
+        b.ability_description = ability_desc_cat_regiment.script_cat[b.selected_ability](the_unit)
 
 
 def close_ability_menu_window():
