@@ -67,6 +67,7 @@ def solution(realm, role, friendly_cities, hostile_cities, at_war_list, army):
 
     if go_to_adventure:
         issued_order = False
+        print("city_id_in_location - " + str(city_id_in_location))
         settlement = common_selects.select_settlement_by_id(city_id_in_location)
         if settlement.owner == realm.name:
             # role.army_role = "Adventure"

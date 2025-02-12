@@ -1,4 +1,5 @@
-## Miracle battles
+## Among Myth and Wonder
+## diplomacy_logic
 
 import random
 

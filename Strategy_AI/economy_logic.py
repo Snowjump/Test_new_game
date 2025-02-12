@@ -312,12 +312,10 @@ def create_medium_armies(player, economy, medium_armies_ea, settlements_with_ded
                 keep_building = True
 
                 # print(unit_roster)
+                army_id_in_settlement = game_obj.game_map[the_settlement.location].army_id
                 the_army = None
-                if game_obj.game_map[the_settlement.location].army_id is not None:
-                    for army in game_obj.game_armies:
-                        if army.army_id == game_obj.game_map[the_settlement.location].army_id:
-                            the_army = army
-                            break
+                if army_id_in_settlement:
+                    the_army = common_selects.select_army_by_id(army_id_in_settlement)
 
                 while keep_building:
                     new_unit = random.choice(unit_roster)
@@ -367,7 +365,7 @@ def create_medium_armies(player, economy, medium_armies_ea, settlements_with_ded
                         print("New rank sum - " + str(rank_sum))
 
                         # Create army if necessary
-                        if game_obj.game_map[the_settlement.location].army_id is None:
+                        if army_id_in_settlement is None:
                             owner = str(the_settlement.owner)
                             game_stats.army_id_counter += 1
                             game_obj.game_map[the_settlement.location].army_id = int(game_stats.army_id_counter)
@@ -380,27 +378,24 @@ def create_medium_armies(player, economy, medium_armies_ea, settlements_with_ded
                             print("Created new army, ID - " + str(game_stats.army_id_counter))
 
                             # Army role
-                            for army in game_obj.game_armies:
-                                if army.army_id == game_obj.game_map[the_settlement.location].army_id:
-                                    the_army = army
+                            the_army = common_selects.select_army_by_id(game_stats.army_id_counter)
+                            player.AI_cogs.army_roles.append(
+                                strategy_AI_classes.army_roles(int(the_army.army_id),
+                                                               "Idle",
+                                                               2))  # Medium size
 
-                                    player.AI_cogs.army_roles.append(
-                                        strategy_AI_classes.army_roles(int(the_army.army_id),
-                                                                       "Idle",
-                                                                       2))  # Medium size
-
-                                    for army_role in player.AI_cogs.army_roles:
-                                        if army_role.army_id == the_army.army_id:
-                                            print("base_of_operation: " + the_settlement.name + "; city_id - " +
-                                                  str(the_settlement.city_id))
-                                            army_role.base_of_operation = int(the_settlement.city_id)
-                                            break
+                            for army_role in player.AI_cogs.army_roles:
+                                if army_role.army_id == the_army.army_id:
+                                    print("base_of_operation: " + the_settlement.name + "; city_id - " +
+                                          str(the_settlement.city_id))
+                                    army_role.base_of_operation = int(the_settlement.city_id)
                                     break
 
                         for creating_unit in unit_list:
-                            if creating_unit.name == new_unit.unit_name:
+                            if creating_unit == new_unit.unit_name:
+                                creating_unit = unit_list[new_unit.unit_name]()
                                 # Create new regiment
-                                the_army.units.append(copy.deepcopy(creating_unit))
+                                the_army.units.append(creating_unit)
                                 game_basic.establish_leader(the_army.army_id, "Game")
 
                                 # Increase estimated expenses
@@ -570,9 +565,10 @@ def hire_new_regiments(player, economy, rank_sum, rank_ea, the_army, the_settlem
                 print("New rank sum - " + str(rank_sum))
 
                 for creating_unit in unit_list:
-                    if creating_unit.name == new_unit.unit_name:
+                    if creating_unit == new_unit.unit_name:
+                        creating_unit = unit_list[new_unit.unit_name]()
                         # Create new regiment
-                        the_army.units.append(copy.deepcopy(creating_unit))
+                        the_army.units.append(creating_unit)
                         game_basic.establish_leader(the_army.army_id, "Game")
 
                         # Increase estimated expenses

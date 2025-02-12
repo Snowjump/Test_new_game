@@ -81,6 +81,7 @@ def accept_everything_AI(realm):
     realm_name = str(realm.name)
     if realm.diplomatic_messages:
         for message in realm.diplomatic_messages:
+            print(message.dm_from + " => " + message.dm_to + " message.subject - " + str(message.subject))
             if message.subject == "White peace":
                 game_diplomacy.accept_white_peace(realm.diplomatic_messages, message)
                 print(realm.name + " // messages: " + str(len(realm.diplomatic_messages)))

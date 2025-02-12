@@ -62,8 +62,6 @@ def white_buff_effect(screen, b, current_position):
 def message_float(screen, b):
     msg1 = ""
     k2 = 0
-    x = b.queue[0].position[0]
-    y = b.queue[0].position[1]
 
     if b.primary in ["Wait message1", "Defend message1", "Damage message1", "Counterattack damage message1"]:
         k2 = 20
@@ -87,6 +85,9 @@ def message_float(screen, b):
     # print("k - " + str(k))
 
     if b.queue[0].obj_type == "Regiment":
+        # print("b.queue[0].position - " + str(b.queue[0].position) + "; obj_type - " + str(b.queue[0].obj_type))
+        x = b.queue[0].position[0]
+        y = b.queue[0].position[1]
         x -= int(b.battle_pov[0])
         y -= int(b.battle_pov[1])
 

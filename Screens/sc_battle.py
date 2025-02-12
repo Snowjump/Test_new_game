@@ -117,7 +117,7 @@ def draw_tiles(screen):
                         # print("Success TileObj.posxy - " + str(TileObj.posxy))
                         highlight_border = anim_battle_effects.border_blipping(LimeBorder)
 
-                        points = [(1, 1), (96, 1), (96, 96), (1, 96)]
+                        points = [(1, 1), (94, 1), (94, 94), (1, 94)]
                         points2 = [(x - 1) * 96, (y - 1) * 96]
                         draw_lines_alpha(screen, highlight_border, True, points, points2)
 
@@ -125,7 +125,7 @@ def draw_tiles(screen):
             if battle.realm_in_control == game_stats.player_power:
                 if battle.movement_grid is not None and battle.ready_to_act:
                     if [int(TileObj.posxy[0]), int(TileObj.posxy[1])] in battle.movement_grid:
-                        draw_rect_alpha(screen, GreenGrid, ((x - 1) * 96 + 1, (y - 1) * 96 + 1, 96, 96))
+                        draw_rect_alpha(screen, GreenGrid, ((x - 1) * 96, (y - 1) * 96, 96, 96))
 
     for TileObj in battle.battle_map:
         x = TileObj.posxy[0]
@@ -140,7 +140,7 @@ def draw_tiles(screen):
                         battle.cover_map[1] <= TileObj.posxy[1] <= battle.cover_map[3]:
 
                     draw_rect_alpha(screen, TileCover,
-                                    ((x - 1) * 96 + 1, (y - 1) * 96 + 1, 96, 96))
+                                    ((x - 1) * 96, (y - 1) * 96, 96, 96))
 
             # Siege tower docked to the wall
             if TileObj.siege_tower_deployed:
@@ -211,15 +211,7 @@ def draw_direction_lines(screen, b, direction, x, y, check_position):
     if direction == "E":
         # print("x " + str(x) + " y " + str(y))
         points = [(96, 3), (98, 48), (98, 49), (96, 94)]
-        # [(0, 0), (2, 45), (2, 46), (0, 91)]
         points2 = [(x - 1 + x2) * 96, (y - 1 + y2) * 96]  # [(x - 1) * 96, (y - 1) * 96]
-        # [(x - 1) * 96 + 96, (y - 1) * 96 + 3]
-        # print("Points: " + str(points))
-        # points = [(25, 0), (50, 25), (25, 50), (0, 25)]
-        # pygame.draw.lines(screen, LightYellow, False, points)
-        # pygame.draw.lines(screen, LightYellow, False, points, 2)
-        # pygame.draw.line(screen, RedColor, ((x - 1) * 96 + 96, (y - 1) * 96 + 1),
-        # ((x - 1) * 96 + 96, (y - 1) * 96 + 96))
         draw_lines_alpha(screen, LightYellow, False, points, points2)
 
     elif direction == "W":

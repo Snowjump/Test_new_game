@@ -19,6 +19,7 @@ from Resources import update_gf_game_board
 from Resources import update_gf_battle
 from Resources import game_pathfinding
 from Resources import common_selects
+from Resources.Game_Battle import hit_funs
 
 from Content import ability_catalog
 from Content import ability_desc_cat_hero
@@ -610,8 +611,8 @@ def fill_regiment_information(b, TileNum):
     for creature in unit.crew:
         total_HP += creature.HP
 
-    final_armour = game_battle.armour_effect(b, None, unit, unit.armour, None, army.hero)
-    final_defence = game_battle.defence_effect(unit, unit.defence, army.hero)
+    final_armour = hit_funs.armour_effect(b, None, unit, unit.armour, None, army.hero)
+    final_defence = hit_funs.defence_effect(unit, unit.defence, army.hero)
 
     b.unit_info = game_classes.Regiment_Info_Card(unit.name, f_color, s_color, len(unit.crew), total_HP, unit.morale,
                                                   unit.max_HP, unit.base_HP, unit.experience, unit.speed,
@@ -795,10 +796,7 @@ def next_ability_info():
 
 
 def waiting_index_left():
-    for battle in game_obj.game_battles:
-        if battle.attacker_realm == game_stats.player_power or \
-                battle.defender_realm == game_stats.player_power:
-            b = battle
+    b = game_stats.present_battle
 
     if len(b.waiting_list) > 10:
         if b.waiting_index == 0:
@@ -810,10 +808,7 @@ def waiting_index_left():
 
 
 def waiting_index_right():
-    for battle in game_obj.game_battles:
-        if battle.attacker_realm == game_stats.player_power or \
-                battle.defender_realm == game_stats.player_power:
-            b = battle
+    b = game_stats.present_battle
 
     if len(b.waiting_list) > 10:
         if b.waiting_index == len(b.waiting_list) - 10:
@@ -1103,17 +1098,14 @@ def wait_but():
 def defend_but():
     print("defend_but")
 
-    for battle in game_obj.game_battles:
-        if battle.attacker_realm == game_stats.player_power or \
-                battle.defender_realm == game_stats.player_power:
-            b = battle
+    b = game_stats.present_battle
 
-        if b.queue[0].obj_type == "Regiment":
+    if b.queue[0].obj_type == "Regiment":
 
-            if b.realm_in_control == game_stats.player_power and b.ready_to_act:
-                b.ready_to_act = False
-                game_battle.action_order(b, "Defend", None)
-                # game_battle.complete_turn(b, 1.0)
+        if b.realm_in_control == game_stats.player_power and b.ready_to_act:
+            b.ready_to_act = False
+            game_battle.action_order(b, "Defend", None)
+            # game_battle.complete_turn(b, 1.0)
 
 
 def prepare_opening_ability_menu():
@@ -1465,10 +1457,7 @@ def end_battle_but():
         known_map = []
 
         if loser.owner != "Neutral":
-            for realm in game_obj.game_powers:
-                if realm.name == loser.owner:
-                    loser_realm = realm
-                    break
+            loser_realm = common_selects.select_realm_by_name(loser.owner)
 
             known_map = loser_realm.known_map
             friendly_cities, hostile_cities, at_war_list = game_pathfinding.find_friendly_cities(loser_realm.name)
@@ -1520,11 +1509,7 @@ def end_battle_but():
     # Result script
     if b.result_script is not None:
         if b.attacker_realm == game_stats.player_power:
-            winner_army = None
-            for army in game_obj.game_armies:
-                if army.army_id == b.attacker_id:
-                    winner_army = army
-                    break
+            winner_army = common_selects.select_army_by_id(b.attacker_id)
 
             game_stats.reward_id_counter += 1
             game_obj.game_rewards.append(reward_catalog.reward_scripts[b.result_script](winner_army))
@@ -1532,18 +1517,12 @@ def end_battle_but():
                 if reward[0] == game_stats.reward_id_counter:
                     game_stats.reward_for_demonstration = list(reward[1])
                     break
-            for realm in game_obj.game_powers:
-                if realm.name == winner_army.owner:
-                    realm.reward_IDs.append(int(game_stats.reward_id_counter))
-                    break
+            realm = common_selects.select_realm_by_name(winner_army.owner)
+            realm.reward_IDs.append(int(game_stats.reward_id_counter))
             battle_result_scripts.result_scripts[b.result_script](winner_army)
 
     elif loser.event is not None:
-        attacker_realm = None
-        for realm in game_obj.game_powers:
-            if realm.name == winner.owner:
-                attacker_realm = realm
-                break
+        attacker_realm = common_selects.select_realm_by_name(winner.owner)
 
         print("end_battle_but: Event name - " + loser.event.name)
         if loser.event.name in knight_lords_quest_result_scripts.result_scripts:

@@ -31,7 +31,7 @@ def refresh_borders(tiles_list, erase_borders=False):
     # tiles_list consist of integers with numbers of tiles
     realms_list = {}
     for location in tiles_list:
-        print(game_stats.current_screen + "; location - " + str(location))
+        # print(game_stats.current_screen + "; location - " + str(location))
         tile = None
         city_location = "game_cities"
         power_location = "game_powers"
@@ -51,11 +51,11 @@ def refresh_borders(tiles_list, erase_borders=False):
         # print("Tile position - " + str(tile.posxy) + "; type - " + str(type(rm)))
 
         if tile.city_id:
-            print("tile.posxy - " + str(tile.posxy) + " tile.city_id - " + str(tile.city_id))
+            # print("tile.posxy - " + str(tile.posxy) + " tile.city_id - " + str(tile.city_id))
             settlement = common_selects.select_settlement_by_id(tile.city_id, location=city_location)
             if tile.city_id not in realms_list:
                 realm = common_selects.select_realm_by_name(settlement.owner, location=power_location)
-                print("Realm: " + str(realm))
+                # print("Realm: " + str(realm))
                 if realm is None:
                     # Neutral settlement
                     realms_list[tile.city_id] = ["Neutral", "NeutralDarkGrey", "NeutralDarkRed"]
@@ -91,14 +91,14 @@ def refresh_borders(tiles_list, erase_borders=False):
                 elif game_stats.current_screen in ["New Game", "Game Board", "Skirmish", "Battle"]:
                     bt = game_obj.game_map[btl]
 
-                print("bt.posxy - " + str(bt.posxy) + " bt.city_id - " + str(bt.city_id))
+                # print("bt.posxy - " + str(bt.posxy) + " bt.city_id - " + str(bt.city_id))
 
                 if bt.city_id:
                     bt_settlement = common_selects.select_settlement_by_id(bt.city_id, location=city_location)
                     # if bt_settlement.owner == settlement.owner:
                     if bt_settlement.city_id == settlement.city_id:
-                        print("btl - " + str(btl) + " city_id - " + str(bt_settlement.city_id) +
-                              "; location - " + str(location) + " city_id - " + str(settlement.city_id))
+                        # print("btl - " + str(btl) + " city_id - " + str(bt_settlement.city_id) +
+                        #       "; location - " + str(location) + " city_id - " + str(settlement.city_id))
                         if bt.posxy[0] < tile.posxy[0]:
                             if bt.posxy[1] < tile.posxy[1]:
                                 nw = False
@@ -156,7 +156,7 @@ def refresh_borders(tiles_list, erase_borders=False):
 
 
 def collect_surrounding_tiles(control_zone_list):
-    print("control_zone_list: " + str(control_zone_list))
+    # print("control_zone_list: " + str(control_zone_list))
     tiles_list = list(control_zone_list)
     for tile in control_zone_list:
         posxy = []
@@ -167,5 +167,5 @@ def collect_surrounding_tiles(control_zone_list):
         surrounding_tiles = algo_square_range.within_square_range(posxy, 1, True)
         for surrounding_tile in surrounding_tiles:
             tiles_list.append(int(surrounding_tile))
-    print("tiles_list: " + str(tiles_list))
+    # print("tiles_list: " + str(tiles_list))
     return tiles_list

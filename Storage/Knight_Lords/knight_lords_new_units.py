@@ -214,7 +214,7 @@ def create_knights():
                                                                  "Increase damage",
                                                                  "Heavy charge",
                                                                  [])],
-                                     [["Florins", 20], ["Armament", 12], ["Food", 12]],
+                                     [["Florins", 25], ["Armament", 20], ["Food", 12]],
                                      # Abilities
                                      [])
     return new_unit

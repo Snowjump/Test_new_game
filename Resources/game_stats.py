@@ -4,7 +4,7 @@
 # Software versioning
 version_major = 0
 version_minor = 2
-version_micro = 1
+version_micro = 2
 
 time_counted = 0
 fps = 0.0

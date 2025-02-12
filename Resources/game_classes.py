@@ -185,7 +185,7 @@ class Regiment:  # main class for creatures that serves as units for fighting in
         self.rows = rows  # Number of rows
         self.crew = crew  # List of creatures that fill regiment
         self.cemetery = []  # Where dead creatures get put from crew
-        self.position = None  # Position on battlefield
+        self.position = None  # Position on battlefield - list of int
         self.direction = None  # In what direction regiment is oriented on battlefield
         self.attacks = attacks  # List of attacks consisting of Strike class objects
         self.engaged = False

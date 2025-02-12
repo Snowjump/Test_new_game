@@ -1024,6 +1024,7 @@ def quest_log_but():
 
 
 def diplomacy_but():
+    print("diplomacy_but()")
     if game_stats.game_board_panel == "war panel":
         close_war_panel_but()
 
@@ -2617,7 +2618,7 @@ def select_war_goal(position):
 
 
 def draft_a_peace_offer_but():
-    # print(game_stats.war_summary)
+    print("draft_a_peace_offer_but()")
     print(game_stats.war_summary.war_goals)
     game_stats.claimed_demands = []
     game_stats.calculated_pa_cost = 0
@@ -2656,17 +2657,21 @@ def change_between_demands_and_concessions_but():
 
 
 def propose_peace_offer_but():
+    print("propose_peace_offer_but()")
     if game_stats.claimed_demands:
+        print("game_stats.claimed_demands: " + str(game_stats.claimed_demands))
         if game_stats.will_accept_peace_agreement:
             game_diplomacy.propose_peace_agreement()
             return_to_sue_for_peace_area_but()
     else:
         if game_stats.will_accept_white_peace:
+            print("game_stats.will_accept_white_peace - " + str(game_stats.will_accept_white_peace))
             game_diplomacy.propose_white_peace()
             return_to_sue_for_peace_area_but()
 
 
 def select_demand(position):
+    print("select_demand()")
     y_axis = position[1]
     y_axis -= 338
     print(str(y_axis))
@@ -2826,6 +2831,7 @@ def close_war_panel_but():
 
 
 def war_sue_for_peace_but():
+    print("war_sue_for_peace_but()")
     if game_stats.realm_inspection.name == game_stats.player_power \
             or game_stats.contact_inspection.name == game_stats.player_power:
         realm_name = str(game_stats.contact_inspection.name)

@@ -36,10 +36,9 @@ def form_queue(b):  # b - stands for Battle
             first_color = None
             second_color = None
             if a.owner != "Neutral":
-                for power in game_obj.game_powers:
-                    if a.owner == power.name:
-                        first_color = str(power.f_color)
-                        second_color = str(power.s_color)
+                power = common_selects.select_realm_by_name(a.owner)
+                first_color = str(power.f_color)
+                second_color = str(power.s_color)
 
             index = 0
             for unit in a.units:

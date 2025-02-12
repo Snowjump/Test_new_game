@@ -13,8 +13,10 @@ from Surfaces import sf_game_board
 
 
 def prepare_summary():
+    print("prepare_summary()")
     war_status = False
     for war in game_obj.game_wars:
+        print("war: " + war.initiator + " against " + war.respondent)
         if war.initiator == game_stats.realm_inspection.name \
                 or war.respondent == game_stats.realm_inspection.name:
             if war.initiator == game_stats.contact_inspection.name \
@@ -25,6 +27,7 @@ def prepare_summary():
 
 
 def prepare_war_summary():
+    print("prepare_war_summary()")
     the_war = None
     for war in game_obj.game_wars:
         if war.initiator == game_stats.realm_inspection.name or war.respondent == game_stats.realm_inspection.name:
@@ -222,6 +225,7 @@ def create_war_summary(own_realm, enemy, war):
 
 
 def prepare_casus_bellis():
+    print("prepare_war_summary()")
     ## Conquest casus belli
     # War goal is to conquer a province by taking its settlement
     permissible_settlements = []
@@ -359,6 +363,7 @@ def declare_war():
 
 
 def prepare_peace_demands_summary():
+    print("prepare_peace_demands_summary()")
     the_war = None
     the_player = game_stats.realm_inspection.name
     the_opponent = game_stats.contact_inspection.name
@@ -818,6 +823,7 @@ def demands_details_impose_tribute():
 
 
 def propose_white_peace():
+    print("propose_white_peace()")
     the_player = game_stats.realm_inspection
     opponent = game_stats.contact_inspection
     no_messages = True
@@ -840,6 +846,7 @@ def propose_white_peace():
 
 
 def propose_peace_agreement():
+    print("propose_peace_agreement()")
     the_player = game_stats.realm_inspection
     opponent = game_stats.contact_inspection
     no_messages = True
@@ -972,7 +979,7 @@ def accept_white_peace(diplomatic_messages, message):
 
 
 def accept_peace_agreement(diplomatic_messages, message):
-    # print("message.subject == Surrender request")
+    print("accept_peace_agreement()")
     print("message.subject - " + str(message.subject))
     # Remove war
     num = 0
@@ -1052,7 +1059,7 @@ def accept_peace_agreement(diplomatic_messages, message):
     for army in game_obj.game_armies:
         if army.owner == message.dm_from:
             if army.action in ["Stand", "Ready to move", "Moving", "Routing"]:
-                print("posxy - " + str(army.posxy) + "; location - " + str(army.location))
+                print("army: posxy - " + str(army.posxy) + "; location - " + str(army.location))
                 if game_obj.game_map[army.location].lot:
                     if game_obj.game_map[army.location].lot == "City":
                         for settlement in game_obj.game_cities:
@@ -1149,7 +1156,10 @@ def accept_peace_agreement(diplomatic_messages, message):
 
     # if game_stats.contact_inspection.name == realm_name:
     if game_stats.diplomacy_area in ["Diplomatic actions", "Sue for peace", "Draft a peace offer"]:
-        sf_game_board.return_to_diplomatic_actions_area_but()
+        if game_stats.contact_inspection:
+            sf_game_board.return_to_diplomatic_actions_area_but()
+        else:
+            sf_game_board.diplomacy_but()
 
 
 def prepare_threats():
