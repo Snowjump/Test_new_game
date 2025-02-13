@@ -33,7 +33,7 @@ artifact_data = {"Champion's lance": ["Champion's lance", 'img/Artifacts/champio
                                                                       None,
                                                                       None,
                                                                       ["Haste"],
-                                                                      ["Devine magic"])]],
+                                                                      ["Divine magic"])]],
                  "Bronze spurs": ["Bronze spurs", 'img/Artifacts/bronze_spurs.png',
                                   1200, [],
                                   [artifact_classes.Artifact_Effect("Movement points",

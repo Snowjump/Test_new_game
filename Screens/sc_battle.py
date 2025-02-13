@@ -1785,7 +1785,7 @@ def change_cursor(screen, b, unit):
 
 school_imgs = {"Overall" : "everything",
                "Tactics" : "tactics",
-               "Devine" : "devine",
+               "Divine" : "divine",
                "Elemental" : "elemental"}
 
 additional_windows = {"Regiment info" : battle_regiment_information.regiment_info_window,

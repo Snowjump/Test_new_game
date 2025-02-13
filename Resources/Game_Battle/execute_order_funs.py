@@ -8,6 +8,7 @@ from Resources import effect_classes
 from Resources import common_selects
 from Resources import algo_b_movement_range
 from Resources import game_classes
+from Resources.Game_Battle import defence_action_funs
 
 
 def primary_move(b, unit, acting_army, enemy_army):
@@ -148,12 +149,16 @@ def primary_wait_message1(b):
     game_battle.complete_turn(b, 0.5)
 
 
-def primary_defend(b, unit):
+def primary_defend(b, unit, acting_hero):
+    defence_value = defence_action_funs.defence_action_effect(int(unit.defence), acting_hero)
+    base_missile_defence = 1
+    missile_defence_value = defence_action_funs.defence_action_effect(int(base_missile_defence), acting_hero)
+    defence_action_funs.defence_morale_restoration(unit, acting_hero)
     unit.effects.append(effect_classes.Battle_Effect("Defend action", True,
                                                      float(b.queue[0].time_act), float(b.queue[0].time_act + 1.0),
-                                                     [effect_classes.Buff("Missile defence", 1,
+                                                     [effect_classes.Buff("Missile defence", missile_defence_value,
                                                                           "addition", None),
-                                                      effect_classes.Buff("Defence", int(unit.defence),
+                                                      effect_classes.Buff("Defence", defence_value,
                                                                           "addition", None)]))
 
     battle_skills.passive_charge_track(unit)

@@ -60,7 +60,7 @@ def begin_battle(attacker, defender, battle_type, battle_result_script):
             elif skill.skill_level == "Expert":
                 attacker_hero_bonus += 0.12
 
-            if skill.theme in ["Devine magic", "Elemental magic"]:
+            if skill.theme in ["Divine magic", "Elemental magic"]:
                 if skill.skill_level == "Basic" and attacker_action_level < 1:
                     attacker_action_level = 1
                 elif skill.skill_level == "Advanced" and attacker_action_level < 2:
@@ -165,7 +165,7 @@ def begin_battle(attacker, defender, battle_type, battle_result_script):
             elif skill.skill_level == "Expert":
                 defender_hero_bonus += 0.12
 
-            if skill.theme in ["Devine magic", "Elemental magic"]:
+            if skill.theme in ["Divine magic", "Elemental magic"]:
                 if skill.skill_level == "Basic" and defender_action_level < 1:
                     defender_action_level = 1
                 elif skill.skill_level == "Advanced" and defender_action_level < 2:

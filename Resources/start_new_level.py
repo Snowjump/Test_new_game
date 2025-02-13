@@ -94,6 +94,8 @@ def begin_new_level(folder, level_to_load):
 
     game_stats.game_board_panel = ""
 
+    game_stats.new_tasks = False
+
     game_stats.ongoing_wars = []
 
     game_obj.game_battles = []

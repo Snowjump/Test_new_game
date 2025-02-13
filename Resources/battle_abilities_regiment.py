@@ -54,7 +54,7 @@ def bless_spell(b, TileNum, hero, caster):
     mana_bonus = 0
     mana_cost_subtraction = []
 
-    artifact_bonus("Bless", "Devine magic", hero, MP_addition_list, initiative_reduction, mana_cost_subtraction, caster)
+    artifact_bonus("Bless", "Divine magic", hero, MP_addition_list, initiative_reduction, mana_cost_subtraction, caster)
 
     MP_bonus, initiative, mana_bonus = allocate_bonuses(MP_addition_list, MP_bonus, initiative_reduction,
                                                         initiative, mana_cost_subtraction, mana_bonus)
@@ -99,7 +99,7 @@ def healing_spell(b, TileNum, hero, caster):
     mana_bonus = 0
     mana_cost_subtraction = []
 
-    artifact_bonus("Healing", "Devine magic", hero, MP_addition_list, initiative_reduction, mana_cost_subtraction,
+    artifact_bonus("Healing", "Divine magic", hero, MP_addition_list, initiative_reduction, mana_cost_subtraction,
                    caster)
 
     MP_bonus, initiative, mana_bonus = allocate_bonuses(MP_addition_list, MP_bonus, initiative_reduction,

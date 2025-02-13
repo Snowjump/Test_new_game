@@ -322,7 +322,7 @@ def execute_order(b):
         execute_order_funs.primary_wait_message1(b)
 
     elif b.primary == "Defend":
-        execute_order_funs.primary_defend(b, acting_unit)
+        execute_order_funs.primary_defend(b, acting_unit, acting_hero)
     elif b.primary == "Defend message":
         execute_order_funs.primary_defend_message(b)
     elif b.primary == "Defend message1":

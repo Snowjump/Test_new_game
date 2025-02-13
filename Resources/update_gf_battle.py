@@ -330,5 +330,5 @@ def add_battle_effects_sprites(effects):
 
 school_imgs = {"Overall" : "everything",
                "Tactics" : "tactics",
-               "Devine" : "devine",
+               "Divine" : "divine",
                "Elemental" : "elemental"}

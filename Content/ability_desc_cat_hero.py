@@ -49,14 +49,14 @@ def healing_desc(hero):
     return description
 
 
-def devine_protection_desc(hero):
+def divine_protection_desc(hero):
     description = ["Grant 1 regiment +" + str(2 + math.ceil(hero.magic_power * 2 / 3)) + " defence",
                    "Duration " + str(1 + hero.magic_power)]
 
     return description
 
 
-def devine_strength_desc(hero):
+def divine_strength_desc(hero):
     description = ["Grant 1 regiment +" + str(2 + math.ceil(hero.magic_power * 2 / 3)) + " melee mastery",
                    "Duration " + str(1 + hero.magic_power)]
 
@@ -109,8 +109,8 @@ script_cat = {"Direct order" : direct_order_desc,
               "Bless" : bless_desc,
               "Haste" : haste_desc,
               "Healing" : healing_desc,
-              "Devine protection" : devine_protection_desc,
-              "Devine strength" : devine_strength_desc,
+              "Divine protection" : divine_protection_desc,
+              "Divine strength" : divine_strength_desc,
               "Inspiration" : inspiration_desc,
               "Missile shielding" : missile_shielding_desc,
               "Fire arrows" : fire_arrows_desc,

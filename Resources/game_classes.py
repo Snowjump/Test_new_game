@@ -134,10 +134,10 @@ class Facility:  # main class for facilities that belong to settlements in whose
 class Development_Plot:  # main class for piece of land, that could have structure built upon it
     def __init__(self, screen_position, structure, status, upgrade):
         self.screen_position = screen_position  # Position of development plot on settlement screen interface
-        self.structure = structure
+        self.structure = structure  # None or Structure class object
         self.status = status  # Empty when no structure exist, Building when structure is being built, Built when
         # structure is ready to operate
-        self.upgrade = upgrade
+        self.upgrade = upgrade  # None or Structure class object
         self.collected_resources = []  # Collected resources for building this structure
         self.priority = None  # Int number or None - priority number in realm for collecting resources
         # before construction

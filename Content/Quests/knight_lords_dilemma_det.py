@@ -45,7 +45,7 @@ def forrest_law_upheld():
     # Adjust recruitment
     for plot in settlement.buildings:
         if plot.structure is not None:
-            if len(plot.structure.recruitment) > 0:
+            if plot.structure.recruitment:
                 if plot.status == "Built":
                     for lodge in plot.structure.recruitment:
                         if "peasant" in recruitment_structures.unit_tags[lodge.unit_name]:
@@ -160,7 +160,7 @@ def rule_of_monastic_life_ignore():
             # Adjust recruitment
             for plot in settlement.buildings:
                 if plot.structure is not None:
-                    if len(plot.structure.recruitment) > 0:
+                    if plot.structure.recruitment:
                         if plot.status == "Built":
                             for lodge in plot.structure.recruitment:
                                 if "Battle monks" in recruitment_structures.unit_tags[lodge.unit_name]:
@@ -492,7 +492,7 @@ def provide_troops_to_vassal():
     # Adjust recruitment
     for plot in settlement.buildings:
         if plot.structure is not None:
-            if len(plot.structure.recruitment) > 0:
+            if plot.structure.recruitment:
                 if plot.status == "Built":
                     for lodge in plot.structure.recruitment:
                         if "men-at-arms" in recruitment_structures.unit_tags[lodge.unit_name]:

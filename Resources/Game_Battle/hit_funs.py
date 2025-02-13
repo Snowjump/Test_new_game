@@ -309,6 +309,7 @@ def armour_effect(b, unit, primary_target, base_armour, acting_hero, enemy_hero)
 
 
 def defence_effect(primary_target, base_defence, enemy_hero):
+    # Calculated when regiment is hit by enemy regiment
     final_defence = int(base_defence)
     addition_bonus_list = []
     subtraction_bonus_list = []
@@ -323,6 +324,7 @@ def defence_effect(primary_target, base_defence, enemy_hero):
                     if buff.method == "addition":
                         # bonus = buff.quantity
                         addition_bonus_list.append(buff.quantity)
+                        print("Effect defence bonus: addition - " + str(buff.quantity))
                     elif buff.method == "division":
                         division_bonus_list.append(buff.quantity)
 
@@ -343,6 +345,7 @@ def defence_effect(primary_target, base_defence, enemy_hero):
                     if a.stat == "defence":
                         if a.tag in primary_target.reg_tags:
                             addition_bonus_list.append(a.value)
+                            print("Attribute defence bonus: addition - " + str(a.value))
 
         # Hero artifacts
         if len(enemy_hero.inventory) > 0:
@@ -363,9 +366,10 @@ def defence_effect(primary_target, base_defence, enemy_hero):
                             elif effect.method == "subtraction":
                                 subtraction_bonus_list.append(int(effect.quantity))
 
-    if len(addition_bonus_list) > 0:
+    if addition_bonus_list:
         for addition in addition_bonus_list:
             final_defence += int(addition)
+            print("addition_bonus_list: addition - " + str(addition) + "; final_defence - " + str(final_defence))
 
     if len(subtraction_bonus_list) > 0:
         for addition in addition_bonus_list:
@@ -376,7 +380,7 @@ def defence_effect(primary_target, base_defence, enemy_hero):
     if len(multiplication_bonus_list) > 0:
         for multiplication in multiplication_bonus_list:
             final_defence *= float(multiplication)
-            print("Testing: final_defence - " + str(final_defence))
+            # print("Testing: final_defence - " + str(final_defence))
 
     if len(division_bonus_list) > 0:
         for division in division_bonus_list:
@@ -389,8 +393,8 @@ def defence_effect(primary_target, base_defence, enemy_hero):
     else:
         final_defence = int(final_defence)
 
-    # print("base_defence - " + str(base_defence) + " => "
-    #       + "final_defence - " + str(final_defence))
+    print("base_defence - " + str(base_defence) + " => "
+          + "final_defence - " + str(final_defence))
     return final_defence
 
 
@@ -409,7 +413,7 @@ def ranged_defence_effect(primary_target, enemy_hero):
         for addition in addition_bonus_list:
             final_defence += int(addition)
 
-    # print("final_defence against ranged attack - " + str(final_defence))
+    print("final_defence against ranged attack - " + str(final_defence))
     return final_defence
 
 
@@ -686,4 +690,5 @@ def ranged_base_defence(distance, primary_target):
             base_value *= 1.25
             break
     base_defence = int(math.ceil(base_value))
+    print("Base defence against ranged attack - " + str(base_defence))
     return base_defence

@@ -13,6 +13,7 @@ class Structure:  # Building in settlement
         self.time_passed = 0  # Int number of turn passed so far
         self.provided_effects = provided_effects  # List of building effects that this structure provides when it built
         self.recruitment = recruitment  # Structure's ability to recruit new units
+        # Either None or Hire_Unit class object
         self.fulfilled_conditions = True  # Check if tags from required_buildings exist among built structures
         self.structure_tags = structure_tags  # List
         self.required_buildings = required_buildings  # List of additional buildings needed to be present

@@ -127,7 +127,7 @@ def bless_spell(b, TileNum, acting_army, opponent_army):
         mana_bonus = 0
         mana_cost_subtraction = []
 
-        artifact_bonus("Bless", "Devine magic", acting_army.hero, MP_addition_list, initiative_reduction,
+        artifact_bonus("Bless", "Divine magic", acting_army.hero, MP_addition_list, initiative_reduction,
                        mana_cost_subtraction)
 
         MP_bonus, initiative, mana_bonus = allocate_bonuses(MP_addition_list, MP_bonus, initiative_reduction,
@@ -185,7 +185,7 @@ def haste_spell(b, TileNum, acting_army, opponent_army):
                         if effect.method == "subtraction":
                             initiative_reduction.append(effect.quantity)
 
-        artifact_bonus("Haste", "Devine magic", acting_army.hero, MP_addition_list, initiative_reduction,
+        artifact_bonus("Haste", "Divine magic", acting_army.hero, MP_addition_list, initiative_reduction,
                        mana_cost_subtraction)
 
         MP_bonus, initiative, mana_bonus = allocate_bonuses(MP_addition_list, MP_bonus, initiative_reduction,
@@ -234,7 +234,7 @@ def healing_spell(b, TileNum, acting_army, opponent_army):
         mana_bonus = 0
         mana_cost_subtraction = []
 
-        artifact_bonus("Healing", "Devine magic", acting_army.hero, MP_addition_list, initiative_reduction,
+        artifact_bonus("Healing", "Divine magic", acting_army.hero, MP_addition_list, initiative_reduction,
                        mana_cost_subtraction)
 
         MP_bonus, initiative, mana_bonus = allocate_bonuses(MP_addition_list, MP_bonus, initiative_reduction,
@@ -277,7 +277,7 @@ def healing_spell(b, TileNum, acting_army, opponent_army):
         return False
 
 
-def devine_protection_spell(b, TileNum, acting_army, opponent_army):
+def divine_protection_spell(b, TileNum, acting_army, opponent_army):
     initiative = 1.0
     unit = find_single_ally(b, TileNum, acting_army)
     if unit:
@@ -287,7 +287,7 @@ def devine_protection_spell(b, TileNum, acting_army, opponent_army):
         mana_bonus = 0
         mana_cost_subtraction = []
 
-        artifact_bonus("Devine protection", "Devine magic", acting_army.hero, MP_addition_list, initiative_reduction,
+        artifact_bonus("Divine protection", "Divine magic", acting_army.hero, MP_addition_list, initiative_reduction,
                        mana_cost_subtraction)
 
         MP_bonus, initiative, mana_bonus = allocate_bonuses(MP_addition_list, MP_bonus, initiative_reduction,
@@ -303,15 +303,15 @@ def devine_protection_spell(b, TileNum, acting_army, opponent_army):
                 info_card = card
                 break
 
-        add_effect = add_or_prolong_effect(unit, b, "Devine protection", duration)
+        add_effect = add_or_prolong_effect(unit, b, "Divine protection", duration)
 
         if add_effect:
             b.queue.append(game_classes.Queue_Card(float(b.queue[0].time_act + duration), "Effect", info_card.army_id,
                                                    info_card.owner, info_card.number, info_card.position,
                                                    "Icons", "eff", info_card.f_color, info_card.s_color,
-                                                   4, 14, 20, 20, "Devine protection"))
+                                                   4, 14, 20, 20, "Divine protection"))
 
-            unit.effects.append(effect_classes.Battle_Effect("Devine protection", False,
+            unit.effects.append(effect_classes.Battle_Effect("Divine protection", False,
                                                              float(b.queue[0].time_act),
                                                              float(b.queue[0].time_act + duration),
                                                              [effect_classes.Buff("Defence", 2 + math.ceil(final_MP * 2 / 3),
@@ -321,11 +321,11 @@ def devine_protection_spell(b, TileNum, acting_army, opponent_army):
         acting_army.hero.initiative = float(initiative)
         return True
     else:
-        print("devine_protection_spell() - Selected wrong unit")
+        print("divine_protection_spell() - Selected wrong unit")
         return False
 
 
-def devine_strength_spell(b, TileNum, acting_army, opponent_army):
+def divine_strength_spell(b, TileNum, acting_army, opponent_army):
     initiative = 1.0
     unit = find_single_ally(b, TileNum, acting_army)
     if unit:
@@ -335,7 +335,7 @@ def devine_strength_spell(b, TileNum, acting_army, opponent_army):
         mana_bonus = 0
         mana_cost_subtraction = []
 
-        artifact_bonus("Devine strength", "Devine magic", acting_army.hero, MP_addition_list, initiative_reduction,
+        artifact_bonus("Divine strength", "Divine magic", acting_army.hero, MP_addition_list, initiative_reduction,
                        mana_cost_subtraction)
 
         MP_bonus, initiative, mana_bonus = allocate_bonuses(MP_addition_list, MP_bonus, initiative_reduction,
@@ -351,15 +351,15 @@ def devine_strength_spell(b, TileNum, acting_army, opponent_army):
                 info_card = card
                 break
 
-        add_effect = add_or_prolong_effect(unit, b, "Devine strength", duration)
+        add_effect = add_or_prolong_effect(unit, b, "Divine strength", duration)
 
         if add_effect:
             b.queue.append(game_classes.Queue_Card(float(b.queue[0].time_act + duration), "Effect", info_card.army_id,
                                                    info_card.owner, info_card.number, info_card.position,
                                                    "Icons", "eff", info_card.f_color, info_card.s_color,
-                                                   4, 14, 20, 20, "Devine strength"))
+                                                   4, 14, 20, 20, "Divine strength"))
 
-            unit.effects.append(effect_classes.Battle_Effect("Devine strength", False,
+            unit.effects.append(effect_classes.Battle_Effect("Divine strength", False,
                                                              float(b.queue[0].time_act),
                                                              float(b.queue[0].time_act + duration),
                                                              [effect_classes.Buff("Melee mastery",
@@ -370,7 +370,7 @@ def devine_strength_spell(b, TileNum, acting_army, opponent_army):
         acting_army.hero.initiative = float(initiative)
         return True
     else:
-        print("devine_strength_spell() - Selected wrong unit")
+        print("divine_strength_spell() - Selected wrong unit")
         return False
 
 
@@ -384,7 +384,7 @@ def inspiration_spell(b, TileNum, acting_army, opponent_army):
         mana_bonus = 0
         mana_cost_subtraction = []
 
-        artifact_bonus("Inspiration", "Devine magic", acting_army.hero, MP_addition_list, initiative_reduction,
+        artifact_bonus("Inspiration", "Divine magic", acting_army.hero, MP_addition_list, initiative_reduction,
                        mana_cost_subtraction)
 
         MP_bonus, initiative, mana_bonus = allocate_bonuses(MP_addition_list, MP_bonus, initiative_reduction,
@@ -419,7 +419,7 @@ def missile_shielding_spell(b, TileNum, acting_army, opponent_army):
         mana_bonus = 0
         mana_cost_subtraction = []
 
-        artifact_bonus("Missile shielding", "Devine magic", acting_army.hero, MP_addition_list, initiative_reduction,
+        artifact_bonus("Missile shielding", "Divine magic", acting_army.hero, MP_addition_list, initiative_reduction,
                        mana_cost_subtraction)
 
         MP_bonus, initiative, mana_bonus = allocate_bonuses(MP_addition_list, MP_bonus, initiative_reduction,
@@ -724,11 +724,9 @@ def magic_resistance(b, unit, TileNum, final_MP):
     print("name - " + str(unit.name) + ", magic_power " + str(unit.magic_power))
     unit_MP = int(unit.magic_power)
     the_hero = None
-    for army in game_obj.game_armies:
-        if army.army_id == b.battle_map[TileNum].army_id:
-            if army.hero is not None:
-                the_hero = army.hero
-            break
+    army = common_selects.select_army_by_id(b.battle_map[TileNum].army_id)
+    if army.hero is not None:
+        the_hero = army.hero
 
     if the_hero is not None:
         if len(the_hero.inventory) > 0:
@@ -737,7 +735,7 @@ def magic_resistance(b, unit, TileNum, final_MP):
                     allowed = True
                     if len(effect.other_tags) > 0:
                         allowed = False
-                        for tag in caster.reg_tags:
+                        for tag in unit.reg_tags:
                             if tag in effect.other_tags:
                                 allowed = True
 
@@ -817,8 +815,8 @@ script_cat = {"Direct order - increase morale" : increase_morale,
               "Bless" : bless_spell,
               "Haste" : haste_spell,
               "Healing" : healing_spell,
-              "Devine protection" : devine_protection_spell,
-              "Devine strength" : devine_strength_spell,
+              "Divine protection" : divine_protection_spell,
+              "Divine strength" : divine_strength_spell,
               "Inspiration" : inspiration_spell,
               "Missile shielding" : missile_shielding_spell,
               "Fire arrows" : fire_arrows_spell,

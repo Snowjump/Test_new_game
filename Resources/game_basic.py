@@ -4,8 +4,6 @@
 import math
 import random
 
-from Storage import create_unit
-
 from Content import starting_skills
 from Content import exploration_catalog
 from Content import exploration_scripts
@@ -961,11 +959,9 @@ def AI_blockade_settlement(settlement, attacker, defender, attacker_realm):
         # Standard border is 120
         power_border = 120
         # But for human player factions increase to 135, since humans are better at battling
-        for realm in game_obj.game_powers:
-            if realm.name == defender.owner:
-                if not realm.AI_player:
-                    power_border = 135
-                break
+        realm = common_selects.select_realm_by_name(defender.owner)
+        if not realm.AI_player:
+            power_border = 135
 
         if power_ranking.rank_ratio_calculation(own_army_sum_rank, defender, power_border):
             print("Assault")
