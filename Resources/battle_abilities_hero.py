@@ -116,6 +116,24 @@ def advance_initiative(b, TileNum, acting_army, opponent_army):
     return True
 
 
+def increase_army_morale(b, TileNum, acting_army, opponent_army):
+    initiative = 1.5
+
+    for card in b.queue:
+        if card.army_id == acting_army.army_id and card.obj_type == "Regiment":
+            unit = acting_army.units[card.number]
+            print("Before: " + unit.name + " unit.morale - " + str(unit.morale))
+            if unit.morale + 0.5 > unit.leadership:
+                unit.morale = float(unit.leadership)
+            else:
+                unit.morale = float(math.ceil((unit.morale + 0.5) * 100) / 100)
+            print("After: " + unit.name + " unit.morale - " + str(unit.morale))
+
+    print("Final: initiative - " + str(initiative))
+    acting_army.hero.initiative = float(initiative)
+    return True
+
+
 def bless_spell(b, TileNum, acting_army, opponent_army):
     initiative = 1.0
     unit = find_single_ally(b, TileNum, acting_army)
@@ -812,6 +830,7 @@ def perished_creatures(b, unit):
 
 script_cat = {"Direct order - increase morale" : increase_morale,
               "Direct order - advance initiative" : advance_initiative,
+              "Rally" : increase_army_morale,
               "Bless" : bless_spell,
               "Haste" : haste_spell,
               "Healing" : healing_spell,

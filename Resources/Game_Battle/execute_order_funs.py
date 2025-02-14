@@ -221,7 +221,8 @@ def primary_rotate(b, acting_army, acting_unit, enemy_army):
         acting_unit.direction = game_battle.change_direction(acting_unit.position, b.target_destination)
         TileNum2 = (b.target_destination[1] - 1) * game_stats.battle_width + b.target_destination[0] - 1
         primary_target = enemy_army.units[b.battle_map[TileNum2].unit_index]
-        primary_target.direction = game_battle.change_direction(primary_target.position, acting_unit.position)
+        if primary_target.counterattack:
+            primary_target.direction = game_battle.change_direction(primary_target.position, acting_unit.position)
 
         b.damage_dealt_positions.append(tuple(primary_target.position))
         print("b.damage_dealt_positions: " + str(b.damage_dealt_positions))
@@ -361,6 +362,7 @@ def primary_damage_message1(b, acting_army, acting_unit, enemy_army):
                     if skill.application == "Counterattack":
                         if skill.quality == "Unlimited counterattacks":
                             decrease = False
+                            break
                 if decrease:
                     enemy_unit.counterattack -= 1
 

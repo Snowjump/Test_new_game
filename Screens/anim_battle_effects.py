@@ -45,7 +45,7 @@ def damage_dealt_red(screen, b, current_position):
         x = int(current_position[0]) - int(b.battle_pov[0])
         y = int(current_position[1]) - int(b.battle_pov[1])
 
-        draw_rect_alpha(screen, color, ((x - 1) * 96 + 1, (y - 1) * 96 + 1, 96, 96))
+        draw_rect_alpha(screen, color, ((x - 1) * 96, (y - 1) * 96, 96, 96))
 
 
 def white_buff_effect(screen, b, current_position):
@@ -56,7 +56,7 @@ def white_buff_effect(screen, b, current_position):
     x = int(current_position[0]) - int(b.battle_pov[0])
     y = int(current_position[1]) - int(b.battle_pov[1])
 
-    draw_rect_alpha(screen, color, ((x - 1) * 96 + 1, (y - 1) * 96 + 1, 96, 96))
+    draw_rect_alpha(screen, color, ((x - 1) * 96, (y - 1) * 96, 96, 96))
 
 
 def message_float(screen, b):

@@ -1,10 +1,17 @@
-## Miracle battles
+## Among Myth and Wonder
+## ability_desc_cat_hero
 
 import math
 
 
 def direct_order_desc(hero):
     description = ["Inspire 1 regiment", "Increase morale by 0.3", "Move initiative by 0.25"]
+
+    return description
+
+
+def rally_desc(hero):
+    description = ["Rally all regiments", "Increase morale by 0.5", "Hero initiative cost 1.5"]
 
     return description
 
@@ -106,6 +113,7 @@ def hail_desc(hero):
 
 
 script_cat = {"Direct order" : direct_order_desc,
+              "Rally" : rally_desc,
               "Bless" : bless_desc,
               "Haste" : haste_desc,
               "Healing" : healing_desc,
