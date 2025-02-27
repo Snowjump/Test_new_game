@@ -3,7 +3,7 @@
 
 import pygame.draw
 
-from Screens.colors_catalog import *
+# from Screens.colors_catalog import *
 
 
 def adventure_flag(screen, x, y, c, xm, ym, flagpole_color, top_color, bottom_color):
@@ -45,3 +45,22 @@ def battlefield_flag(screen, x, y, xm, ym, flagpole_color, top_color, bottom_col
                          [x + 14 + xm, y + 85 + ym],
                          [x + 14 + xm, y + 88 + ym],
                          [x + 5 + xm, y + 88 + ym]))
+
+
+def card_flag(screen, x, y, flagpole_color, top_color, bottom_color):
+    # x and y are coordinates
+    pygame.draw.polygon(screen, flagpole_color,
+                        ([x + 3, y + 44],
+                         [x + 4, y + 44],
+                         [x + 4, y + 60],
+                         [x + 3, y + 60]))
+    pygame.draw.polygon(screen, top_color,
+                        ([x + 5, y + 44],
+                         [x + 14, y + 44],
+                         [x + 14, y + 47],
+                         [x + 5, y + 47]))
+    pygame.draw.polygon(screen, bottom_color,
+                        ([x + 5, y + 48],
+                         [x + 14, y + 48],
+                         [x + 14, y + 51],
+                         [x + 5, y + 51]))

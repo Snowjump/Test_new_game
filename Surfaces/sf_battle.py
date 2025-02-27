@@ -12,6 +12,7 @@ from Resources import game_battle
 from Resources import game_classes
 from Resources import game_basic
 from Resources import graphics_basic
+from Resources import graphics_obj
 from Resources import algo_movement_range
 from Resources import battle_abilities_hero
 from Resources import battle_abilities_regiment
@@ -310,12 +311,12 @@ def battle_surface_m1(position):
                     # print("player_id - " + str(player_id))
 
                     if b.preparation_siege_machine is not None and b.selected_tile in starting_positions:
-                        if b.battle_map[TileNum].army_id is not None:
+                        if b.battle_map[TileNum].army_id:
                             # Equip regiment with siege machine
                             equip_regiment(b, TileNum)
 
                     elif b.selected_unit == -1 and b.selected_tile in starting_positions and b.unit_card == -1:
-                        if b.battle_map[TileNum].army_id is not None:
+                        if b.battle_map[TileNum].army_id:
                             # Select unit on battlefield
                             b.selected_unit = int(TileNum)
                             b.selected_unit_alt = (int(x2), int(y2))
@@ -324,7 +325,7 @@ def battle_surface_m1(position):
 
                     elif b.selected_unit != -1 and b.selected_tile in starting_positions and b.unit_card == -1:
                         # Select tile, while already selected a unit on battlefield
-                        if b.battle_map[TileNum].army_id is None:  # Empty tile
+                        if b.battle_map[TileNum].army_id:  # Empty tile
                             unit_num = int(b.battle_map[b.selected_unit].unit_index)  # Previous tile
                             b.battle_map[b.selected_unit].unit_index = None
                             b.battle_map[b.selected_unit].army_id = None
@@ -845,6 +846,8 @@ def start_battle_but():
 
         click_sound = pygame.mixer.Sound("Sound/Interface/Minimalist2.ogg")
         click_sound.play()
+
+        graphics_basic.init_fighting_battle_graphics()
 
 
 def siege_tower_reserve_but():
@@ -1512,6 +1515,7 @@ def end_battle_but():
     game_stats.attacker_army_id = 0
     game_stats.defender_army_id = 0
 
+    graphics_obj.battle_objects = []
     graphics_basic.init_game_board_graphics()
 
     # Update visuals

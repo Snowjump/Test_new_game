@@ -940,13 +940,6 @@ def game_board_screen(screen):
     yVar = game_stats.game_window_height - 800
 
     ## Buttons
-    # Top ribbon
-    # Next turn - hourglass icon
-    # Calendar
-    # Left ribbon menu
-    # Button - realm
-    # Button - tasks
-    # Button - Diplomacy
     for obj in graphics_obj.game_board_objects:
         obj.draw_panel(screen)
         # print(obj.name)

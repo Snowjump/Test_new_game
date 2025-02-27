@@ -13,3 +13,6 @@ game_board_objects = []
 
 #
 level_editor_objects = []
+
+#
+battle_objects = []

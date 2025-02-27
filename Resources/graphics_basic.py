@@ -17,6 +17,9 @@ from Screens.Game_Board_Windows import panel_calendar
 from Screens.Game_Board_Windows import panel_resource_ribbon
 from Screens.Game_Board_Windows import panel_left_ribbon_menu
 from Screens.Game_Board_Windows import panel_vision_mode
+from Screens.Game_Board_Windows import panel_waiting_list
+from Screens.Game_Board_Windows import panel_battle_queue
+from Screens.Game_Board_Windows import panel_battle_actions
 from Screens.Game_Board_Windows import info_panel_army
 from Screens.Game_Board_Windows import info_panel_settlement
 from Screens.Game_Board_Windows import info_panel_tile_obj
@@ -33,7 +36,19 @@ def init_game_board_graphics():
 
 
 def init_level_editor_graphics():
+    graphics_obj.level_editor_objects = []
     prepare_vision_mode_buttons()
+
+
+def init_formation_battle_graphics():
+    graphics_obj.battle_objects = []
+    prepare_waiting_list()
+
+
+def init_fighting_battle_graphics():
+    graphics_obj.battle_objects = []
+    prepare_battle_queue()
+    prepare_battle_action_buttons()
 
 
 def refresh_graphics_object(new_object, objects_list):
@@ -198,3 +213,18 @@ def prepare_vision_mode_buttons():
         refresh_graphics_object(new_object, graphics_obj.game_board_objects)
     elif game_stats.current_screen in ["Create Level", "Load Level Into Editor"]:
         refresh_graphics_object(new_object, graphics_obj.level_editor_objects)
+
+
+def prepare_waiting_list():
+    new_object = panel_waiting_list.Waiting_List_Panel("Waiting list panel")
+    refresh_graphics_object(new_object, graphics_obj.battle_objects)
+
+
+def prepare_battle_queue():
+    new_object = panel_battle_queue.Battle_Queue_Panel("Battle queue panel")
+    refresh_graphics_object(new_object, graphics_obj.battle_objects)
+
+
+def prepare_battle_action_buttons():
+    new_object = panel_battle_actions.Battle_Actions_Panel("Battle actions panel")
+    refresh_graphics_object(new_object, graphics_obj.battle_objects)

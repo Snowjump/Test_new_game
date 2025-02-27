@@ -17,6 +17,7 @@ from Content import siege_warfare_catalog
 from Resources import game_obj
 from Resources import game_stats
 from Resources import common_selects
+from Resources import graphics_obj
 
 from Screens import anim_battle_effects
 from Screens import anim_battle_unit_action
@@ -917,233 +918,6 @@ def draw_siege_machine(screen, unit, index, row, line, side, x , y, unit_index, 
                                  machine_position[1] + xy_animation[1]))
 
 
-def draw_waiting_list(screen, b):
-    yVar = game_stats.game_window_height - 800
-
-    # print(str(game_stats.gf_misc_img_dict))
-    # print(str(game_stats.gf_misc_img_dict["Icons/paper_3_square_560_x_60"]))
-    ribbon_img = game_stats.gf_misc_img_dict["Icons/paper_3_square_560_x_60"]
-    screen.blit(ribbon_img, [361, 741 + yVar])
-
-    # Arrows
-    pygame.draw.polygon(screen, RockTunel, [[360, 740 + yVar], [380, 740 + yVar], [380, 800 + yVar], [360, 800 + yVar]])
-    pygame.draw.polygon(screen, LineMainMenuColor1, [[360, 740 + yVar], [380, 740 + yVar],
-                                                     [380, 800 + yVar], [360, 800 + yVar]], 3)
-    pygame.draw.lines(screen, LineMainMenuColor1, False, [(376, 762 + yVar), (364, 770 + yVar), (376, 778 + yVar)], 2)
-
-    pygame.draw.polygon(screen, RockTunel, [[900, 740 + yVar], [920, 740 + yVar], [920, 800 + yVar], [900, 800 + yVar]])
-    pygame.draw.polygon(screen, LineMainMenuColor1, [[900, 740 + yVar], [920, 740 + yVar],
-                                                     [920, 800 + yVar], [900, 800 + yVar]], 3)
-    pygame.draw.lines(screen, LineMainMenuColor1, False, [(904, 762 + yVar), (916, 770 + yVar), (904, 778 + yVar)], 2)
-
-    # Units
-    player_id = int(b.defender_id)
-    if b.attacker_realm == game_stats.player_power:
-        player_id = int(b.attacker_id)
-
-    a = common_selects.select_army_by_id(player_id)
-
-    number = 0
-    for unit in b.waiting_list:
-        side = "_l"
-        if a.right_side:
-            side = "_r"
-        if b.waiting_index <= number <= 9 + b.waiting_index:
-            x_pos = 380 + (number - b.waiting_index) * 52
-            y_pos = 744 + yVar
-
-            if a.units[unit].crew[0].img_width > 44 or a.units[unit].crew[0].img_height > 44:
-                army_img = game_stats.gf_regiment_dict[a.units[unit].img_source + "/" + a.units[unit].img + side]
-                if a.units[unit].crew[0].img_width > 44:
-                    proportion = 44 / a.units[unit].crew[0].img_width
-                    army_img = pygame.transform.scale(army_img,
-                                                      (44,
-                                                       int(a.units[unit].crew[0].img_height * proportion)))
-                    x_offset = 3
-                    y_offset = (48 - (a.units[unit].crew[0].img_height * proportion)) / 2
-                else:
-                    proportion = 44 / a.units[unit].crew[0].img_height
-                    army_img = pygame.transform.scale(army_img,
-                                                      (int(a.units[unit].crew[0].img_width * proportion),
-                                                       44))
-                    x_offset = (48 - (a.units[unit].crew[0].img_width * proportion)) / 2
-                    y_offset = 3
-            else:
-                army_img = game_stats.gf_regiment_dict[a.units[unit].img_source + "/" + a.units[unit].img + side]
-                x_offset = a.units[unit].x_offset
-                y_offset = a.units[unit].y_offset
-
-            screen.blit(army_img, [x_pos + x_offset, y_pos + y_offset])
-
-            # Highlight selected unit card
-            if b.unit_card != -1:
-                if 0 <= b.unit_card - b.waiting_index <= 9:
-                    unit_pos = 380 + int(b.unit_card - b.waiting_index) * 52
-                    pygame.draw.polygon(screen, WhiteBorder,
-                                        [[unit_pos + 1, 740 + yVar],
-                                         [unit_pos + 52, 740 + yVar],
-                                         [unit_pos + 52, 800 + yVar],
-                                         [unit_pos + 1, 800 + yVar]], 1)
-
-            # Number of creatures in regiment
-            text_panel = arial_font8.render(str(len(a.units[unit].crew)) + "/"
-                                            + str(a.units[unit].number * a.units[unit].rows), True, DarkText)
-            screen.blit(text_panel, [384 + (number - b.waiting_index) * 52, 744 + yVar])
-
-        number += 1
-
-
-def draw_queue(screen, b):
-    yVar = game_stats.game_window_height - 800
-
-    ribbon_img = game_stats.gf_misc_img_dict["Icons/paper_3_square_560_x_60"]
-    screen.blit(ribbon_img, [361, 741 + yVar])
-
-    # Arrows
-    pygame.draw.polygon(screen, RockTunel, [[360, 740 + yVar], [380, 740 + yVar], [380, 800 + yVar], [360, 800 + yVar]])
-    pygame.draw.polygon(screen, LineMainMenuColor1, [[360, 740 + yVar], [380, 740 + yVar],
-                                                     [380, 800 + yVar], [360, 800 + yVar]], 3)
-    pygame.draw.lines(screen, LineMainMenuColor1, False, [(376, 762 + yVar), (364, 770 + yVar), (376, 778 + yVar)], 2)
-
-    pygame.draw.polygon(screen, RockTunel, [[900, 740 + yVar], [920, 740 + yVar], [920, 800 + yVar], [900, 800 + yVar]])
-    pygame.draw.polygon(screen, LineMainMenuColor1, [[900, 740 + yVar], [920, 740 + yVar],
-                                                     [920, 800 + yVar], [900, 800 + yVar]], 3)
-    pygame.draw.lines(screen, LineMainMenuColor1, False, [(904, 762 + yVar), (916, 770 + yVar), (904, 778 + yVar)], 2)
-
-    number = 0
-    for card in b.queue:
-        if card.obj_type == "Regiment":
-            if b.queue_index <= number <= 9 + b.queue_index:
-                x_pos = 380 + (number - b.queue_index) * 52
-                y_pos = 744 + yVar
-
-                a = common_selects.select_army_by_id(card.army_id)
-
-                side = "_l"
-                if a.army_id == b.attacker_id:
-                    side = "_r"
-
-                if card.img_width > 44 or card.img_height > 44:
-                    card_img = game_stats.gf_regiment_dict[card.img_source + "/" + card.img + side]
-                    if card.img_width > 44:
-                        proportion = 44 / card.img_width
-                        card_img = pygame.transform.scale(card_img,
-                                                          (44,
-                                                           int(card.img_height * proportion)))
-                        x_offset = 3
-                        y_offset = (48 - (card.img_height * proportion)) / 2
-                    else:
-                        proportion = 44 / card.img_height
-                        card_img = pygame.transform.scale(card_img,
-                                                          (int(card.img_width * proportion),
-                                                           44))
-                        x_offset = (48 - (card.img_width * proportion)) / 2
-                        y_offset = 3
-                else:
-                    card_img = game_stats.gf_regiment_dict[card.img_source + "/" + card.img + side]
-                    x_offset = card.x_offset
-                    y_offset = card.y_offset
-
-                screen.blit(card_img, [x_pos + x_offset, y_pos + y_offset])
-
-                # # Highlight selected unit card
-                # if b.unit_card != -1:
-                #     if 0 <= b.unit_card - b.waiting_index <= 9:
-                #         unit_pos = 380 + int(b.unit_card - b.waiting_index) * 52
-                #         pygame.draw.polygon(screen, WhiteBorder,
-                #                             [[unit_pos + 1, 740 + yVar],
-                #                              [unit_pos + 52, 740 + yVar],
-                #                              [unit_pos + 52, 800 + yVar],
-                #                              [unit_pos + 1, 800 + yVar]], 1)
-
-                # Number of creatures in regiment
-                text_panel = arial_font10.render(str(len(a.units[card.number].crew)) + "/"
-                                           + str(a.units[card.number].number * a.units[card.number].rows),
-                                           True, DarkText)
-                screen.blit(text_panel, [384 + (number - b.queue_index) * 52, 742 + yVar])
-
-                # Regiment's morale
-                text_panel = arial_font10.render(str(a.units[card.number].morale), True, DarkText)
-                screen.blit(text_panel, [x_pos + 4, y_pos + 8])
-
-                if card.f_color is not None:  # Draw flag
-                    pygame.draw.polygon(screen, FlagpoleColor,
-                                        ([x_pos + 3, y_pos + 44],
-                                         [x_pos + 4, y_pos + 44],
-                                         [x_pos + 4, y_pos + 60],
-                                         [x_pos + 3, y_pos + 60]))
-                    pygame.draw.polygon(screen, FlagColors[card.f_color],
-                                        ([x_pos + 5, y_pos + 44],
-                                         [x_pos + 15, y_pos + 44],
-                                         [x_pos + 15, y_pos + 48],
-                                         [x_pos + 5, y_pos + 48]))
-                    pygame.draw.polygon(screen, FlagColors[card.s_color],
-                                        ([x_pos + 5, y_pos + 48],
-                                         [x_pos + 15, y_pos + 48],
-                                         [x_pos + 15, y_pos + 53],
-                                         [x_pos + 5, y_pos + 53]))
-
-                # Act time
-                text_panel = arial_font10.render(str(b.queue[number - b.queue_index].time_act), True, DarkText)
-                screen.blit(text_panel, [400 + (number - b.queue_index) * 52, 788 + yVar])
-
-            number += 1
-
-        if card.obj_type == "Effect":
-            if b.queue_index <= number <= 9 + b.queue_index:
-                x_pos = 380 + (number - b.queue_index) * 52
-                y_pos = 744 + yVar
-
-                card_img = game_stats.gf_misc_img_dict[card.img_source + "/" + card.img]
-                screen.blit(card_img, [x_pos + card.x_offset, y_pos + card.y_offset])
-
-                # Act time
-                text_panel = arial_font10.render(str(b.queue[number - b.queue_index].time_act), True, DarkText)
-                screen.blit(text_panel, [396 + (number - b.queue_index) * 52, 788 + yVar])
-
-            number += 1
-
-        if card.obj_type == "Hero":
-            if b.queue_index <= number <= 9 + b.queue_index:
-                x_pos = 380 + (number - b.queue_index) * 52
-                y_pos = 744 + yVar
-
-                for army in game_obj.game_armies:
-                    if army.army_id == card.army_id:
-                        a = army
-                        break
-
-                side = "_l"
-                if a.army_id == b.attacker_id:
-                    side = "_r"
-
-                card_img = game_stats.gf_hero_dict[card.img_source + "/" + card.img + side]
-                screen.blit(card_img, [x_pos + card.x_offset, y_pos + card.y_offset])
-
-                # Act time
-                text_panel = arial_font10.render(str(b.queue[number - b.queue_index].time_act), True, DarkText)
-                screen.blit(text_panel, [396 + (number - b.queue_index) * 52, 788 + yVar])
-
-                if card.f_color is not None:  # Draw flag
-                    pygame.draw.polygon(screen, FlagpoleColor,
-                                        ([x_pos + 3, y_pos + 44],
-                                         [x_pos + 4, y_pos + 44],
-                                         [x_pos + 4, y_pos + 60],
-                                         [x_pos + 3, y_pos + 60]))
-                    pygame.draw.polygon(screen, FlagColors[card.f_color],
-                                        ([x_pos + 5, y_pos + 44],
-                                         [x_pos + 11, y_pos + 44],
-                                         [x_pos + 11, y_pos + 48],
-                                         [x_pos + 5, y_pos + 48]))
-                    pygame.draw.polygon(screen, FlagColors[card.s_color],
-                                        ([x_pos + 5, y_pos + 48],
-                                         [x_pos + 11, y_pos + 48],
-                                         [x_pos + 11, y_pos + 53],
-                                         [x_pos + 5, y_pos + 53]))
-
-            number += 1
-
-
 def battle_end_window(screen, b):
     pygame.draw.polygon(screen, Board1, [[130, 100], [1150, 100], [1150, 400], [130, 400]])
 
@@ -1465,6 +1239,10 @@ def battle_screen(screen):
 
     b = game_stats.present_battle
 
+    for obj in graphics_obj.battle_objects:
+        obj.draw_panel(screen)
+        # print(obj.name)
+
     if b.stage == "Formation":
         # print(str(b.stage))
         # Start battle button
@@ -1473,25 +1251,6 @@ def battle_screen(screen):
 
         text_NewGame1 = tnr_font20.render("Start battle", True, TitleText)
         screen.blit(text_NewGame1, [595, 10])
-
-        # White border around selected regiment for relocation
-        if b.selected_unit != -1:
-            tile = b.battle_map[b.selected_unit]
-            x = int(tile.posxy[0])
-            y = int(tile.posxy[1])
-            x -= int(b.battle_pov[0])
-            y -= int(b.battle_pov[1])
-
-            pygame.draw.polygon(screen, WhiteBorder,
-                                [[(x - 1) * 96, (y - 1) * 96],
-                                 [(x - 1) * 96 + 95, (y - 1) * 96],
-                                 [(x - 1) * 96 + 95, (y - 1) * 96 + 95],
-                                 [(x - 1) * 96, (y - 1) * 96 + 95]], 1)
-
-        # print(str(b.waiting_list))
-        # Waiting list lower panel
-        if len(b.waiting_list) > 0:
-            draw_waiting_list(screen, b)
 
         # Draw reserve of siege machines
         if b.battle_type == "Siege":
@@ -1531,7 +1290,6 @@ def battle_screen(screen):
 
     elif b.stage == "Fighting":
         unit = None
-        draw_queue(screen, b)
 
         # Pick up or drop siege machine button
         if b.battle_type == "Siege":
@@ -1568,86 +1326,12 @@ def battle_screen(screen):
                         icon_img = game_stats.gf_misc_img_dict[icon]
                         screen.blit(icon_img, (77, 742 + yVar))
 
-        # Wait button
-        # Let regiment or hero spent 0,5 time
-        pygame.draw.polygon(screen, FieldColor, [[235, 740 + yVar], [357, 740 + yVar],
-                                                 [357, 765 + yVar], [235, 765 + yVar]])
-        if b.realm_in_control == game_stats.player_power:
-            color = HighlightOption
-        else:
-            color = LineMainMenuColor1
-        pygame.draw.polygon(screen, color, [[235, 740 + yVar], [357, 740 + yVar],
-                                            [357, 765 + yVar], [235, 765 + yVar]], 3)
-
-        text_NewGame1 = tnr_font20.render("Wait (Q)", True, TitleText)
-        screen.blit(text_NewGame1, [275, 741 + yVar])
-
-        hourglass_img = game_stats.gf_misc_img_dict["Icons/battle_hourglass"]
-        screen.blit(hourglass_img, (240, 742 + yVar))
-
-        # Defence button
-        # Let regiment increase its defence parameter and spent 1.0 time
-        if b.queue[0].obj_type == "Regiment":
-            pygame.draw.polygon(screen, FieldColor, [[235, 770 + yVar], [357, 770 + yVar],
-                                                     [357, 795 + yVar], [235, 795 + yVar]])
-            if b.realm_in_control == game_stats.player_power:
-                color = HighlightOption
-            else:
-                color = LineMainMenuColor1
-            pygame.draw.polygon(screen, color, [[235, 770 + yVar], [357, 770 + yVar],
-                                                [357, 795 + yVar], [235, 795 + yVar]], 3)
-
-            text_NewGame1 = tnr_font20.render("Defend (E)", True, TitleText)
-            screen.blit(text_NewGame1, [265, 771 + yVar])
-
-            shield_img = game_stats.gf_misc_img_dict["Icons/battle_shield"]
-            screen.blit(shield_img, (240, 772 + yVar))
-
         # Attack method button
-        # Change between attack methods if possible
+        # Changes between attack methods if possible
+        pygame.mouse.set_visible(True)
         if b.realm_in_control == game_stats.player_power:
             if b.queue[0].obj_type == "Regiment" and b.ready_to_act:
                 change_cursor(screen, b, unit)
-
-                pygame.draw.polygon(screen, FieldColor, [[923, 740 + yVar], [1100, 740 + yVar],
-                                                         [1100, 795 + yVar], [923, 795 + yVar]])
-                pygame.draw.polygon(screen, LineMainMenuColor1, [[923, 740 + yVar], [1100, 740 + yVar],
-                                                                 [1100, 795 + yVar], [923, 795 + yVar]], 3)
-
-                attack_method = b.attack_name
-                text_NewGame1 = tnr_font20.render(attack_method, True, TitleText)
-                screen.blit(text_NewGame1, [982, 755 + yVar])
-
-                attack_img = game_stats.gf_misc_img_dict["Icons/" + attack_method]
-                screen.blit(attack_img, (925, 742 + yVar))
-
-                # Next attack type or ability button
-                pygame.draw.polygon(screen, FieldColor, [[1103, 740 + yVar], [1195, 740 + yVar],
-                                                         [1195, 795 + yVar], [1103, 795 + yVar]])
-                pygame.draw.polygon(screen, LineMainMenuColor1, [[1103, 740 + yVar], [1195, 740 + yVar],
-                                                                 [1195, 795 + yVar], [1103, 795 + yVar]], 3)
-
-                arrow_img = game_stats.gf_misc_img_dict["Icons/arrow_next_full"]
-                screen.blit(arrow_img, (1105, 742 + yVar))
-
-                text_NewGame1 = tnr_font20.render("(R)", True, TitleText)
-                screen.blit(text_NewGame1, [1165, 755 + yVar])
-
-            elif b.queue[0].obj_type == "Hero":
-                pygame.draw.polygon(screen, FieldColor, [[923, 740 + yVar], [1100, 740 + yVar],
-                                                         [1100, 795 + yVar], [923, 795 + yVar]])
-                pygame.draw.polygon(screen, LineMainMenuColor1, [[923, 740 + yVar], [1100, 740 + yVar],
-                                                                 [1100, 795 + yVar], [923, 795 + yVar]], 3)
-
-                text_NewGame1 = tnr_font20.render("Abilities", True, TitleText)
-                screen.blit(text_NewGame1, [990, 755 + yVar])
-
-                icon_img = game_stats.gf_misc_img_dict["Icons/abilities_icon"]
-                screen.blit(icon_img, (927, 752 + yVar))
-            else:
-                pygame.mouse.set_visible(True)
-        else:
-            pygame.mouse.set_visible(True)
 
         if b.anim_message:
             anim_battle_effects.message_float(screen, b)
@@ -1690,7 +1374,7 @@ def change_cursor(screen, b, unit):
     if 0 < x <= game_stats.battle_width and 0 < y <= game_stats.battle_height:
         siege_action_icon = ""
         if unit is not None:
-            # print("Regiment - " + unit.name)
+            print("Regiment - " + unit.name)
             if unit.siege_engine is not None:
                 if unit.siege_engine == "Battering ram":
                     # print("Regiment is carrying battering ram")

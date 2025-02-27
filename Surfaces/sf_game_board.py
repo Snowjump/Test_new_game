@@ -1113,6 +1113,8 @@ def select_war_notification(position):
 def play_battle_but():
     battle_map_generation.create_battle_map()
 
+    graphics_basic.init_formation_battle_graphics()
+
     click_sound = pygame.mixer.Sound("Sound/Interface/Minimalist2.ogg")
     click_sound.play()
 
@@ -1219,6 +1221,8 @@ def play_siege_but():
             else:
                 print("Start sortie - create_battle_map()")
                 battle_map_generation.create_battle_map()
+
+    graphics_basic.init_formation_battle_graphics()
 
     click_sound = pygame.mixer.Sound("Sound/Interface/Minimalist2.ogg")
     click_sound.play()

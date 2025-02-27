@@ -52,13 +52,15 @@ def element_button(screen, text, text_font, text_color, field_color, border_colo
 
 
 def element_arrow_button(screen, direction, field_color, border_color, line_color, x, y, x_p, y_p, border_thickness,
-                         line_thickness):
+                         line_thickness, x_s=0, y_s=0):
     # Basic button with a border and an arrow consisting of two lines
 
     # x - x-axis coordinate
     # y - y-axis coordinate
     # x_p - button width
     # y_p - button length
+    # x_s - horizontal line shift
+    # y_s - vertical line shift
 
     # Button's field
     pygame.draw.polygon(screen, color_dic[field_color], [[x, y], [x + x_p, y], [x + x_p, y + y_p], [x, y + y_p]])
@@ -72,13 +74,13 @@ def element_arrow_button(screen, direction, field_color, border_color, line_colo
     point_2 = None
     point_3 = None
     if direction == "Left":
-        point_1 = (x + x_p - 3, y + 3)
-        point_2 = (x + 4, y + (y_p / 2) + 1)
-        point_3 = (x + x_p - 3, y + y_p - 3)
+        point_1 = (x + x_p - 3 - x_s, y + 3 + y_s)
+        point_2 = (x + 4 + x_s, y + (y_p / 2))
+        point_3 = (x + x_p - 3 - x_s, y + y_p - 3 - y_s)
     elif direction == "Right":
-        point_1 = (x + 4, y + 3)
-        point_2 = (x + x_p - 3, y + (y_p / 2) + 1)
-        point_3 = (x + 4, y + y_p - 3)
+        point_1 = (x + 4 + x_s, y + 3 + y_s)
+        point_2 = (x + x_p - 3 - x_s, y + (y_p / 2))
+        point_3 = (x + 4 + x_s, y + y_p - 3 - y_s)
 
     pygame.draw.lines(screen, color_dic[line_color], False, [point_1, point_2, point_3],
                       line_thickness)
