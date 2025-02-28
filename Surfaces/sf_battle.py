@@ -180,7 +180,7 @@ def battle_surface_m1(position):
                         w_funs[button_numb]()
                         break
 
-                if b.battle_window == "Ability menu":
+                if b.battle_window == "Abilities menu":
                     square = [455, 127, 699, 600]  # Ability selection
                     square1 = [187, 127, 431, 600]  # Ability school selection
                     if square[0] < position[0] < square[2] and square[1] < position[1] < square[3]:
@@ -1151,7 +1151,7 @@ def change_attack_method_but(b):
 def open_hero_ability_menu_but(b):
     print("open_hero_ability_menu_but")
 
-    b.battle_window = "Ability menu"
+    b.battle_window = "Abilities menu"
     b.cursor_function = None
     b.ability_index = 0
     b.school_index = 0
@@ -1204,7 +1204,7 @@ def open_regiment_ability_menu_but(b):
     the_unit = army.units[b.queue[0].number]
 
     if b.attack_name == "Abilities":
-        b.battle_window = "Ability menu"
+        b.battle_window = "Abilities menu"
         b.cursor_function = None
         b.ability_index = 0
         b.school_index = 0
@@ -1562,7 +1562,7 @@ regiment_info_window_funs = {1 : close_information_window,
                              10 : switch_detailed_regiment_info}
 
 window_buttons = {"Battle end window": battle_end_window_funs,
-                  "Ability menu": ability_menu_window_funs,
+                  "Abilities menu": ability_menu_window_funs,
                   "Regiment info": regiment_info_window_funs,
                   "Siege equipment menu": siege_equipment_menu_window_funs}
 
@@ -1571,11 +1571,11 @@ lower_panel_buttons = {"Waiting list": waiting_list_panel_funs}
 lower_panel_zone = {"Waiting list": waiting_list_panel_zone}
 
 window_zone = {"Battle end window": battle_end_window_zone,
-               "Ability menu": ability_menu_window_zone,
+               "Abilities menu": ability_menu_window_zone,
                "Regiment info": regiment_info_window_zone,
                "Siege equipment menu": siege_equipment_menu_window_zone}
 
 click_window_zone = {"Regiment info": [642, 70, 1278, 600],
                      "Battle end window": [130, 100, 1150, 400],
-                     "Ability menu": [180, 100, 1100, 600],
+                     "Abilities menu": [180, 100, 1100, 600],
                      "Siege equipment menu": [441, 201, 840, 500]}

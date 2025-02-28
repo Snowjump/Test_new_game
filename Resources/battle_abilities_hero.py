@@ -798,7 +798,6 @@ def perished_creatures(b, unit):
         before_HP += creature.HP
 
     # Let's check who died in unit
-    long_msg = ""
     number = 1
     perished_list = []
     index = 0
@@ -815,8 +814,6 @@ def perished_creatures(b, unit):
         # Remove killed creature
         unit.cemetery.append(unit.crew[perished])
         del unit.crew[perished]
-
-    print(long_msg)
 
     # If no alive creatures left, kill this unit
     if len(unit.crew) == 0:

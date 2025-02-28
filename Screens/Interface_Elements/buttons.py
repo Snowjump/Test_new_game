@@ -81,6 +81,14 @@ def element_arrow_button(screen, direction, field_color, border_color, line_colo
         point_1 = (x + 4 + x_s, y + 3 + y_s)
         point_2 = (x + x_p - 3 - x_s, y + (y_p / 2))
         point_3 = (x + 4 + x_s, y + y_p - 3 - y_s)
+    elif direction == "Up":
+        point_1 = (x + 4, y + y_p - 3)
+        point_2 = (x + (x_p / 2), y + 3)
+        point_3 = (x + x_p - 3, y + y_p - 3)
+    elif direction == "Down":
+        point_1 = (x + 4, y + 3)
+        point_2 = (x + (x_p / 2), y + y_p - 2)
+        point_3 = (x + x_p - 3, y + 3)
 
     pygame.draw.lines(screen, color_dic[line_color], False, [point_1, point_2, point_3],
                       line_thickness)

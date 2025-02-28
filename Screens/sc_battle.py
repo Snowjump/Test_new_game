@@ -11,7 +11,6 @@ from Screens.fonts_catalog import *
 
 from Content import objects_img_catalog
 from Content import terrain_seasons
-from Content import ability_catalog
 from Content import siege_warfare_catalog
 
 from Resources import game_obj
@@ -19,12 +18,12 @@ from Resources import game_stats
 from Resources import common_selects
 from Resources import graphics_obj
 
-from Screens import anim_battle_effects
-from Screens import anim_battle_unit_action
-
-from Screens.Interface_Elements import flags
+from Screens.Sc_Battle import anim_battle_effects
+from Screens.Sc_Battle import anim_battle_unit_action
+from Screens.Sc_Battle import draw_creatures_funs
 
 from Screens.Game_Board_Windows import battle_regiment_information
+from Screens.Game_Board_Windows import abilities_menu
 
 pygame.init()
 
@@ -177,8 +176,8 @@ def draw_tiles(screen):
                     draw_direction_lines(screen, battle, unit.direction, x, y, unit.position)
 
                     # Draw creatures
-                    draw_creatures(screen, unit, x, y, army.owner, TileObj.unit_index, battle,
-                                   TileObj.posxy)
+                    draw_creatures_funs.draw_creatures(screen, unit, x, y, army.owner, TileObj.unit_index, battle,
+                                                       TileObj.posxy)
 
             if TileObj.passing_army_id:
                 focus = TileObj.passing_army_id
@@ -192,8 +191,8 @@ def draw_tiles(screen):
                     draw_direction_lines(screen, battle, unit.direction, x, y, unit.position)
 
                     # Draw creatures
-                    draw_creatures(screen, unit, x, y, army.owner, TileObj.passing_unit_index, battle,
-                                   TileObj.posxy)
+                    draw_creatures_funs.draw_creatures(screen, unit, x, y, army.owner, TileObj.passing_unit_index,
+                                                       battle, TileObj.posxy)
 
 
 def draw_direction_lines(screen, b, direction, x, y, check_position):
@@ -256,419 +255,6 @@ def draw_direction_lines(screen, b, direction, x, y, check_position):
         points = [(2, 48), (0, 0), (48, 2)]
         points2 = [(x - 1 + x2) * 96 - 2, (y - 1 + y2) * 96 - 2]
         draw_lines_alpha(screen, LightYellow, False, points, points2)
-
-
-def draw_creatures(screen, unit, x, y, owner, unit_index, b, current_position):
-    side = "_l"
-    if unit.right_side:
-        side = "_r"
-
-    div_row = unit.rows - 1
-    if div_row == 0:
-        div_row = 1
-
-    div_number = unit.number - 1
-    if div_number == 0:
-        div_number = 1
-
-    x_appendix = 0
-    y_appendix = 0
-
-    if unit.direction == "E":
-        total = len(unit.crew)
-        index = 0
-        while index <= total - 1:
-
-            row = math.ceil((index + 1) / unit.number)
-            if (index + 1) % unit.number == 0:
-                line = unit.number
-            else:
-                line = (index + 1) % unit.number
-
-            if unit.number == 1:
-                y_appendix = 48 - unit.crew[index].img_height / 2
-            else:
-                x_appendix = (row - 1) * ((90 - unit.crew[index].img_width) / div_row)
-                y_appendix = (unit.number - line) * ((90 - unit.crew[index].img_height) / div_number)
-
-            creature_position = [(x - 1) * 96 + 4 + 90 - unit.crew[index].img_width - x_appendix
-                                 ,
-                                 (y - 1) * 96 + 4 + 90 - unit.crew[index].img_height - y_appendix
-                                 ]
-
-            xy_animation = [0, 0]
-            if b.primary == "Rotate":
-                xy_animation = anim_battle_unit_action.unit_rotate(b, unit, unit_index, owner, current_position,
-                                                                   creature_position, unit.number, row, line,
-                                                                   unit.crew[index].img_width,
-                                                                   unit.crew[index].img_height, unit.rows)
-            elif b.primary == "Move":
-                xy_animation = anim_battle_unit_action.unit_march(b, unit_index, current_position,
-                                                                  creature_position, unit.number, row, line,
-                                                                  unit.crew[index].img_width,
-                                                                  unit.crew[index].img_height, unit.rows,
-                                                                  owner)
-            elif b.primary == "Hit from above":
-                xy_animation = anim_battle_unit_action.unit_nosedive(b, unit_index, owner)
-
-            # New code
-            army_img = game_stats.gf_regiment_dict[unit.crew[index].img_source + "/" + unit.crew[index].img + side]
-            screen.blit(army_img,
-                        (creature_position[0] + xy_animation[0],
-                         creature_position[1] + xy_animation[1]))
-
-            draw_siege_machine(screen, unit, index, row, line, side, x, y, unit_index, current_position, b, owner)
-
-            index += 1
-
-    elif unit.direction == "W":
-        total = len(unit.crew)
-        index = 0
-        while index <= total - 1:
-            row = math.ceil((index + 1) / unit.number)
-            if (index + 1) % unit.number == 0:
-                line = unit.number
-            else:
-                line = (index + 1) % unit.number
-
-            if unit.number == 1:
-                y_appendix = 48 - unit.crew[index].img_height / 2
-            else:
-                x_appendix = (row - 1) * ((90 - unit.crew[index].img_width) / div_row)
-                y_appendix = (unit.number - line) * ((90 - unit.crew[index].img_height) / div_number)
-
-            creature_position = [(x - 1) * 96 + 4 +  # unit.crew[index].img_width +
-                                 x_appendix,
-                                 (y - 1) * 96 + 4 + 90 - unit.crew[index].img_height -
-                                 y_appendix]
-
-            xy_animation = [0, 0]
-            if b.primary == "Rotate":
-                xy_animation = anim_battle_unit_action.unit_rotate(b, unit, unit_index, owner, current_position,
-                                                                   creature_position, unit.number, row, line,
-                                                                   unit.crew[index].img_width,
-                                                                   unit.crew[index].img_height, unit.rows)
-            elif b.primary == "Move":
-                xy_animation = anim_battle_unit_action.unit_march(b, unit_index, current_position, creature_position,
-                                                                  unit.number, row, line, unit.crew[index].img_width,
-                                                                  unit.crew[index].img_height, unit.rows, owner)
-
-            elif b.primary == "Hit from above":
-                xy_animation = anim_battle_unit_action.unit_nosedive(b, unit_index, owner)
-
-            # New code
-            army_img = game_stats.gf_regiment_dict[unit.crew[index].img_source + "/" + unit.crew[index].img + side]
-            screen.blit(army_img,
-                        (creature_position[0] + xy_animation[0],
-                         creature_position[1] + xy_animation[1]))
-
-            draw_siege_machine(screen, unit, index, row, line, side, x, y, unit_index, current_position, b, owner)
-
-            index += 1
-
-    elif unit.direction == "N":
-        total = len(unit.crew)
-        index = 0
-        while index <= total - 1:
-            row = math.ceil((index + 1) / unit.number)
-            if (index + 1) % unit.number == 0:
-                line = unit.number
-            else:
-                line = (index + 1) % unit.number
-
-            if unit.number == 1:
-                x_appendix = 48 - unit.crew[index].img_width / 2
-            else:
-                x_appendix = (unit.number - line) * ((90 - unit.crew[index].img_width) / div_number)
-                y_appendix = (row - 1) * ((90 - unit.crew[index].img_height) / div_row)
-
-            creature_position = [(x - 1) * 96 + 4 +  # unit.crew[index].img_width +
-                                 x_appendix,
-                                 (y - 1) * 96 + 4 +  # 90 - unit.crew[index].img_height -
-                                 y_appendix]
-
-            xy_animation = [0, 0]
-            if b.primary == "Rotate":
-                xy_animation = anim_battle_unit_action.unit_rotate(b, unit, unit_index, owner, current_position,
-                                                                   creature_position, unit.number, row, line,
-                                                                   unit.crew[index].img_width,
-                                                                   unit.crew[index].img_height, unit.rows)
-            elif b.primary == "Move":
-                xy_animation = anim_battle_unit_action.unit_march(b, unit_index, current_position, creature_position,
-                                                                  unit.number, row, line, unit.crew[index].img_width,
-                                                                  unit.crew[index].img_height, unit.rows, owner)
-
-            elif b.primary == "Hit from above":
-                xy_animation = anim_battle_unit_action.unit_nosedive(b, unit_index, owner)
-
-            # New code
-            army_img = game_stats.gf_regiment_dict[unit.crew[index].img_source + "/" + unit.crew[index].img + side]
-            screen.blit(army_img,
-                        (creature_position[0] + xy_animation[0],
-                         creature_position[1] + xy_animation[1]))
-
-            draw_siege_machine(screen, unit, index, row, line, side, x, y, unit_index, current_position, b, owner)
-
-            index += 1
-
-    elif unit.direction == "S":
-        total = len(unit.crew)
-        index = int(len(unit.crew) - 1)
-        while index >= 0:
-            row = math.ceil((index + 1) / unit.number)
-            if (index + 1) % unit.number == 0:
-                line = unit.number
-            else:
-                line = (index + 1) % unit.number
-
-            if unit.number == 1:
-                x_appendix = 48 - unit.crew[index].img_width / 2
-            else:
-                x_appendix = (unit.number - line) * ((90 - unit.crew[index].img_width) / div_number)
-                y_appendix = (row - 1) * ((90 - unit.crew[index].img_height) / div_row)
-
-            creature_position = [(x - 1) * 96 + 4 +  # unit.crew[index].img_width +
-                                 x_appendix,
-                                 (y - 1) * 96 + 4 + 90 - unit.crew[index].img_height -
-                                 y_appendix]
-
-            xy_animation = [0, 0]
-            if b.primary == "Rotate":
-                xy_animation = anim_battle_unit_action.unit_rotate(b, unit, unit_index, owner, current_position,
-                                                                   creature_position, unit.number, row, line,
-                                                                   unit.crew[index].img_width,
-                                                                   unit.crew[index].img_height, unit.rows)
-            elif b.primary == "Move":
-                xy_animation = anim_battle_unit_action.unit_march(b, unit_index, current_position, creature_position,
-                                                                  unit.number, row, line, unit.crew[index].img_width,
-                                                                  unit.crew[index].img_height, unit.rows, owner)
-
-            elif b.primary == "Hit from above":
-                xy_animation = anim_battle_unit_action.unit_nosedive(b, unit_index, owner)
-
-            # New code
-            army_img = game_stats.gf_regiment_dict[unit.crew[index].img_source + "/" + unit.crew[index].img + side]
-            screen.blit(army_img,
-                        (creature_position[0] + xy_animation[0],
-                         creature_position[1] + xy_animation[1]))
-
-            draw_siege_machine(screen, unit, index, row, line, side, x, y, unit_index, current_position, b, owner)
-
-            index -= 1
-
-    elif unit.direction == "NE":
-        total = len(unit.crew)
-        index = 0
-        while index <= total - 1:
-            row = math.ceil((index + 1) / unit.number)
-            if (index + 1) % unit.number == 0:
-                line = unit.number
-            else:
-                line = (index + 1) % unit.number
-
-            if unit.number == 1:
-                x_appendix = - (unit.crew[index].img_width / 2)
-                y_appendix = unit.crew[index].img_height / 2
-            else:
-                x_appendix = (row - 1) * (48 / div_row) - (line - 1) * (40 / div_number)
-                y_appendix = (unit.number - line) * (48 / div_number) - (row - 1) * (40 / div_row)
-
-            creature_position = [(x - 1) * 96 + 48 - (unit.crew[index].img_width / 2) - x_appendix,
-                                 (y - 1) * 96 + 48 - (unit.crew[index].img_height / 2) - y_appendix]
-
-            xy_animation = [0, 0]
-            if b.primary == "Rotate":
-                xy_animation = anim_battle_unit_action.unit_rotate(b, unit, unit_index, owner, current_position,
-                                                                   creature_position, unit.number, row, line,
-                                                                   unit.crew[index].img_width,
-                                                                   unit.crew[index].img_height, unit.rows)
-            elif b.primary == "Move":
-                xy_animation = anim_battle_unit_action.unit_march(b, unit_index, current_position, creature_position,
-                                                                  unit.number, row, line, unit.crew[index].img_width,
-                                                                  unit.crew[index].img_height, unit.rows, owner)
-
-            elif b.primary == "Hit from above":
-                xy_animation = anim_battle_unit_action.unit_nosedive(b, unit_index, owner)
-
-            # New code
-            army_img = game_stats.gf_regiment_dict[unit.crew[index].img_source + "/" + unit.crew[index].img + side]
-            screen.blit(army_img,
-                        (creature_position[0] + xy_animation[0],
-                         creature_position[1] + xy_animation[1]))
-
-            draw_siege_machine(screen, unit, index, row, line, side, x, y, unit_index, current_position, b, owner)
-
-            index += 1
-
-    elif unit.direction == "NW":
-        total = len(unit.crew)
-        index = 0
-        while index <= total - 1:
-            row = math.ceil((index + 1) / unit.number)
-            if (index + 1) % unit.number == 0:
-                line = unit.number
-            else:
-                line = (index + 1) % unit.number
-
-            if unit.number == 1:
-                x_appendix = - (unit.crew[index].img_width / 2)
-                y_appendix = unit.crew[index].img_height / 2
-            else:
-                x_appendix = (row - 1) * (48 / div_row) - (line - 1) * (40 / div_number)
-                y_appendix = (unit.number - line) * (48 / div_number) - (row - 1) * (40 / div_row)
-
-            creature_position = [(x - 1) * 96 + 48 - (unit.crew[index].img_width / 2) + x_appendix,
-                                 (y - 1) * 96 + 48 - (unit.crew[index].img_height / 2) - y_appendix]
-
-            xy_animation = [0, 0]
-            if b.primary == "Rotate":
-                xy_animation = anim_battle_unit_action.unit_rotate(b, unit, unit_index, owner, current_position,
-                                                                   creature_position, unit.number, row, line,
-                                                                   unit.crew[index].img_width,
-                                                                   unit.crew[index].img_height, unit.rows)
-            elif b.primary == "Move":
-                xy_animation = anim_battle_unit_action.unit_march(b, unit_index, current_position, creature_position,
-                                                                  unit.number, row, line, unit.crew[index].img_width,
-                                                                  unit.crew[index].img_height, unit.rows, owner)
-
-            elif b.primary == "Hit from above":
-                xy_animation = anim_battle_unit_action.unit_nosedive(b, unit_index, owner)
-
-            # New code
-            army_img = game_stats.gf_regiment_dict[unit.crew[index].img_source + "/" + unit.crew[index].img + side]
-            screen.blit(army_img,
-                        (creature_position[0] + xy_animation[0],
-                         creature_position[1] + xy_animation[1]))
-
-            draw_siege_machine(screen, unit, index, row, line, side, x, y, unit_index, current_position, b, owner)
-
-            index += 1
-
-    elif unit.direction == "SE":
-        total = len(unit.crew)
-        index = int(len(unit.crew) - 1)
-        while index >= 0:
-            row = math.ceil((index + 1) / unit.number)
-            if (index + 1) % unit.number == 0:
-                line = unit.number
-            else:
-                line = (index + 1) % unit.number
-
-            if unit.number == 1:
-                x_appendix = - (unit.crew[index].img_width / 2)
-                y_appendix = unit.crew[index].img_height / 2
-            else:
-                x_appendix = (row - 1) * (48 / div_row) - (line - 1) * (40 / div_number)
-                y_appendix = (unit.number - line) * (48 / div_number) - (row - 1) * (40 / div_row)
-
-            creature_position = [(x - 1) * 96 + 48 - (unit.crew[index].img_width / 2) - x_appendix,
-                                 (y - 1) * 96 + 48 - (unit.crew[index].img_height / 2) + y_appendix]
-
-            xy_animation = [0, 0]
-            if b.primary == "Rotate":
-                xy_animation = anim_battle_unit_action.unit_rotate(b, unit, unit_index, owner, current_position,
-                                                                   creature_position, unit.number, row, line,
-                                                                   unit.crew[index].img_width,
-                                                                   unit.crew[index].img_height, unit.rows)
-            elif b.primary == "Move":
-                xy_animation = anim_battle_unit_action.unit_march(b, unit_index, current_position, creature_position,
-                                                                  unit.number, row, line, unit.crew[index].img_width,
-                                                                  unit.crew[index].img_height, unit.rows, owner)
-
-            elif b.primary == "Hit from above":
-                xy_animation = anim_battle_unit_action.unit_nosedive(b, unit_index, owner)
-
-            # New code
-            army_img = game_stats.gf_regiment_dict[unit.crew[index].img_source + "/" + unit.crew[index].img + side]
-            screen.blit(army_img,
-                        (creature_position[0] + xy_animation[0],
-                         creature_position[1] + xy_animation[1]))
-
-            draw_siege_machine(screen, unit, index, row, line, side, x, y, unit_index, current_position, b, owner)
-
-            index -= 1
-
-    elif unit.direction == "SW":
-        total = len(unit.crew)
-        index = int(len(unit.crew) - 1)
-        while index >= 0:
-            row = math.ceil((index + 1) / unit.number)
-            if (index + 1) % unit.number == 0:
-                line = unit.number
-            else:
-                line = (index + 1) % unit.number
-
-            if unit.number == 1:
-                x_appendix = unit.crew[index].img_width / 2
-                y_appendix = unit.crew[index].img_height / 2
-            else:
-                x_appendix = (row - 1) * (48 / div_row) - (line - 1) * (40 / div_number)
-                y_appendix = (unit.number - line) * (48 / div_number) - (row - 1) * (40 / div_row)
-
-            creature_position = [(x - 1) * 96 + 48 - (unit.crew[index].img_width / 2) + x_appendix,
-                                 (y - 1) * 96 + 48 - (unit.crew[index].img_height / 2) + y_appendix]
-
-            xy_animation = [0, 0]
-            if b.primary == "Rotate":
-                xy_animation = anim_battle_unit_action.unit_rotate(b, unit, unit_index, owner, current_position,
-                                                                   creature_position, unit.number, row, line,
-                                                                   unit.crew[index].img_width,
-                                                                   unit.crew[index].img_height, unit.rows)
-            elif b.primary == "Move":
-                xy_animation = anim_battle_unit_action.unit_march(b, unit_index, current_position, creature_position,
-                                                                  unit.number, row, line, unit.crew[index].img_width,
-                                                                  unit.crew[index].img_height, unit.rows, owner)
-
-            elif b.primary == "Hit from above":
-                xy_animation = anim_battle_unit_action.unit_nosedive(b, unit_index, owner)
-
-            # New code
-            army_img = game_stats.gf_regiment_dict[unit.crew[index].img_source + "/" + unit.crew[index].img + side]
-            screen.blit(army_img,
-                        (creature_position[0] + xy_animation[0],
-                         creature_position[1] + xy_animation[1]))
-
-            draw_siege_machine(screen, unit, index, row, line, side, x, y, unit_index, current_position, b, owner)
-
-            index -= 1
-
-    if owner != "Neutral":  # Draw flag
-        power = common_selects.select_realm_by_name(owner)
-        xy_animation = [0, 0]  # Temporary, delete this when animation would be implemented
-
-        if b.tile_trail is not None and unit.position == b.queue[0].position:
-            # print("x - " + str(x) + ", y - " + str(y))
-            spread = (b.battle_display_time / 1000 - b.battle_last_change) / 1
-            new_x = int(b.tile_trail[0][0]) - int(b.battle_pov[0])
-            new_y = int(b.tile_trail[0][1]) - int(b.battle_pov[1])
-            xy_animation[0] = (new_x - int(x)) * spread * 96
-            xy_animation[1] = (new_y - int(y)) * spread * 96
-            # print("b.tile_trail - " + str(b.tile_trail))
-            # print("xy_animation - " + str(xy_animation))
-
-        xb = (x - 1) * 96
-        yb = (y - 1) * 96
-        flags.battlefield_flag(screen, xb, yb, xy_animation[0], xy_animation[1], FlagpoleColor,
-                               FlagColors[power.f_color], FlagColors[power.s_color])
-
-    # Blink red color over unit during fight
-    if b.primary in ["Melee attack", "Counterattack", "Ranged attack"]:
-        anim_battle_effects.damage_dealt_red(screen, b, current_position)
-
-    # Blink white during buffing cast
-    elif b.primary == "Pass" or b.primary == "Pass1":
-        # print("Pass")
-        if ability_catalog.ability_cat[b.selected_ability].anim_effect == "buff":
-            # print("buff")
-            # print("current_position - " + str(current_position))
-            # print("b.selected_tile - " + str(b.selected_tile))
-            if list(current_position) == b.selected_tile:
-                # print("current_position - " + str(current_position))
-                anim_battle_effects.white_buff_effect(screen, b, current_position)
-
-        elif ability_catalog.ability_cat[b.selected_ability].anim_effect == "damage spell":
-            if list(current_position) == b.selected_tile:
-                anim_battle_effects.spell_effect(screen, b, current_position)
 
 
 def draw_siege_machine(screen, unit, index, row, line, side, x , y, unit_index, current_position, b, owner):
@@ -1052,149 +638,6 @@ def battle_end_window(screen, b):
     screen.blit(text_panel5, [625, 135])
 
 
-def ability_menu_window(screen, b):
-    pygame.draw.polygon(screen, MainMenuColor, [[181, 101], [1100, 101], [1100, 600], [181, 600]])
-
-    # Close window button
-    pygame.draw.polygon(screen, CancelFieldColor, [[1076, 106], [1095, 106], [1095, 125], [1076, 125]])
-    pygame.draw.polygon(screen, CancelElementsColor, [[1076, 106], [1095, 106], [1095, 125], [1076, 125]], 2)
-    pygame.draw.line(screen, CancelElementsColor, [1079, 109], [1092, 122], 2)
-    pygame.draw.line(screen, CancelElementsColor, [1079, 122], [1092, 109], 2)
-
-    # Ability school
-    text_panel1 = tnr_font20.render("Ability school", True, TitleText)
-    screen.blit(text_panel1, [188, 103])
-
-    y_points = 0
-    y_shift = 44
-
-    for school in b.list_of_schools:
-        # Background
-        pygame.draw.polygon(screen, FillButton,
-                            [[232, 128 + y_shift * y_points],
-                             [430, 128 + y_shift * y_points],
-                             [430, 167 + y_shift * y_points],
-                             [232, 167 + y_shift * y_points]])
-
-        if b.selected_school == school:
-            # White border
-            pygame.draw.polygon(screen, WhiteBorder, [[232, 128 + y_shift * y_points],
-                                                      [430, 128 + y_shift * y_points],
-                                                      [430, 167 + y_shift * y_points],
-                                                      [232, 167 + y_shift * y_points]], 2)
-
-        # School's icon
-        back_img = game_stats.gf_misc_img_dict["Icons/paper_3_square_40"]
-        screen.blit(back_img, [188, 128 + y_shift * y_points])
-
-        school_img = game_stats.gf_misc_img_dict["Schools/" + school_imgs[school]]
-        screen.blit(school_img, [188, 128 + y_shift * y_points])
-
-        # School name
-        text_panel1 = arial_font20.render(school, True, DarkText)
-        screen.blit(text_panel1, [236, 135 + y_shift * y_points])
-
-        y_points += 1
-
-    # Buttons - previous and next ability school
-    pygame.draw.polygon(screen, RockTunel, [[432, 128], [451, 128], [451, 147], [432, 147]])
-    pygame.draw.polygon(screen, LineMainMenuColor1, [[432, 128], [451, 128], [451, 147], [432, 147]], 2)
-    pygame.draw.lines(screen, LineMainMenuColor1, False, [(436, 144), (442, 131), (448, 144)], 2)
-
-    pygame.draw.polygon(screen, RockTunel, [[432, 579], [451, 579], [451, 598], [432, 598]])
-    pygame.draw.polygon(screen, LineMainMenuColor1, [[432, 579], [451, 579], [451, 598], [432, 598]], 2)
-    pygame.draw.lines(screen, LineMainMenuColor1, False, [(436, 582), (442, 596), (448, 582)], 2)
-
-    # Ability school
-    text_panel1 = tnr_font20.render("Abilities", True, TitleText)
-    screen.blit(text_panel1, [456, 103])
-
-    y_points = 0
-    y_shift = 44
-
-    for ability_name in b.list_of_abilities:
-        # Background
-        pygame.draw.polygon(screen, FillButton,
-                            [[500, 128 + y_shift * y_points],
-                             [698, 128 + y_shift * y_points],
-                             [698, 167 + y_shift * y_points],
-                             [500, 167 + y_shift * y_points]])
-
-        if b.selected_ability == ability_name:
-            # White border
-            pygame.draw.polygon(screen, WhiteBorder, [[500, 128 + y_shift * y_points],
-                                                      [698, 128 + y_shift * y_points],
-                                                      [698, 167 + y_shift * y_points],
-                                                      [500, 167 + y_shift * y_points]], 2)
-
-        # Ability's icon
-        back_img = game_stats.gf_misc_img_dict["Icons/paper_3_square_40"]
-        screen.blit(back_img, [456, 128 + y_shift * y_points])
-
-        img = ability_catalog.ability_cat[ability_name].img
-        img_source = ability_catalog.ability_cat[ability_name].img_source
-        ability_img = game_stats.gf_misc_img_dict[img_source + img]
-        screen.blit(ability_img, [456, 128 + y_shift * y_points])
-
-        # Ability name
-        text_panel1 = arial_font20.render(ability_name, True, DarkText)
-        screen.blit(text_panel1, [504, 135 + y_shift * y_points])
-
-        y_points += 1
-
-    # Buttons - previous and next ability
-    pygame.draw.polygon(screen, RockTunel, [[700, 128], [719, 128], [719, 147], [700, 147]])
-    pygame.draw.polygon(screen, LineMainMenuColor1, [[700, 128], [719, 128], [719, 147], [700, 147]], 2)
-    pygame.draw.lines(screen, LineMainMenuColor1, False, [(704, 144), (710, 131), (716, 144)], 2)
-
-    pygame.draw.polygon(screen, RockTunel, [[700, 579], [719, 579], [719, 598], [700, 598]])
-    pygame.draw.polygon(screen, LineMainMenuColor1, [[700, 579], [719, 579], [719, 598], [700, 598]], 2)
-    pygame.draw.lines(screen, LineMainMenuColor1, False, [(704, 582), (710, 596), (716, 582)], 2)
-
-    # Description
-    text_panel1 = tnr_font20.render("Description", True, TitleText)
-    screen.blit(text_panel1, [728, 103])
-
-    y_points2 = 0
-    y_shift2 = 20
-
-    for text_line in b.ability_description:
-        text_panel1 = arial_font14.render(text_line, True, DarkText)
-        screen.blit(text_panel1, [728, 127 + y_points2 * y_shift2])
-
-        y_points2 += 1
-
-    # Button - Execute
-    pygame.draw.polygon(screen, FillButton,
-                        [[970, 106], [1070, 106], [1070, 125], [970, 125]])
-    if b.available_mana_reserve >= ability_catalog.ability_cat[b.selected_ability].mana_cost:
-        color1 = HighlightOption
-    else:
-        color1 = LineMainMenuColor1
-    pygame.draw.polygon(screen, color1, [[970, 106], [1070, 106], [1070, 125], [970, 125]], 2)
-
-    text_panel1 = arial_font16.render("Execute", True, DarkText)
-    screen.blit(text_panel1, [995, 107])
-
-    text_panel1 = arial_font16.render("Mana reserve", True, TitleText)
-    screen.blit(text_panel1, [971, 127])
-
-    ability_img = game_stats.gf_misc_img_dict["Icons/mana_icon"]
-    screen.blit(ability_img, [971, 148])
-
-    text_panel1 = arial_font16.render(str(b.available_mana_reserve), True, TitleText)
-    screen.blit(text_panel1, [995, 147])
-
-    text_panel1 = arial_font16.render("Mana cost", True, TitleText)
-    screen.blit(text_panel1, [971, 167])
-
-    ability_img = game_stats.gf_misc_img_dict["Icons/mana_icon"]
-    screen.blit(ability_img, [971, 188])
-
-    text_panel1 = arial_font16.render(str(ability_catalog.ability_cat[b.selected_ability].mana_cost), True, TitleText)
-    screen.blit(text_panel1, [995, 187])
-
-
 def siege_equipment_menu_window(screen, b):
     pygame.draw.polygon(screen, MainMenuColor, [[441, 201], [840, 201], [840, 500], [441, 500]])
 
@@ -1339,17 +782,6 @@ def battle_screen(screen):
     # Draw additional window
     if b.battle_window:
         additional_windows[b.battle_window](screen, b)
-    # if b.battle_window == "Regiment info":
-    #     battle_regiment_information.regiment_info_window(screen, b)
-    #
-    # elif b.battle_window == "Battle end window":
-    #     battle_end_window(screen, b)
-    #
-    # elif b.battle_window == "Ability menu":
-    #     ability_menu_window(screen, b)
-    #
-    # elif b.battle_window == "Siege equipment menu":
-    #     siege_equipment_menu_window(screen, b)
 
     if game_stats.fps_status:
         text_panel = tnr_font20.render(str(game_stats.fps), True, TitleText)
@@ -1474,5 +906,5 @@ school_imgs = {"Overall" : "everything",
 
 additional_windows = {"Regiment info" : battle_regiment_information.regiment_info_window,
                       "Battle end window" : battle_end_window,
-                      "Ability menu" : ability_menu_window,
+                      "Abilities menu" : abilities_menu.abilities_menu_window,
                       "Siege equipment menu" : siege_equipment_menu_window}

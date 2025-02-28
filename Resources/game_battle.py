@@ -80,12 +80,10 @@ def advance_queue(b):  # b - stands for Battle
         list_of_effect_cards = sorted(list_of_effect_cards, reverse=True)
         index_list = []
         for element in list_of_effect_cards:
-            for army in game_obj.game_armies:
-                if army.army_id == b.queue[element].army_id:
-                    for effect in army.units[b.queue[element].number].effects:
-                        if effect.name == b.queue[element].title:
-                            army.units[b.queue[element].number].effects.remove(effect)
-                    break
+            army = common_selects.select_army_by_id(b.queue[element].army_id)
+            for effect in army.units[b.queue[element].number].effects:
+                if effect.name == b.queue[element].title:
+                    army.units[b.queue[element].number].effects.remove(effect)
             index_list.append(element)
 
         common_lists.reversed_list_cleaning(b.queue, index_list)
@@ -104,6 +102,11 @@ def advance_queue(b):  # b - stands for Battle
 
     print("b.realm_in_control - " + str(b.realm_in_control) + " b.attacker_realm - " + str(b.attacker_realm) +
           " b.defender_realm - " + str(b.defender_realm) + " b.enemy - " + str(b.enemy))
+
+    if b.attacker_id == b.queue[0].army_id:
+        b.enemy_army_id = b.defender_id
+    else:
+        b.enemy_army_id = b.attacker_id
 
     if b.realm_in_control == game_stats.player_power:
         b.ready_to_act = True
@@ -1498,8 +1501,9 @@ def calculate_speed(unit, acting_hero):
 
 
 def check_if_no_one_left_alive(b):
-    # print("check_if_no_one_left_alive()")
     print("")
+    print("check_if_no_one_left_alive()")
+    print("b.enemy_army_id - " + str(b.enemy_army_id))
     alive = False
     army = common_selects.select_army_by_id(b.enemy_army_id)
     for unit in army.units:

@@ -1,5 +1,5 @@
 ## Among Myth and Wonder
-    ## battle_regiment_information
+## battle_regiment_information
 
 import pygame.draw
 import pygame.font
