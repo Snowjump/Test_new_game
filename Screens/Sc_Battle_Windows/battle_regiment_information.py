@@ -71,45 +71,45 @@ def regiment_information_draw(screen, b):
         screen.blit(text_panel, [682, 105])
 
     # Amount
-    text_panel = arial_font16.render("Amount - " + str(b.unit_info.amount), True, TitleText)
+    text_panel = arial_font16.render("Amount ‒ " + str(b.unit_info.amount), True, TitleText)
     screen.blit(text_panel, [646, 125])
 
     # Total HP left
-    text_panel = arial_font16.render("Hit points - " + str(b.unit_info.total_HP), True, TitleText)
+    text_panel = arial_font16.render("Hit points ‒ " + str(b.unit_info.total_HP), True, TitleText)
     screen.blit(text_panel, [646, 145])
 
     # Current morale
-    text_panel = arial_font16.render("Morale - " + str(b.unit_info.morale), True, TitleText)
+    text_panel = arial_font16.render("Morale ‒ " + str(b.unit_info.morale), True, TitleText)
     screen.blit(text_panel, [646, 165])
 
     # Base health of single creature
-    text = "Max health - " + str(b.unit_info.health)
+    text = "Max health ‒ " + str(b.unit_info.health)
     if game_stats.detailed_regiment_info:
         text += "   (" + str(b.unit_info.base_health) + " + " + str(b.unit_info.health - b.unit_info.base_health) + ")"
     text_panel = arial_font16.render(text, True, TitleText)
     screen.blit(text_panel, [646, 185])
 
     # Leadership
-    text_panel = arial_font16.render("Leadership - " + str(b.unit_info.leadership), True, TitleText)
+    text_panel = arial_font16.render("Leadership ‒ " + str(b.unit_info.leadership), True, TitleText)
     screen.blit(text_panel, [646, 205])
 
     # Regiment's experience
-    text_panel = arial_font16.render("Experience - " + str(b.unit_info.experience), True, TitleText)
+    text_panel = arial_font16.render("Experience ‒ " + str(b.unit_info.experience), True, TitleText)
     screen.blit(text_panel, [646, 225])
 
     # Speed
-    text_panel = arial_font16.render("Speed - " + str(b.unit_info.speed), True, TitleText)
+    text_panel = arial_font16.render("Speed ‒ " + str(b.unit_info.speed), True, TitleText)
     screen.blit(text_panel, [646, 245])
 
     # Armour
-    text = "Armour - " + str(b.unit_info.final_armour)
+    text = "Armour ‒ " + str(b.unit_info.final_armour)
     if game_stats.detailed_regiment_info:
         text += "   (" + str(b.unit_info.armour) + " + " + str(b.unit_info.final_armour - b.unit_info.armour) + ")"
     text_panel = arial_font16.render(text, True, TitleText)
     screen.blit(text_panel, [646, 265])
 
     # Defence
-    text = "Defence - " + str(b.unit_info.final_defence)
+    text = "Defence ‒ " + str(b.unit_info.final_defence)
     if game_stats.detailed_regiment_info:
         text += "   (" + str(b.unit_info.defence) + " + " + str(b.unit_info.final_defence - b.unit_info.defence) + ")"
     text_panel = arial_font16.render(text, True, TitleText)
@@ -117,11 +117,11 @@ def regiment_information_draw(screen, b):
 
     # Magic power
     if b.unit_info.magic_power > 0:
-        text_panel = arial_font16.render("Magic power - " + str(b.unit_info.magic_power), True, TitleText)
+        text_panel = arial_font16.render("Magic power ‒ " + str(b.unit_info.magic_power), True, TitleText)
         screen.blit(text_panel, [646, 305])
 
         # Mana reserve
-        text_panel = arial_font16.render("Mana reserve - " + str(b.unit_info.mana_reserve) + "/"
+        text_panel = arial_font16.render("Mana reserve ‒ " + str(b.unit_info.mana_reserve) + "/"
                                          + str(b.unit_info.max_mana_reserve), True, TitleText)
         screen.blit(text_panel, [646, 325])
 
@@ -147,20 +147,20 @@ def attacks_abilities_information_draw(screen, b, ybase):
         dmg_text = str(b.attack_info.min_dmg)
         if b.attack_info.min_dmg < b.attack_info.max_dmg:
             dmg_text += " - " + str(b.attack_info.max_dmg)
-        text_panel = arial_font16.render("Damage - " + dmg_text, True, TitleText)
+        text_panel = arial_font16.render("Damage ‒ " + dmg_text, True, TitleText)
         screen.blit(text_panel, [646, ybase + 40])
 
         # Mastery level
-        text_panel = arial_font16.render("Mastery - " + str(b.attack_info.mastery), True, TitleText)
+        text_panel = arial_font16.render("Mastery ‒ " + str(b.attack_info.mastery), True, TitleText)
         screen.blit(text_panel, [646, ybase + 60])
 
         # Effective range
         if b.attack_info.effective_range > 0:
-            text_panel = arial_font16.render("Effective range - " + str(b.attack_info.effective_range), True, TitleText)
+            text_panel = arial_font16.render("Effective range ‒ " + str(b.attack_info.effective_range), True, TitleText)
             screen.blit(text_panel, [646, ybase + 80])
 
             # Range limit
-            text_panel = arial_font16.render("Range limit - " + str(b.attack_info.range_limit), True, TitleText)
+            text_panel = arial_font16.render("Range limit ‒ " + str(b.attack_info.range_limit), True, TitleText)
             screen.blit(text_panel, [646, ybase + 100])
 
         # Tags

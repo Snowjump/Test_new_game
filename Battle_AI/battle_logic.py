@@ -18,8 +18,8 @@ def manage_unit(b, acting_army, enemy_army, acting_unit, acting_hero):
     enemy_army_id = enemy_army.army_id
     card = b.queue[0]
     print("manage_unit() b.queue[0]: " + str(card.obj_type) + " " + str(card.owner))
-    if acting_hero:
-        print("manage_unit: " + acting_hero.hero_class + " " + acting_hero.name)
+    # if acting_hero:
+    #     print("manage_unit: " + acting_hero.hero_class + " " + acting_hero.name)
 
     if card.obj_type == "Regiment":
 
@@ -40,7 +40,7 @@ def manage_unit(b, acting_army, enemy_army, acting_unit, acting_hero):
 
             else:
                 ranged_AI.manage_ranged(b, acting_unit, own_army_id, enemy_army_id, own_melee, own_ranged, enemy_melee,
-                                        enemy_ranged, enemy_units)
+                                        enemy_ranged, enemy_units, acting_hero, enemy_army.hero)
 
             # # Wait
             # b.AI_ready = False
@@ -55,7 +55,7 @@ def manage_unit(b, acting_army, enemy_army, acting_unit, acting_hero):
 
             else:
                 hybrid_AI.manage_hybrid(b, acting_unit, own_army_id, enemy_army_id, own_melee, own_ranged, enemy_melee,
-                                        enemy_ranged, enemy_units)
+                                        enemy_ranged, enemy_units, acting_hero, enemy_army.hero)
 
         elif "melee" in unit.reg_tags:
             if route_true:
@@ -65,7 +65,7 @@ def manage_unit(b, acting_army, enemy_army, acting_unit, acting_hero):
 
             else:
                 melee_AI.manage_melee(b, acting_unit, own_army_id, enemy_army_id, own_melee, own_ranged, enemy_melee,
-                                      enemy_ranged, enemy_units, acting_hero)
+                                      enemy_ranged, enemy_units, acting_hero, enemy_army.hero)
 
             # # Wait
             # b.AI_ready = False
@@ -80,7 +80,7 @@ def manage_unit(b, acting_army, enemy_army, acting_unit, acting_hero):
 
             else:
                 caster_AI.manage_caster(b, acting_unit, own_army_id, enemy_army_id, own_melee, own_ranged, enemy_melee,
-                                        enemy_ranged, enemy_units)
+                                        enemy_ranged, enemy_units, acting_army, enemy_army, enemy_army.hero)
 
     elif card.obj_type == "Hero":
         hero_AI.manage_hero(b, acting_hero, acting_army, enemy_army, own_units)

@@ -20,10 +20,10 @@ from Resources import graphics_obj
 
 from Screens.Sc_Battle import anim_battle_effects
 from Screens.Sc_Battle import anim_battle_unit_action
+from Screens.Sc_Battle import anim_battle_message
 from Screens.Sc_Battle import draw_creatures_funs
 
-from Screens.Game_Board_Windows import battle_regiment_information
-from Screens.Game_Board_Windows import abilities_menu
+from Screens.Sc_Battle_Windows import abilities_menu, battle_regiment_information
 
 pygame.init()
 
@@ -684,6 +684,8 @@ def battle_screen(screen):
 
     for obj in graphics_obj.battle_objects:
         obj.draw_panel(screen)
+        for button in obj.buttons:
+            button.draw_text_button(screen)
         # print(obj.name)
 
     if b.stage == "Formation":
@@ -777,7 +779,8 @@ def battle_screen(screen):
                 change_cursor(screen, b, unit)
 
         if b.anim_message:
-            anim_battle_effects.message_float(screen, b)
+            anim_battle_message.manage_messages(screen, b)
+            # anim_battle_effects.message_float(screen, b)
 
     # Draw additional window
     if b.battle_window:

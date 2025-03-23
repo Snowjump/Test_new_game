@@ -4,7 +4,6 @@
 import math
 import pygame
 import random
-import sys
 
 from Resources import game_obj
 from Resources import game_stats
@@ -14,23 +13,21 @@ from Resources import game_basic
 from Resources import graphics_basic
 from Resources import graphics_obj
 from Resources import algo_movement_range
-from Resources import battle_abilities_hero
-from Resources import battle_abilities_regiment
 from Resources import update_gf_game_board
-from Resources import update_gf_battle
 from Resources import game_pathfinding
 from Resources import common_selects
 from Resources.Game_Battle import hit_funs
 
-from Content import ability_catalog
-from Content import ability_desc_cat_hero
-from Content import ability_desc_cat_regiment
+from Content.Abilities import ability_desc_cat_regiment
 from Content import battle_result_scripts
 from Content import exploration_catalog
 from Content import reward_catalog
 from Content import siege_warfare_catalog
 
 from Content.Quests import knight_lords_quest_result_scripts
+
+from Surfaces.Sf_Battle import ability_menu_funs
+from Surfaces.Sf_Battle import battle_surface_m1_funs
 
 from Strategy_AI import strategy_logic
 
@@ -108,7 +105,11 @@ def battle_surface_m1(position):
 
     b.button_pressed = False
 
-    if b.stage == "Formation":
+    # Click on interface elements
+    battle_surface_m1_funs.manage_clicks(position, b)
+    print("1) b.button_pressed - " + str(b.button_pressed))
+
+    if b.stage == "Formation" and not b.button_pressed:
         # Buttons
         button_numb = 0
         for square in formation_button_zone:
@@ -148,7 +149,7 @@ def battle_surface_m1(position):
 
                     b.button_pressed = True
 
-    elif b.stage == "Fighting":
+    elif b.stage == "Fighting" and not b.button_pressed:
         # Buttons
         # print(b.stage == "Fighting")
         button_numb = 0
@@ -185,97 +186,18 @@ def battle_surface_m1(position):
                     square1 = [187, 127, 431, 600]  # Ability school selection
                     if square[0] < position[0] < square[2] and square[1] < position[1] < square[3]:
                         # Select ability
-                        y_axis = position[1]
-                        y_axis -= 127
-                        print("y_axis - " + str(y_axis))
-                        if y_axis % 44 <= 40:
-                            y_axis = math.ceil(y_axis / 44)
-                            print("index - " + str(y_axis))
-                            hero = None
-                            the_unit = None
-                            army = common_selects.select_army_by_id(b.queue[0].army_id)
-                            if b.queue[0].obj_type == "Regiment":
-                                the_unit = army.units[b.queue[0].number]
-                            elif b.queue[0].obj_type == "Hero":
-                                hero = army.hero
-                            # if y_axis <= len(hero.abilities):
-                            if y_axis <= len(b.list_of_abilities):
-                                b.selected_ability = str(b.list_of_abilities[y_axis - 1])
-                                # b.selected_ability = str(hero.abilities[y_axis - 1])
-                                if b.queue[0].obj_type == "Hero":
-                                    b.ability_description = ability_desc_cat_hero.script_cat[b.selected_ability](hero)
-                                elif b.queue[0].obj_type == "Regiment":
-                                    b.ability_description = ability_desc_cat_regiment.script_cat[b.selected_ability](the_unit)
+                        ability_menu_funs.prepare_selecting_ability(b, position)
 
                     elif square1[0] < position[0] < square1[2] and square1[1] < position[1] < square1[3]:
                         # Select ability school
-                        y_axis = position[1]
-                        y_axis -= 127
-                        print("y_axis - " + str(y_axis))
-                        if y_axis % 44 <= 40:
-                            y_axis = math.ceil(y_axis / 44)
-                            print("index - " + str(y_axis))
-                            hero = None
-                            the_unit = None
-                            for army in game_obj.game_armies:
-                                if army.army_id == b.queue[0].army_id:
-                                    if b.queue[0].obj_type == "Regiment":
-                                        the_unit = army.units[b.queue[0].number]
-                                    elif b.queue[0].obj_type == "Hero":
-                                        hero = army.hero
-                                    break
-
-                            b.list_of_abilities = []
-
-                            if y_axis <= len(b.list_of_schools):
-                                b.selected_school = str(b.list_of_schools[y_axis - 1])
-                                if b.queue[0].obj_type == "Hero":
-                                    for ability in hero.abilities:
-                                        if b.selected_school == "Overall":
-                                            b.list_of_abilities.append(str(ability))
-                                            # Update visuals
-                                            update_gf_battle.add_ability_misc_sprites(ability)
-                                        elif ability_catalog.ability_cat[ability].school == b.selected_school:
-                                            b.list_of_abilities.append(str(ability))
-                                            # Update visuals
-                                            update_gf_battle.add_school_misc_sprites(b.selected_school)
-                                            update_gf_battle.add_ability_misc_sprites(ability)
-
-                                    # Abilities from artifacts
-                                    if len(hero.inventory) > 0:
-                                        for artifact in hero.inventory:
-                                            for effect in artifact.effects:
-                                                if effect.application == "Cast spells":
-                                                    if b.selected_school == "Overall":
-                                                        for ability in effect.application_tags:
-                                                            b.list_of_abilities.append(str(ability))
-                                                            # Update visuals
-                                                            update_gf_battle.add_ability_misc_sprites(ability)
-                                                    else:
-                                                        for ability in effect.application_tags:
-                                                            if ability_catalog.ability_cat[ability].school == b.selected_school:
-                                                                b.list_of_abilities.append(str(ability))
-                                                                # Update visuals
-                                                                update_gf_battle.add_school_misc_sprites(b.selected_school)
-                                                                update_gf_battle.add_ability_misc_sprites(ability)
-
-                                    b.selected_ability = str(b.list_of_abilities[0])
-                                    b.ability_description = ability_desc_cat_hero.script_cat[b.selected_ability](hero)
-
-                                elif b.queue[0].obj_type == "Regiment":
-                                    for ability in the_unit.abilities:
-                                        if b.selected_school == "Overall":
-                                            b.list_of_abilities.append(str(ability))
-                                        elif ability_catalog.ability_cat[ability].school == b.selected_school:
-                                            b.list_of_abilities.append(str(ability))
-
-                                    b.selected_ability = str(b.list_of_abilities[0])
-                                    b.ability_description = ability_desc_cat_regiment.script_cat[b.selected_ability](the_unit)
+                        ability_menu_funs.prepare_selecting_ability_school(b, position)
 
                 elif b.battle_window == "Siege equipment menu":
                     square = [755, 204, 814, 500]  # Ability selection
                     if square[0] < position[0] < square[2] and square[1] < position[1] < square[3]:
                         pick_up_siege_equipment(b, position)
+
+    print("2) b.button_pressed - " + str(b.button_pressed))
 
     # Click on game map
     if not b.button_pressed and b.battle_window is None:
@@ -302,6 +224,7 @@ def battle_surface_m1(position):
             if 0 < y2 <= game_stats.battle_height:
 
                 if b.stage == "Formation":
+                    print("b.stage - " + str(b.stage))
                     if b.attacker_realm == game_stats.player_power:
                         starting_positions = list(b.starting_attacking_positions)
                         player_id = int(b.attacker_id)
@@ -317,7 +240,8 @@ def battle_surface_m1(position):
 
                     elif b.selected_unit == -1 and b.selected_tile in starting_positions and b.unit_card == -1:
                         if b.battle_map[TileNum].army_id:
-                            # Select unit on battlefield
+                            # Select unit on a battlefield
+                            print("Selected unit on a battlefield")
                             b.selected_unit = int(TileNum)
                             b.selected_unit_alt = (int(x2), int(y2))
                             print("selected_unit - " + str(b.selected_unit)
@@ -325,7 +249,9 @@ def battle_surface_m1(position):
 
                     elif b.selected_unit != -1 and b.selected_tile in starting_positions and b.unit_card == -1:
                         # Select tile, while already selected a unit on battlefield
-                        if b.battle_map[TileNum].army_id:  # Empty tile
+                        print("Clicked on a tile, while already has selected a unit on a battlefield")
+                        if b.battle_map[TileNum].army_id is None:  # Empty tile
+                            print("Clicked on an empty tile, while already has selected a unit on a battlefield")
                             unit_num = int(b.battle_map[b.selected_unit].unit_index)  # Previous tile
                             b.battle_map[b.selected_unit].unit_index = None
                             b.battle_map[b.selected_unit].army_id = None
@@ -340,7 +266,7 @@ def battle_surface_m1(position):
                             b.selected_unit_alt = (int(x2), int(y2))
 
                         elif TileNum != b.selected_unit:  # Tile with unit that is not the same as already selected one
-                            # print("Tile with unit that is not the same as already selected one")
+                            print("Tile with unit that is not the same as already selected one")
                             unit_num = int(b.battle_map[b.selected_unit].unit_index)  # Previous tile
                             b.battle_map[b.selected_unit].unit_index = None
                             b.battle_map[b.selected_unit].army_id = None
@@ -352,7 +278,7 @@ def battle_surface_m1(position):
                             army.units[unit_num].position = [int(x2), int(y2)]  # Moving unit
                             army.units[b.battle_map[TileNum].unit_index].position = []  # Standing unit
                             b.waiting_list.append(b.battle_map[TileNum].unit_index)  # Change waiting list
-                            # print("waiting_list: " + str(b.waiting_list))
+                            print("waiting_list: " + str(b.waiting_list))
                             if army.units[b.battle_map[TileNum].unit_index].siege_engine is not None:
                                 if army.units[b.battle_map[TileNum].unit_index].siege_engine == "Siege tower":
                                     b.available_siege_towers += 1
@@ -367,7 +293,7 @@ def battle_surface_m1(position):
                             b.selected_unit_alt = (int(x2), int(y2))
 
                     elif b.selected_unit == -1 and b.selected_tile in starting_positions and b.unit_card != -1:
-                        # Select tile, while already selected a unit in waiting list
+                        # Select tile, while already selected a unit in the waiting list
                         if b.battle_map[TileNum].army_id is None:  # Empty tile
                             army = common_selects.select_army_by_id(player_id)
                             army.units[b.waiting_list[b.unit_card]].position = [int(x2), int(y2)]  # Unit
@@ -432,25 +358,7 @@ def battle_surface_m1(position):
                                             b.ready_to_act = False
                                             game_battle.ranged_attack_preparation(b, TileNum, x2, y2)
                     elif b.cursor_function == "Execute ability":
-                        print("Execute ability")
-                        print(b.selected_ability)
-                        correct_target = False
-                        for action in ability_catalog.ability_cat[b.selected_ability].action:
-                            if b.queue[0].obj_type == "Regiment":
-                                the_unit = player_army.units[b.queue[0].number]
-                                correct_target = battle_abilities_regiment.script_cat[action.script](b, TileNum,
-                                                                                                     player_army.hero,
-                                                                                                     the_unit)
-                            elif b.queue[0].obj_type == "Hero":
-                                correct_target = battle_abilities_hero.script_cat[action.script](b, TileNum,
-                                                                                                 player_army,
-                                                                                                 opponent_army)
-                            if not correct_target:
-                                break  # Selected wrong regiment for ability
-
-                        if correct_target:
-                            b.ready_to_act = False
-                            game_battle.action_order(b, "Pass", None)
+                        ability_menu_funs.confirm_ability_targets(b, TileNum, player_army, opponent_army)
 
 
 def battle_surface_m3(position):
@@ -627,7 +535,6 @@ def fill_regiment_information(b, TileNum):
         if effect.until_next_turn:
             time_text = "Until next turn"
         else:
-            # time_text = "Time left: " + str(effect.time_left)
             time_text = "Time left: " + str(effect.end_time - b.queue[0].time_act)
         b.effect_info = game_classes.Effect_Info_Card(effect.name, time_text, effect.buffs)
 
@@ -739,7 +646,7 @@ def previous_effect_info():
         if effect.until_next_turn:
             time_text = "Until next turn"
         else:
-            time_text = "Time left: " + str(effect.time_left)
+            time_text = "Time left: " + str(effect.end_time)
         b.effect_info = game_classes.Effect_Info_Card(effect.name, time_text, effect.buffs)
 
 
@@ -754,7 +661,7 @@ def next_effect_info():
 
         effect = unit.effects[b.regiment_effects_index]
 
-        time_text = "Time left: " + str(effect.time_left)
+        time_text = "Time left: " + str(effect.end_time)
         if effect.until_next_turn:
             time_text = "Until next turn"
         b.effect_info = game_classes.Effect_Info_Card(effect.name, time_text, effect.buffs)
@@ -1101,14 +1008,6 @@ def defend_but():
             # game_battle.complete_turn(b, 1.0)
 
 
-def prepare_opening_ability_menu():
-    b = game_stats.present_battle
-    if b.queue[0].obj_type == "Hero":
-        open_hero_ability_menu_but(b)
-    elif b.queue[0].obj_type == "Regiment":
-        open_regiment_ability_menu_but(b)
-
-
 def prepare_change_attack_method():
     b = game_stats.present_battle
     if b.queue[0].obj_type == "Regiment":
@@ -1146,123 +1045,6 @@ def change_attack_method_but(b):
     # b.cur_range_limit = unit.attacks[b.attack_type_index].range_limit
     b.cur_range_limit = game_battle.attack_range_effect(army, unit,
                                                         unit.attacks[b.attack_type_index].range_limit)
-
-
-def open_hero_ability_menu_but(b):
-    print("open_hero_ability_menu_but")
-
-    b.battle_window = "Abilities menu"
-    b.cursor_function = None
-    b.ability_index = 0
-    b.school_index = 0
-    b.list_of_abilities = []
-    b.list_of_schools = []
-
-    army = common_selects.select_army_by_id(b.queue[0].army_id)
-    b.available_mana_reserve = int(army.hero.mana_reserve)
-    b.list_of_schools.append("Overall")
-    b.selected_school = "Overall"
-    # Update visuals
-    update_gf_battle.add_school_misc_sprites("Overall")
-    for ability in army.hero.abilities:
-        b.list_of_abilities.append(str(ability))
-
-        school = ability_catalog.ability_cat[ability].school
-
-        if school not in b.list_of_schools:
-            b.list_of_schools.append(str(school))
-
-        # Update visuals
-        update_gf_battle.add_school_misc_sprites(school)
-        update_gf_battle.add_ability_misc_sprites(ability)
-
-    # Abilities from artifacts
-    if len(army.hero.inventory) > 0:
-        for artifact in army.hero.inventory:
-            for effect in artifact.effects:
-                if effect.application == "Cast spells":
-                    for ability in effect.application_tags:
-                        b.list_of_abilities.append(str(ability))
-
-                        school = ability_catalog.ability_cat[ability].school
-
-                        if school not in b.list_of_schools:
-                            b.list_of_schools.append(str(school))
-
-                        # Update visuals
-                        update_gf_battle.add_school_misc_sprites(school)
-                        update_gf_battle.add_ability_misc_sprites(ability)
-
-    b.selected_ability = str(army.hero.abilities[0])
-    b.ability_description = ability_desc_cat_hero.script_cat[b.selected_ability](army.hero)
-
-
-def open_regiment_ability_menu_but(b):
-    print("open_regiment_ability_menu_but")
-
-    army = common_selects.select_army_by_id(b.queue[0].army_id)
-    the_unit = army.units[b.queue[0].number]
-
-    if b.attack_name == "Abilities":
-        b.battle_window = "Abilities menu"
-        b.cursor_function = None
-        b.ability_index = 0
-        b.school_index = 0
-        b.list_of_abilities = []
-        b.list_of_schools = []
-
-        b.available_mana_reserve = int(the_unit.mana_reserve)
-        b.list_of_schools.append("Overall")
-        b.selected_school = "Overall"
-        # Update visuals
-        update_gf_battle.add_school_misc_sprites("Overall")
-
-        for ability in the_unit.abilities:
-            b.list_of_abilities.append(str(ability))
-
-            school = ability_catalog.ability_cat[ability].school
-
-            if school not in b.list_of_schools:
-                b.list_of_schools.append(str(school))
-
-            # Update visuals
-            update_gf_battle.add_school_misc_sprites(school)
-            update_gf_battle.add_ability_misc_sprites(ability)
-
-        b.selected_ability = str(the_unit.abilities[0])
-        b.ability_description = ability_desc_cat_regiment.script_cat[b.selected_ability](the_unit)
-
-
-def close_ability_menu_window():
-    b = game_stats.present_battle
-
-    b.list_of_schools = []
-    b.list_of_abilities = []
-    b.ability_index = 0
-    b.school_index = 0
-    b.selected_school = None
-    b.selected_ability = None
-    b.battle_window = None
-    b.available_mana_reserve = None
-    b.ability_description = None
-
-
-def execute_ability():
-    b = game_stats.present_battle
-    ability = ability_catalog.ability_cat[b.selected_ability]
-    if b.available_mana_reserve >= ability.mana_cost:
-        if ability.target == "all_allies":
-            # Ability is executing instantly
-            player_army = common_selects.select_army_by_id(b.queue[0].army_id)
-            for action in ability.action:
-                battle_abilities_hero.script_cat[action.script](b, None, player_army, None)
-                b.ready_to_act = False
-                game_battle.action_order(b, "Pass", None)
-                b.battle_window = None
-        else:
-            # Player have to select suitable regiment as a target for ability
-            b.cursor_function = "Execute ability"
-            b.battle_window = None
 
 
 def close_siege_equipment_menu_window():
@@ -1536,7 +1318,7 @@ formation_button_funs = {1: start_battle_but,
 
 fighting_button_funs = {1: wait_but,
                         2: defend_but,
-                        3: prepare_opening_ability_menu,
+                        3: ability_menu_funs.prepare_opening_ability_menu,
                         4: prepare_change_attack_method,
                         5: handle_siege_equipment}
 
@@ -1545,8 +1327,8 @@ waiting_list_panel_funs = {1: waiting_index_left,
 
 battle_end_window_funs = {1: end_battle_but}
 
-ability_menu_window_funs = {1: close_ability_menu_window,
-                            2: execute_ability}
+ability_menu_window_funs = {1: ability_menu_funs.close_ability_menu_window,
+                            2: ability_menu_funs.execute_ability_but}
 
 siege_equipment_menu_window_funs = {1: close_siege_equipment_menu_window}
 

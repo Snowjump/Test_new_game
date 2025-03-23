@@ -17,9 +17,8 @@ from Screens.Game_Board_Windows import panel_calendar
 from Screens.Game_Board_Windows import panel_resource_ribbon
 from Screens.Game_Board_Windows import panel_left_ribbon_menu
 from Screens.Game_Board_Windows import panel_vision_mode
-from Screens.Game_Board_Windows import panel_waiting_list
-from Screens.Game_Board_Windows import panel_battle_queue
-from Screens.Game_Board_Windows import panel_battle_actions
+from Screens.Sc_Battle_Windows import panel_waiting_list, panel_battle_queue, panel_battle_actions, \
+    panel_selected_targets_counter
 from Screens.Game_Board_Windows import info_panel_army
 from Screens.Game_Board_Windows import info_panel_settlement
 from Screens.Game_Board_Windows import info_panel_tile_obj
@@ -61,19 +60,22 @@ def refresh_graphics_object(new_object, objects_list):
     objects_list.append(new_object)
 
 
-def remove_specific_objects(names_of_objects):
+def remove_specific_objects(names_of_objects, location):
+    print("remove_specific_objects()")
     for name in names_of_objects:
-        for obj in graphics_obj.game_board_objects:
+        print("remove " + name)
+        for obj in location:
+            print("obj name is " + obj.name)
             if obj.name == name:
-                graphics_obj.game_board_objects.remove(obj)
+                location.remove(obj)
                 break
 
 
-def remove_selected_objects():
+def remove_selected_objects(location):
     list_of_names = ["Info panel army",
                      "Info panel settlement",
                      "Info panel tile object"]
-    remove_specific_objects(list_of_names)
+    remove_specific_objects(list_of_names, location)
 
 
 def prepare_exit_to_menu():
@@ -227,4 +229,9 @@ def prepare_battle_queue():
 
 def prepare_battle_action_buttons():
     new_object = panel_battle_actions.Battle_Actions_Panel("Battle actions panel")
+    refresh_graphics_object(new_object, graphics_obj.battle_objects)
+
+
+def prepare_selected_targets_counter():
+    new_object = panel_selected_targets_counter.Selected_Targets_Counter_Panel("Selected targets counter panel")
     refresh_graphics_object(new_object, graphics_obj.battle_objects)

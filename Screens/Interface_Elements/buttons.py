@@ -11,8 +11,10 @@ font_dic = {"tnr_font20" : tnr_font20,
             "arial_font14" : arial_font14}
 
 color_dic = {"LineMainMenuColor1" : LineMainMenuColor1,
+             "TitleText" : TitleText,
              "DarkText" : DarkText,
              "FillButton" : FillButton,
+             "FieldColor" : FieldColor,
              "CancelFieldColor" : CancelFieldColor,
              "CancelElementsColor" : CancelElementsColor,
              "RockTunel" : RockTunel,

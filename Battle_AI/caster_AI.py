@@ -1,28 +1,21 @@
 ## Among Myth and Wonder
-import math
+## caster_AI
+
 import random
 
+from Content.Abilities import ability_catalog
+from Content.Abilities.AI_behavior import reg_abilities_application, reg_abilities_probability
 
-from Content import reg_abilities_application
-from Content import reg_abilities_probability
-from Content import ability_catalog
-
-from Resources import battle_abilities_regiment
-from Resources import game_obj
 from Resources import game_stats
 from Resources import game_battle
 
+from Resources.Game_Battle import hit_funs
+
+from Resources.Abilities import battle_abilities_regiment
+
 
 def manage_caster(b, acting_unit, own_army_id, enemy_army_id, own_melee, own_ranged, enemy_melee,
-                  enemy_ranged, enemy_units):
-    own_army = None
-    enemy_army = None
-    for army in game_obj.game_armies:
-        if army.army_id == own_army_id:
-            own_army = army
-        elif army.army_id == enemy_army_id:
-            enemy_army = army
-
+                  enemy_ranged, enemy_units, own_army, enemy_army, enemy_hero):
     # At beginning asses available abilities
     abilities_list = []
     application_type = []
@@ -160,10 +153,13 @@ def manage_caster(b, acting_unit, own_army_id, enemy_army_id, own_melee, own_ran
                     if e.counterattack == 0:
                         target_without_counterattack = True
                         if defence_strength is None:
-                            defence_strength = int(e.defence) + int(armor) + game_battle.defence_effect(e)
+                            defence_strength = int(e.defence) + int(e.armour) + \
+                                               hit_funs.defence_effect(e, e.defence, enemy_hero)
                             e_index = int(num)
-                        elif int(e.defence) + int(armor) + game_battle.defence_effect(e) < defence_strength:
-                            defence_strength = int(e.defence) + int(armor) + game_battle.defence_effect(e)
+                        elif int(e.defence) + int(e.armour) + \
+                                hit_funs.defence_effect(e, e.defence, enemy_hero) < defence_strength:
+                            defence_strength = int(e.defence) + int(e.armour) + \
+                                               hit_funs.defence_effect(e, e.defence, enemy_hero)
                             e_index = int(num)
                         else:
                             pass
@@ -202,6 +198,39 @@ def manage_caster(b, acting_unit, own_army_id, enemy_army_id, own_melee, own_ran
             print("Run out of options")
             b.AI_ready = False
             game_battle.action_order(b, "Wait", None)
+
+
+def direction_of_hit(chosen_enemy, old_position):
+
+    if chosen_enemy[0] - old_position[0] == 1:
+        if chosen_enemy[1] - old_position[1] == 1:
+            # NW from target
+            pos = [20, 20]
+        elif chosen_enemy[1] - old_position[1] == 0:
+            # W from target
+            pos = [20, 50]
+        elif chosen_enemy[1] - old_position[1] == -1:
+            # SW from target
+            pos = [20, 80]
+    elif chosen_enemy[0] - old_position[0] == 0:
+        if chosen_enemy[1] - old_position[1] == 1:
+            # N from target
+            pos = [50, 20]
+        elif chosen_enemy[1] - old_position[1] == -1:
+            # S from target
+            pos = [50, 80]
+    elif chosen_enemy[0] - old_position[0] == -1:
+        if chosen_enemy[1] - old_position[1] == 1:
+            # NE from target
+            pos = [80, 20]
+        elif chosen_enemy[1] - old_position[1] == 0:
+            # E from target
+            pos = [80, 50]
+        elif chosen_enemy[1] - old_position[1] == -1:
+            # SE from target
+            pos = [80, 80]
+
+    return pos
 
 
 def present_effect(unit, effect_name):

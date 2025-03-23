@@ -21,7 +21,7 @@ def create_simurg_anarchists():
                                      # creatures
                                      [game_classes.Strike("Melee assault", "Melee",
                                                           ["Melee", "Physical"],
-                                                          3, 5, 4,  # min_dmg, max_dmg, mastery
+                                                          3, 6, 4,  # min_dmg, max_dmg, mastery
                                                           0, 0)],  # effective and limit range
                                      2, 1, 3,  # Armour and defence and leadership
                                      # Skills
@@ -76,7 +76,7 @@ def create_highway_robbers():
                                      # creatures
                                      [game_classes.Strike("Melee assault", "Melee",
                                                           ["Melee", "Physical"],
-                                                          3, 6, 5,  # min_dmg, max_dmg, mastery
+                                                          3, 7, 5,  # min_dmg, max_dmg, mastery
                                                           0, 0)],  # effective and limit range
                                      2, 2, 4,  # Armour and defence and base leadership
                                      # Skills
@@ -99,7 +99,7 @@ def create_robber_knights():
                                      # creatures
                                      [game_classes.Strike("Melee assault", "Melee",
                                                           ["Melee", "Physical"],
-                                                          4, 7, 8,  # min_dmg, max_dmg, mastery
+                                                          4, 8, 8,  # min_dmg, max_dmg, mastery
                                                           0, 0)],  # effective and limit range
                                      4, 4, 4,  # Armour and defence and leadership
                                      # Skills

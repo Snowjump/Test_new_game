@@ -92,6 +92,10 @@ def advance_queue(b):  # b - stands for Battle
     b.attacking_rotate = []
     b.defending_rotate = []
     b.ready_to_act = False
+    b.ability_targets = []
+    b.total_targets = 0
+    b.ability_mana_cost = 0
+    b.initiative_cost = 0
 
     b.realm_in_control = str(b.queue[0].owner)
 
@@ -520,6 +524,11 @@ def complete_melee_attack(b, unit, primary_target, angle, acting_hero, enemy_her
 
     check_if_no_one_left_alive(b)
 
+    b.anim_message.append(game_classes.Battle_Message(["Damage " + str(b.dealt_damage),
+                                                       "Killed " + str(b.killed_creatures)],
+                                                      "Regiment",
+                                                      (primary_target.position[0], primary_target.position[1])))
+
 
 def choose_melee_target(b, at_creature, primary_target, angle, perform_attack):
     enemy_list = []  # List of creature indexes
@@ -731,7 +740,7 @@ def complete_ranged_attack(b, unit, primary_target, acting_hero, enemy_hero):
             hit_funs.ranged_hit(b, unit, primary_target, target, acting_hero, enemy_hero)
 
     # Let's check who died in unit
-    long_msg = ""
+    # long_msg = ""
     number = 1
     perished_list = []
     index = 0
@@ -754,7 +763,7 @@ def complete_ranged_attack(b, unit, primary_target, acting_hero, enemy_hero):
         primary_target.cemetery.append(primary_target.crew[perished])
         del primary_target.crew[perished]
 
-    print(long_msg)
+    # print(long_msg)
 
     # If no alive creatures left, kill this unit
     if len(primary_target.crew) == 0:
@@ -767,6 +776,11 @@ def complete_ranged_attack(b, unit, primary_target, acting_hero, enemy_hero):
     set_initiative(unit, acting_hero, "Ranged")
 
     check_if_no_one_left_alive(b)
+
+    b.anim_message.append(game_classes.Battle_Message(["Damage " + str(b.dealt_damage),
+                                                       "Killed " + str(b.killed_creatures)],
+                                                      "Regiment",
+                                                      (primary_target.position[0], primary_target.position[1])))
 
 
 def choose_ranged_target(b, primary_target):
@@ -789,7 +803,7 @@ def perform_battle_actions(b):
     if not b.battle_stop:
         # print("if not b.battle_stop")
         if b.realm_in_control != game_stats.player_power and b.AI_ready:
-            print("perform_battle_actions -> manage_unit")
+            print("perform_battle_actions -> AI manage_unit")
             battle_logic.manage_unit(b, acting_army, enemy_army, acting_unit, acting_hero)
 
         if b.secondary == "Route" and b.realm_in_control == game_stats.player_power and b.primary is None:
@@ -1153,6 +1167,7 @@ def reduce_morale(b, primary_target, before_HP, angle):
                       "Above": 133.0}
 
     total_HP = primary_target.rows * primary_target.number * primary_target.base_HP
+    print("before_HP - " + str(before_HP) + "; total_HP - " + str(total_HP) + "; b.dealt_damage - " + str(b.dealt_damage))
     damage_fraction = (b.dealt_damage / 2) / before_HP + (b.dealt_damage / 2) / total_HP
     morale_hit = float(math.ceil(damage_fraction / game_stats.battle_base_morale_hit * angle_modifier[angle])) / 100
     # print("angle_modifier - " + str(angle_modifier[angle]) + " damage_fraction - " + str(damage_fraction) +
@@ -1692,8 +1707,11 @@ def gates_destruction(b, TileNum):
     toughness = siege_warfare_catalog.detailed_hardness_table[b.battle_map[TileNum].map_object.obj_name]
     attack = 4
     result = random.randint(1, attack + toughness)
+    tile = b.battle_map[TileNum]
     if result <= attack:
-        b.anim_message = "The gate has been destroyed"
+        b.anim_message.append(game_classes.Battle_Message(["The gate has been destroyed"],
+                                                          "Structure",
+                                                          (tile.posxy[0], tile.posxy[1])))
         b.battle_map[TileNum].map_object.obj_name = siege_warfare_catalog.name_change_after_destruction[
             b.battle_map[TileNum].map_object.obj_name]
         b.battle_map[TileNum].map_object.img_path = siege_warfare_catalog.path_change_after_destruction[
@@ -1704,7 +1722,9 @@ def gates_destruction(b, TileNum):
                                                           b.battle_map[TileNum].map_object.img_path]])
 
     else:
-        b.anim_message = "The gate withstood the attack"
+        b.anim_message.append(game_classes.Battle_Message(["The gate has been destroyed"],
+                                                          "Structure",
+                                                          (tile.posxy[0], tile.posxy[1])))
 
 
 def dock_the_wall(b):

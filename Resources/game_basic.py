@@ -1350,7 +1350,7 @@ def hero_next_level(hero, new_exp):
 
     print("Hero's level - " + str(hero.level) + ", experience - " + str(hero.experience))
     print("hero.archetype - " + str(hero.archetype))
-    if hero.archetype is not None:
+    if hero.archetype:
         AI_learn_skills.manage_skill_points(hero)
         AI_learn_attributes.manage_attributes_points(hero)
 

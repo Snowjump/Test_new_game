@@ -10,7 +10,7 @@ from Screens.Interface_Elements import buttons
 
 from Resources import game_stats
 
-from Content import ability_catalog
+from Content.Abilities import ability_catalog
 
 
 def abilities_menu_window(screen, b):
@@ -29,35 +29,8 @@ def abilities_menu_window(screen, b):
     # Ability description
     ability_description_draw(screen, b)
 
-    # Button - Execute
-    pygame.draw.polygon(screen, FillButton,
-                        [[970, 106], [1070, 106], [1070, 125], [970, 125]])
-    if b.available_mana_reserve >= ability_catalog.ability_cat[b.selected_ability].mana_cost:
-        color1 = HighlightOption
-    else:
-        color1 = LineMainMenuColor1
-    pygame.draw.polygon(screen, color1, [[970, 106], [1070, 106], [1070, 125], [970, 125]], 2)
-
-    text_panel1 = arial_font16.render("Execute", True, DarkText)
-    screen.blit(text_panel1, [995, 107])
-
-    text_panel1 = arial_font16.render("Mana reserve", True, TitleText)
-    screen.blit(text_panel1, [971, 127])
-
-    ability_img = game_stats.gf_misc_img_dict["Icons/mana_icon"]
-    screen.blit(ability_img, [971, 148])
-
-    text_panel1 = arial_font16.render(str(b.available_mana_reserve), True, TitleText)
-    screen.blit(text_panel1, [995, 147])
-
-    text_panel1 = arial_font16.render("Mana cost", True, TitleText)
-    screen.blit(text_panel1, [971, 167])
-
-    ability_img = game_stats.gf_misc_img_dict["Icons/mana_icon"]
-    screen.blit(ability_img, [971, 188])
-
-    text_panel1 = arial_font16.render(str(ability_catalog.ability_cat[b.selected_ability].mana_cost), True, TitleText)
-    screen.blit(text_panel1, [995, 187])
+    # Ability execution
+    ability_execution(screen, b)
 
 
 def ability_school_draw(screen, b):
@@ -160,6 +133,45 @@ def ability_description_draw(screen, b):
         screen.blit(text_panel1, [728, 127 + y_points2 * y_shift2])
 
         y_points2 += 1
+
+
+def ability_execution(screen, b):
+    # Button - Execute
+    border_color = "LineMainMenuColor1"
+    if b.available_mana_reserve >= b.ability_mana_cost:
+        border_color = "HighlightOption"
+    buttons.element_button(screen, "Execute", "arial_font16", "DarkText", "FillButton", border_color, 970, 106,
+                           100, 19, 25, 1, 2)
+
+    text_panel1 = arial_font16.render("Execute", True, DarkText)
+    screen.blit(text_panel1, [995, 107])
+
+    text_panel1 = arial_font16.render("Mana reserve", True, TitleText)
+    screen.blit(text_panel1, [971, 128])
+
+    ability_img = game_stats.gf_misc_img_dict["Icons/mana_icon"]
+    screen.blit(ability_img, [971, 149])
+
+    text_panel1 = arial_font16.render(str(b.available_mana_reserve), True, TitleText)
+    screen.blit(text_panel1, [995, 148])
+
+    text_panel1 = arial_font16.render("Mana cost", True, TitleText)
+    screen.blit(text_panel1, [971, 169])
+
+    ability_img = game_stats.gf_misc_img_dict["Icons/mana_icon"]
+    screen.blit(ability_img, [971, 190])
+
+    text_panel1 = arial_font16.render(str(b.ability_mana_cost), True, TitleText)
+    screen.blit(text_panel1, [995, 189])
+
+    text_panel1 = arial_font16.render("Initiative cost", True, TitleText)
+    screen.blit(text_panel1, [971, 210])
+
+    ability_img = game_stats.gf_misc_img_dict["Icons/duration_icon"]
+    screen.blit(ability_img, [974, 231])
+
+    text_panel1 = arial_font16.render(str(b.initiative_cost), True, TitleText)
+    screen.blit(text_panel1, [995, 230])
 
 
 school_imgs = {"Overall" : "everything",

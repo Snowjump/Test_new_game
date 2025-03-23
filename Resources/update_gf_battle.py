@@ -8,7 +8,7 @@ from Resources import game_obj
 
 from Content import objects_img_catalog
 from Content import terrain_seasons
-from Content import ability_catalog
+from Content.Abilities import ability_catalog
 
 WhiteColor = (255, 255, 255)
 
@@ -142,6 +142,11 @@ def update_misc_sprites():
     misc_img = pygame.image.load('img/Icons/battle_shield.png').convert_alpha()
     misc_img.set_colorkey(WhiteColor)
     game_stats.gf_misc_img_dict["Icons/battle_shield"] = misc_img
+
+    # Icon - duration icon for initiative cost
+    misc_img = pygame.image.load('img/Icons/duration_icon.png').convert_alpha()
+    misc_img.set_colorkey(WhiteColor)
+    game_stats.gf_misc_img_dict["Icons/duration_icon"] = misc_img
 
     # Paper background
     misc_img = pygame.image.load('img/Icons/paper_3_square_560_x_60.png').convert_alpha()

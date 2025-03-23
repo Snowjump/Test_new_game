@@ -1,4 +1,6 @@
 ## Among Myth and Wonder
+## melee_AI
+
 import copy
 import random
 
@@ -12,7 +14,7 @@ from Content import movement_catalog
 
 
 def manage_melee(b, acting_unit, own_army_id, enemy_army_id, own_melee, own_ranged, enemy_melee, enemy_ranged,
-                 enemy_units, acting_hero):
+                 enemy_units, acting_hero, enemy_hero):
     base_MP = game_battle.calculate_speed(acting_unit, acting_hero)
 
     mode = "March"

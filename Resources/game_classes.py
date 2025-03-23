@@ -256,6 +256,8 @@ class Land_Battle:  # class keeps information about outgoing battle
         self.starting_attacking_positions = starting_attacking_positions
         self.starting_defending_positions = starting_defending_positions
         self.selected_tile = []
+        self.ability_targets = []  # List of tiles sets (x, y) with targets for abilities
+        self.total_targets = 0  # How many targets could be selected for ability
         self.selected_unit = -1  # Index of tile with selected regiment
         # -1 means that no regiment is selected at this moment
         self.selected_unit_alt = ()  # (x, y) position format
@@ -286,7 +288,7 @@ class Land_Battle:  # class keeps information about outgoing battle
         self.primary = None  # Battle order for unit to perform an action
         self.secondary = None  # Next battle order for unit to perform an action
         self.move_figure = None  # For flying
-        self.anim_message = None  # Text on battlefield
+        self.anim_message = []  # List that either empty or filled with Battle_Message objects
         self.move_destination = None  # Where unit is going
         self.target_destination = None  # Whom unit going to hit - [int, int]
         self.move_back_destination = None  # Where unit is returning after hit and run or hit and fly attack
@@ -298,7 +300,7 @@ class Land_Battle:  # class keeps information about outgoing battle
         self.perform_attack = []  # List of indexes that indicates which creatures from regiment will perform attack
         self.dealt_damage = 0  # Total amount of damage dealt during one attack by regiment
         self.killed_creatures = 0
-        self.damage_msg_position = []  # Around which unit should message pop up - singular position - [int, int]
+        # self.damage_msg_position = []  # Around which unit should message pop up - singular position - [int, int]
         self.damage_dealt_positions = []  # List of positions of all units hit by an attack
         # - [...] list consist of lists [int, int] with positions
 
@@ -334,6 +336,9 @@ class Land_Battle:  # class keeps information about outgoing battle
         self.selected_ability = None
         self.available_mana_reserve = None
         self.ability_description = None
+        self.ability_mana_cost = 0
+        self.initiative_cost = 0
+        self.bonus_magic_power = 0
 
         # Effects
         self.positions_list = []
@@ -587,3 +592,11 @@ class Autobattle_Regiment_Card:
         self.morale = morale  # (float)
         self.status = "Fighting"  # (str): Fighting, Routing, Routed
         self.receiving_damage = 0.0  # (float)
+
+
+class Battle_Message:
+    def __init__(self, text, msg_type, position=None):
+        # Text on battlefield
+        self.text = text  # List of (str) lines
+        self.msg_type = msg_type  # (str): Hero, Regiment, Structure
+        self.position = position  # Set of two (int) coordinates: (x, y)

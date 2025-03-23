@@ -11,6 +11,7 @@ from Resources import game_basic
 from Resources import graphics_basic
 from Resources import game_classes
 from Resources import game_obj
+from Resources import graphics_obj
 from Resources import game_pathfinding
 from Resources import game_stats
 from Resources import algo_building
@@ -24,6 +25,8 @@ from Resources import common_selects
 
 from Resources.Battle_Preparation import battle_map_generation
 from Resources.Battle_Preparation import siege_map_generation
+
+from Resources.Game_Hero import common_hero_funs
 
 from Storage import create_unit
 
@@ -872,7 +875,7 @@ def game_board_surface_m3(position):
                 game_stats.first_army_exchange_list = []
                 game_stats.second_army_exchange_list = []
 
-                graphics_basic.remove_selected_objects()
+                graphics_basic.remove_selected_objects(graphics_obj.game_board_objects)
 
                 # Update visuals
                 update_gf_game_board.remove_regiment_sprites()
@@ -884,13 +887,13 @@ def game_board_surface_m3(position):
                 game_stats.selected_settlement = -1
                 game_stats.details_panel_mode = ""
 
-                graphics_basic.remove_selected_objects()
+                graphics_basic.remove_selected_objects(graphics_obj.game_board_objects)
 
             # If no army selected, then pop up window will appear with information about selected tile
             # NOTE: maybe I need to rebuild this if segment
             elif not game_stats.info_tile or game_stats.info_tile != [int(x), int(y)]:
                 print("Selected tile")
-                graphics_basic.remove_selected_objects()
+                graphics_basic.remove_selected_objects(graphics_obj.game_board_objects)
                 game_stats.selected_object = "Tile"
                 game_stats.info_tile = [int(x), int(y)]
                 game_stats.right_click_pos = [int(position[0]), int(position[1])]
@@ -933,7 +936,7 @@ def game_board_surface_m3(position):
                 game_stats.details_panel_mode = ""
                 game_stats.right_click_city = -1
 
-                graphics_basic.remove_selected_objects()
+                graphics_basic.remove_selected_objects(graphics_obj.game_board_objects)
 
 
 def exit_but():
@@ -978,7 +981,7 @@ def quest_log_but():
         game_stats.first_army_exchange_list = []
         game_stats.second_army_exchange_list = []
 
-        graphics_basic.remove_selected_objects()
+        graphics_basic.remove_selected_objects(graphics_obj.game_board_objects)
 
         # Update visuals
         update_gf_game_board.update_settlement_misc_sprites()
@@ -1007,7 +1010,7 @@ def quest_log_but():
         game_stats.allocated_requested_goods_records = None
         game_stats.pops_details = None
 
-        graphics_basic.remove_selected_objects()
+        graphics_basic.remove_selected_objects(graphics_obj.game_board_objects)
 
     realm = common_selects.select_realm_by_name(game_stats.player_power)
     game_stats.selected_quest_messages = realm.quests_messages
@@ -1244,7 +1247,7 @@ def encircle_but():
         game_stats.selected_settlement = -1
         game_stats.game_board_panel = ""
 
-        graphics_basic.remove_selected_objects()
+        graphics_basic.remove_selected_objects(graphics_obj.game_board_objects)
 
         # Update visuals
         game_stats.gf_building_dict = {}
@@ -1515,7 +1518,7 @@ def close_settlement_panel_but():
     update_gf_game_board.remove_settlement_misc_sprites(img_list)
     game_stats.gf_building_dict = {}
     # print("sf_game_board - close_settlement_panel_but()")
-    graphics_basic.remove_specific_objects(["Info panel settlement"])
+    graphics_basic.remove_specific_objects(["Info panel settlement"], graphics_obj.game_board_objects)
 
     click_sound = pygame.mixer.Sound("Sound/Interface/Abstract2.ogg")
     click_sound.play()
@@ -1567,7 +1570,7 @@ def select_stationed_army_but():
             game_stats.right_window = ""
             game_stats.rw_object = None
 
-            graphics_basic.remove_specific_objects(["Info panel settlement"])
+            graphics_basic.remove_specific_objects(["Info panel settlement"], graphics_obj.game_board_objects)
             graphics_basic.prepare_army_panel()
 
             # Update visuals
@@ -2004,7 +2007,7 @@ def hire_hero():
     TileNum = settlement.location
     print("hire_hero(): [x, y] - " + str(settlement.posxy) + "; location - " + str(settlement.location))
 
-    treasury = common_selects.select_treasury_by_realm_name(settlement.owner)
+    realm = common_selects.select_realm_by_name(settlement.owner)
 
     print("enough_resources_to_pay - " + str(game_stats.enough_resources_to_pay))
     if not game_stats.enough_resources_to_pay:
@@ -2017,13 +2020,12 @@ def hire_hero():
     if game_obj.game_map[TileNum].army_id is not None:
         the_army = common_selects.select_army_by_id(game_obj.game_map[TileNum].army_id)
 
-        if the_army.hero is not None:
+        if the_army.hero:
             permit_hero_creation = False
 
         if permit_hero_creation:
             print("the_army.army_id - " + str(the_army.army_id))
             hero_class = game_stats.hero_for_hire[0]
-            game_stats.hero_id_counter += 1
             if not starting_skills.locked_first_skill_check[hero_class]:
                 first_skill_name = starting_skills.starting_skills_by_class[hero_class][game_stats.first_starting_skill]
             else:
@@ -2032,75 +2034,8 @@ def hire_hero():
             second_skill_name = starting_skills.starting_skills_by_class[hero_class][game_stats.second_starting_skill]
             second_skill = hero_skill_catalog.hero_skill_data[second_skill_name]
 
-            the_army.hero = game_classes.Hero(int(game_stats.hero_id_counter),  # hero_id
-                                              str(random.choice(hero_names.hero_classes_cat[hero_class])),
-                                              str(game_stats.hero_for_hire[0]),  # hero_class
-                                              int(game_stats.hero_for_hire[3]),  # level
-                                              0,  # experience
-                                              int(game_stats.hero_for_hire[1]),  # magic_power
-                                              int(game_stats.hero_for_hire[2]),  # knowledge
-                                              list(game_stats.hero_for_hire[8]),  # attributes_list
-                                              str(game_stats.hero_for_hire[4]),  # img
-                                              str(game_stats.hero_for_hire[5]),  # img_source
-                                              int(game_stats.hero_for_hire[6]),  # x_offset
-                                              int(game_stats.hero_for_hire[7]),  # y_offset
-                                              [skill_classes.Hero_Skill(str(first_skill_name),
-                                                                        str(first_skill[0]),
-                                                                        str(first_skill[1]),
-                                                                        str(first_skill[2]),
-                                                                        str(first_skill[3]),
-                                                                        str(first_skill[4]),
-                                                                        list(first_skill[5]),
-                                                                        list(first_skill[6]),
-                                                                        first_skill[7],
-                                                                        [0, 0]),
-                                               skill_classes.Hero_Skill(str(second_skill_name),
-                                                                        str(second_skill[0]),
-                                                                        str(second_skill[1]),
-                                                                        str(second_skill[2]),
-                                                                        str(second_skill[3]),
-                                                                        str(second_skill[4]),
-                                                                        list(second_skill[5]),
-                                                                        list(second_skill[6]),
-                                                                        second_skill[7],
-                                                                        [0, 1])],  # skills
-                                              int(game_stats.hero_for_hire[2]) * 10,  # maximum mana reserve
-                                              int(game_stats.hero_for_hire[2]) * 10)  # mana reserve
-
-            # action1 = ability_classes.Ability_Action("Increase morale",
-            #                                          "Direct order - increase morale",
-            #                                          "Addition")
-            # ability = ability_classes.Hero_Ability("Direct order",
-            #                                        "Horn",
-            #                                        "Abilities\Tactics",
-            #                                        "Tactics",
-            #                                        [action1, action2],
-            #                                        [],
-            #                                        "single_ally")
-            the_army.hero.abilities.append("Direct order")
-            game_basic.learn_new_abilities(first_skill_name, the_army.hero)
-            game_basic.learn_new_abilities(second_skill_name, the_army.hero)
-
-            new_experience, bonus_level = game_basic.increase_level_for_new_heroes(settlement)
-
-            game_basic.hero_next_level(the_army.hero, new_experience)
-
-            for res in treasury:
-                depleted = False
-                if "Florins" == res[0]:
-                    res[1] -= 2000 + (game_stats.hero_for_hire[3] + bonus_level - 1) * 250
-                    if res[1] == 0:
-                        depleted = True
-
-                if depleted:
-                    for delete_res in treasury:
-                        if res[0] == delete_res[0]:
-                            treasury.remove(delete_res)
-
-            graphics_basic.prepare_resource_ribbon()
-
-            # Update visuals
-            update_gf_game_board.update_regiment_sprites()
+            the_army.hero = common_hero_funs.create_hero(hero_class, game_stats.hero_for_hire, realm, settlement,
+                                                         first_skill_name, second_skill_name, first_skill, second_skill)
 
 
 def next_first_starting_skill():

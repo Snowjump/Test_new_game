@@ -7,7 +7,7 @@ import random
 from Resources import game_obj
 from Resources import game_classes
 from Resources import effect_classes
-from Content import ability_catalog
+from Content.Abilities import ability_catalog
 
 
 def find_single_ally(b, TileNum):

@@ -1,4 +1,5 @@
-## Miracle battles
+## Among Myth and Wonder
+## artifact_information
 
 
 artifact_desc = {"Champion's lance" : ["Cavalry regiments gain +1 speed"],
@@ -7,9 +8,9 @@ artifact_desc = {"Champion's lance" : ["Cavalry regiments gain +1 speed"],
                  "Sword of haste" : ["Cast Haste spell"],
                  "Bronze spurs" : ["Army's movement points +150"],
                  "Page's chainmail" : ["Ranged infantry gain +2 armour"],
-                 "Wooden chalice" : ["Healing spell: +2 MP, -1 mana cost"],
+                 "Wooden chalice" : ["Healing spell: +3 MP, -1 mana cost"],
                  "Medal of honor" : ["Leadership +1"],
-                 "Red sceptre" : ["Bless spell: +2 MP, -1 mana cost"],
+                 "Red sceptre" : ["Bless spell: +3 MP, -1 mana cost"],
                  "Sapphire ring" : ["Mana reserve +1 replenishment"],
                  "Bone wand" : ["Mana reserve +2 replenishment",
                                 "Melee infantry -1 melee mastery"],

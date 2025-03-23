@@ -1,4 +1,5 @@
-## Miracle battles
+## Among Myth and Wonder
+## artifact_classes
 
 
 class Artifact:

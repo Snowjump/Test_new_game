@@ -110,7 +110,7 @@ def primary_move(b, unit, acting_army, enemy_army):
             elif b.secondary == "Fly back":
                 b.move_back_destination = None
                 b.primary = "Damage message"
-                b.anim_message = "Damage and kills"
+                # b.anim_message = "Damage and kills"
             elif b.secondary == "Route":
                 battle_skills.passive_charge_track(unit)
                 game_battle.battle_ending(b)
@@ -134,18 +134,20 @@ def primary_move(b, unit, acting_army, enemy_army):
 def primary_wait(b, unit):
     if b.queue[0].obj_type != "Hero":
         battle_skills.passive_charge_track(unit)
+        b.anim_message.append(game_classes.Battle_Message(["Wait"], str(b.queue[0].obj_type),
+                                                          (b.queue[0].position[0], b.queue[0].position[1])))
+    else:
+        b.anim_message.append(game_classes.Battle_Message(["Wait"], str(b.queue[0].obj_type)))
     b.primary = "Wait message"
-    b.anim_message = "Wait"
 
 
 def primary_wait_message(b):
     b.primary = "Wait message1"
-    b.anim_message = "Wait"
 
 
 def primary_wait_message1(b):
     b.primary = None
-    b.anim_message = None
+    b.anim_message = []
     game_battle.complete_turn(b, 0.5)
 
 
@@ -164,30 +166,33 @@ def primary_defend(b, unit, acting_hero):
     battle_skills.passive_charge_track(unit)
 
     b.primary = "Defend message"
-    b.anim_message = "Defend"
+    if b.queue[0].obj_type != "Hero":
+        b.anim_message.append(game_classes.Battle_Message(["Defend"], str(b.queue[0].obj_type),
+                                                          (b.queue[0].position[0], b.queue[0].position[1])))
+    else:
+        b.anim_message.append(game_classes.Battle_Message(["Defend"], str(b.queue[0].obj_type)))
 
 
 def primary_defend_message(b):
     b.primary = "Defend message1"
-    b.anim_message = "Defend"
 
 
 def primary_defend_message1(b):
     b.primary = None
-    b.anim_message = None
+    b.anim_message = []
     game_battle.complete_turn(b, 1.0)
 
 
 def primary_pass(b):
     print(str(b.primary) + ", b.selected_ability - " + str(b.selected_ability))
     b.primary = "Pass1"
-    b.anim_message = str(b.selected_ability)
+    # b.anim_message = str(b.selected_ability)
 
 
 def primary_pass1(b, acting_army, acting_hero):
     print(str(b.primary) + ", b.queue[0].obj_type - " + str(b.queue[0].obj_type))
     b.primary = None
-    b.anim_message = None
+    b.anim_message = []
 
     b.list_of_schools = []
     b.list_of_abilities = []
@@ -280,7 +285,7 @@ def primary_melee_attack(b, acting_hero, acting_unit, enemy_hero, enemy_army):
         print("Enemy is killed in melee and battle is over")
     else:
         b.primary = "Damage message"
-        b.anim_message = "Damage and kills"
+        # b.anim_message = "Damage and kills"
 
 
 def primary_hit_from_above(b, acting_hero, acting_unit, enemy_army, enemy_hero):
@@ -325,18 +330,18 @@ def primary_damage_message(b):
     print("b.dealt_damage - " + str(b.dealt_damage) + "; b.killed_creatures - " + str(b.killed_creatures))
     print("")
     b.primary = "Damage message1"
-    if b.anim_message == "Damage and kills":
-        b.anim_message = "Damage and kills"
-    elif b.anim_message == "Gate busting result":
-        b.anim_message = "Gate busting result"
-    elif b.anim_message == "Docking the wall":
-        b.anim_message = "Docking the wall"
+    # if b.anim_message == "Damage and kills":
+    #     b.anim_message = "Damage and kills"
+    # elif b.anim_message == "Gate busting result":
+    #     b.anim_message = "Gate busting result"
+    # elif b.anim_message == "Docking the wall":
+    #     b.anim_message = "Docking the wall"
 
 
 def primary_damage_message1(b, acting_army, acting_unit, enemy_army):
     print("b.primary == Damage message1")
     b.primary = None
-    b.anim_message = None
+    b.anim_message = []
     b.damage_dealt_positions = []
     b.dealt_damage = 0
     b.killed_creatures = 0
@@ -409,18 +414,18 @@ def primary_counterattack(b, acting_army, acting_hero, enemy_army, enemy_hero):
 
     else:
         b.primary = "Counterattack damage message"
-        b.anim_message = "Damage and kills"
+        # b.anim_message = "Damage and kills"
 
 
 def primary_counterattack_damage_message(b):
     b.primary = "Counterattack damage message1"
-    b.anim_message = "Damage and kills"
+    # b.anim_message = "Damage and kills"
     print("")
 
 
 def primary_counterattack_damage_message1(b):
     b.primary = None
-    b.anim_message = None
+    b.anim_message = []
     b.damage_dealt_positions = []
     b.dealt_damage = 0
     b.killed_creatures = 0
@@ -444,5 +449,5 @@ def primary_ranged_attack(b, acting_hero, acting_unit, enemy_army, enemy_hero):
 
     else:
         b.primary = "Damage message"
-        b.anim_message = "Damage and kills"
+        # b.anim_message = "Damage and kills"
         b.secondary = "Ranged attack"

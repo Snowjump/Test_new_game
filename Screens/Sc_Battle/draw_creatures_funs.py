@@ -15,7 +15,7 @@ from Screens.Interface_Elements import flags
 from Resources import game_stats
 from Resources import common_selects
 
-from Content import ability_catalog
+from Content.Abilities import ability_catalog
 
 
 def draw_creatures(screen, unit, x, y, owner, unit_index, b, current_position):
@@ -68,12 +68,12 @@ def draw_creatures(screen, unit, x, y, owner, unit_index, b, current_position):
             # print("buff")
             # print("current_position - " + str(current_position))
             # print("b.selected_tile - " + str(b.selected_tile))
-            if list(current_position) == b.selected_tile:
+            if current_position in b.ability_targets:
                 # print("current_position - " + str(current_position))
                 anim_battle_effects.white_buff_effect(screen, b, current_position)
 
         elif ability_catalog.ability_cat[b.selected_ability].anim_effect == "damage spell":
-            if list(current_position) == b.selected_tile:
+            if current_position in b.ability_targets:
                 anim_battle_effects.spell_effect(screen, b, current_position)
 
 

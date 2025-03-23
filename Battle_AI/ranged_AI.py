@@ -1,4 +1,6 @@
 ## Among Myth and Wonder
+## ranged_AI
+
 import math
 import copy
 import random
@@ -8,16 +10,19 @@ from Resources import game_obj
 from Resources import game_stats
 from Resources import game_battle
 from Resources import algo_b_astar
+from Resources.Game_Battle import hit_funs
 
 
 def manage_ranged(b, acting_unit, own_army_id, enemy_army_id, own_melee, own_ranged, enemy_melee, enemy_ranged,
-                  enemy_units):
-    enemy_hero = None
-    for army in game_obj.game_armies:
-        if army.army_id == enemy_army_id:
-            if army.hero is not None:
-                enemy_hero = army.hero
-            break
+                  enemy_units, acting_hero, enemy_hero):
+    base_MP = game_battle.calculate_speed(acting_unit, acting_hero)
+
+    mode = "March"
+    for skill in acting_unit.skills:
+        if skill.application == "Movement":
+            if skill.quality == "Can fly":
+                mode = "Flight"
+                break
 
     # Important, firstly, need to be sure, that regiment is using ranged attack
     ranged_attacks_list = []
@@ -131,10 +136,13 @@ def manage_ranged(b, acting_unit, own_army_id, enemy_army_id, own_melee, own_ran
                         target_without_counterattack = True
                         print("Enemy without counterattack: new_position - " + str(e) + "; num - " + str(num))
                         if defence_strength is None:
-                            defence_strength = int(e.armour) + game_battle.defence_effect(e, e.defence, enemy_hero)
+                            defence_strength = int(e.defence) + int(e.armour) + \
+                                               hit_funs.defence_effect(e, e.defence, enemy_hero)
                             e_index = int(num)
-                        elif int(e.armour) + game_battle.defence_effect(e, e.defence, enemy_hero) < defence_strength:
-                            defence_strength = int(e.armour) + game_battle.defence_effect(e, e.defence, enemy_hero)
+                        elif int(e.defence) + int(e.armour) + \
+                                hit_funs.defence_effect(e, e.defence, enemy_hero) < defence_strength:
+                            defence_strength = int(e.defence) + int(e.armour) + \
+                                               hit_funs.defence_effect(e, e.defence, enemy_hero)
                             e_index = int(num)
                         else:
                             pass
@@ -192,7 +200,7 @@ def manage_ranged(b, acting_unit, own_army_id, enemy_army_id, own_melee, own_ran
                     if shooting_position is None:
                         print("Unit can't reach position in move where it can shoot enemy")
                         print("closest_enemy - " + str(closest_enemy))
-                        node, a_path = algo_b_astar.b_astar(None, acting_unit.position, closest_enemy, None, b)
+                        node, a_path = algo_b_astar.b_astar(None, acting_unit.position, closest_enemy, None, base_MP, b, mode)
                         if a_path is not None:
                             # Trying to come closer toward enemy
                             a_path.pop(0)

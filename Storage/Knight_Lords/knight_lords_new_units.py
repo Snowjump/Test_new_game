@@ -20,7 +20,7 @@ def create_peasant_mob():
                                      create_unit.fill_with_creatures(5, 4, creature_dict, "Peasant mob"),  # creatures
                                      [game_classes.Strike("Melee assault", "Melee",
                                                           ["Melee", "Physical"],
-                                                          2, 4, 4,  # min_dmg, max_dmg, mastery
+                                                          2, 5, 4,  # min_dmg, max_dmg, mastery
                                                           0, 0)],  # effective and limit range
                                      2, 1, 3,  # Armour and defence and base leadership
                                      # Skills
@@ -100,7 +100,7 @@ def create_spear_footmen():
                                      create_unit.fill_with_creatures(5, 4, creature_dict, "Spear footmen"),  # creatures
                                      [game_classes.Strike("Melee assault", "Melee",
                                                           ["Melee", "Physical"],
-                                                          3, 5, 5,  # min_dmg, max_dmg, mastery
+                                                          3, 6, 5,  # min_dmg, max_dmg, mastery
                                                           0, 0)],  # effective and limit range
                                      3, 2, 4,  # Armour and defence and base leadership
                                      # Skills
@@ -136,7 +136,7 @@ def create_sword_footmen():
                                      create_unit.fill_with_creatures(5, 4, creature_dict, "Sword footmen"),  # creatures
                                      [game_classes.Strike("Melee assault", "Melee",
                                                           ["Melee", "Physical"],
-                                                          3, 6, 5,  # min_dmg, max_dmg, mastery
+                                                          3, 7, 5,  # min_dmg, max_dmg, mastery
                                                           0, 0)],  # effective and limit range
                                      3, 2, 4,  # Armour and defence and base leadership
                                      # Skills
@@ -170,7 +170,7 @@ def create_squires():
                                      create_unit.fill_with_creatures(5, 4, creature_dict, "Squires"),  # creatures
                                      [game_classes.Strike("Melee assault", "Melee",
                                                           ["Melee", "Physical"],
-                                                          3, 6, 6,  # min_dmg, max_dmg, mastery
+                                                          3, 7, 6,  # min_dmg, max_dmg, mastery
                                                           0, 0)],  # effective and limit range
                                      4, 2, 4,  # Armour and defence and base leadership
                                      # Skills
@@ -204,7 +204,7 @@ def create_knights():
                                      create_unit.fill_with_creatures(4, 2, creature_dict, "Knights"),  # creatures
                                      [game_classes.Strike("Melee assault", "Melee",
                                                           ["Melee", "Physical"],
-                                                          4, 7, 8,  # min_dmg, max_dmg, mastery
+                                                          4, 8, 8,  # min_dmg, max_dmg, mastery
                                                           0, 0)],  # effective and limit range
                                      5, 4, 4,  # Armour and defence and leadership
                                      # Skills

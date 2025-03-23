@@ -1,4 +1,6 @@
 ## Among Myth and Wonder
+## hybrid_AI
+
 import math
 import copy
 import random
@@ -8,10 +10,20 @@ from Resources import game_obj
 from Resources import game_stats
 from Resources import game_battle
 from Resources import algo_b_astar
+from Resources.Game_Battle import hit_funs
 
 
 def manage_hybrid(b, acting_unit, own_army_id, enemy_army_id, own_melee, own_ranged, enemy_melee, enemy_ranged,
-                  enemy_units):
+                  enemy_units, acting_hero, enemy_hero):
+    base_MP = game_battle.calculate_speed(acting_unit, acting_hero)
+
+    mode = "March"
+    for skill in acting_unit.skills:
+        if skill.application == "Movement":
+            if skill.quality == "Can fly":
+                mode = "Flight"
+                break
+
     # Important, firstly, need to be sure, that regiment is using ranged attack
     ranged_attacks_list = []
     num = 0
@@ -116,10 +128,13 @@ def manage_hybrid(b, acting_unit, own_army_id, enemy_army_id, own_melee, own_ran
                     if e.counterattack == 0:
                         target_without_counterattack = True
                         if defence_strength is None:
-                            defence_strength = int(e.defence) + int(armor) + game_battle.defence_effect(e)
+                            defence_strength = int(e.defence) + int(e.armour) + \
+                                               hit_funs.defence_effect(e, e.defence, enemy_hero)
                             e_index = int(num)
-                        elif int(e.defence) + int(armor) + game_battle.defence_effect(e) < defence_strength:
-                            defence_strength = int(e.defence) + int(armor) + game_battle.defence_effect(e)
+                        elif int(e.defence) + int(e.armour) + \
+                                hit_funs.defence_effect(e, e.defence, enemy_hero) < defence_strength:
+                            defence_strength = int(e.defence) + int(e.armour) + \
+                                               hit_funs.defence_effect(e, e.defence, enemy_hero)
                             e_index = int(num)
                         else:
                             pass
@@ -192,7 +207,7 @@ def manage_hybrid(b, acting_unit, own_army_id, enemy_army_id, own_melee, own_ran
                     shooting_position = find_closest_position_to_shoot(b, closest_enemy)
                     if shooting_position is None:
                         print("Unit can't reach position in move where it can shoot enemy")
-                        node, a_path = algo_b_astar.b_astar(None, acting_unit.position, closest_enemy, None, b)
+                        node, a_path = algo_b_astar.b_astar(None, acting_unit.position, closest_enemy, None, base_MP, b, mode)
                         a_path.pop(0)
                         a_path.pop(-1)
                         current = node
@@ -218,7 +233,6 @@ def manage_hybrid(b, acting_unit, own_army_id, enemy_army_id, own_melee, own_ran
                     print("Run out of options")
                     b.AI_ready = False
                     game_battle.action_order(b, "Wait", None)
-
 
         # b.AI_ready = False
         # game_battle.action_order(b, "Wait", None)

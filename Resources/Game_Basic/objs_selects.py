@@ -5,6 +5,7 @@ from Resources import game_stats
 from Resources import graphics_basic
 from Resources import algo_building
 from Resources import update_gf_game_board
+from Resources import graphics_obj
 
 
 def deselect_army():
@@ -16,7 +17,7 @@ def deselect_army():
     game_stats.first_army_exchange_list = []
     game_stats.second_army_exchange_list = []
 
-    graphics_basic.remove_selected_objects()
+    graphics_basic.remove_selected_objects(graphics_obj.game_board_objects)
 
 
 def select_settlement(settlement):

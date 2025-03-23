@@ -15,13 +15,14 @@ from Resources import update_gf_game_board
 from Resources import common_selects
 from Resources import common_transactions
 
+from Resources.Game_Hero import common_hero_funs
+
 from Content import production_methods
 from Content import unit_alignment_catalog
 from Content import unit_rank_catalog
 from Content import new_heroes_catalog
 from Content import starting_skills
 from Content import hero_skill_catalog
-from Content import hero_names
 from Content import artifact_assortment
 from Content import artifact_catalog
 from Content import skills_curriculum
@@ -620,7 +621,6 @@ def hire_a_hero(player, economy, the_army, settlement):
         print("Hero archetype - " + str(hero_archetype))
 
         first_starting_skill, second_starting_skill = game_basic.form_starting_skills_pool(hero_class, "AI")
-        game_stats.hero_id_counter += 1
 
         first_skill_name = None
         if first_starting_skill is None:
@@ -640,82 +640,15 @@ def hire_a_hero(player, economy, the_army, settlement):
             second_weight_list.append(archetype_skill_weights.class_cat[hero_archetype][skill_name])
         second_skill_name = random.choices(second_skill_list, weights=second_weight_list)[0]
 
-        # second_list = list(range(len(starting_skills.starting_skills_by_class[hero_class])))
-        # print("second_list - " + str(second_list))
-        # if first_starting_skill is not None:
-        # first_starting_skill = random.randint(0, len(starting_skills.starting_skills_by_class[hero_class]) - 1)
-        # second_list.remove(first_starting_skill)
-        # print("first_starting_skill - " + str(first_starting_skill))
-        # second_starting_skill = random.choice(second_list)
-        # print("second_starting_skill - " + str(second_starting_skill))
-        # if not starting_skills.locked_first_skill_check[hero_class]:
-        # first_skill_name = starting_skills.starting_skills_by_class[hero_class][first_starting_skill]
-        # else:
-        #     first_skill_name = starting_skills.locked_first_skill_by_class[hero_class]
         print("first_skill_name - " + first_skill_name)
         first_skill = hero_skill_catalog.hero_skill_data[first_skill_name]
-        # second_skill_name = starting_skills.starting_skills_by_class[hero_class][second_starting_skill]
         print("second_skill_name - " + second_skill_name)
         second_skill = hero_skill_catalog.hero_skill_data[second_skill_name]
 
-        the_army.hero = game_classes.Hero(int(game_stats.hero_id_counter),  # hero_id
-                                          str(random.choice(hero_names.hero_classes_cat[hero_class])),
-                                          str(hero_pick[0]),  # hero_class
-                                          int(hero_pick[3]),  # level
-                                          0,  # experience
-                                          int(hero_pick[1]),  # magic_power
-                                          int(hero_pick[2]),  # knowledge
-                                          list(hero_pick[8]),  # attributes_list
-                                          str(hero_pick[4]),  # img
-                                          str(hero_pick[5]),  # img_source
-                                          int(hero_pick[6]),  # x_offset
-                                          int(hero_pick[7]),  # y_offset
-                                          [skill_classes.Hero_Skill(str(first_skill_name),
-                                                                    str(first_skill[0]),
-                                                                    str(first_skill[1]),
-                                                                    str(first_skill[2]),
-                                                                    str(first_skill[3]),
-                                                                    str(first_skill[4]),
-                                                                    list(first_skill[5]),
-                                                                    list(first_skill[6]),
-                                                                    first_skill[7],
-                                                                    [0, 0]),
-                                           skill_classes.Hero_Skill(str(second_skill_name),
-                                                                    str(second_skill[0]),
-                                                                    str(second_skill[1]),
-                                                                    str(second_skill[2]),
-                                                                    str(second_skill[3]),
-                                                                    str(second_skill[4]),
-                                                                    list(second_skill[5]),
-                                                                    list(second_skill[6]),
-                                                                    second_skill[7],
-                                                                    [0, 1])],  # skills
-                                          int(hero_pick[2]) * 10,  # maximum mana reserve
-                                          int(hero_pick[2]) * 10)  # mana reserve
-
-        print(str(the_army.hero.hero_class) + " " + the_army.hero.name)
-        the_army.hero.abilities.append("Direct order")
-        game_basic.learn_new_abilities(first_skill_name, the_army.hero)
-        game_basic.learn_new_abilities(second_skill_name, the_army.hero)
+        the_army.hero = common_hero_funs.create_hero(hero_class, hero_pick, player, settlement,
+                                                     first_skill_name, second_skill_name, first_skill, second_skill)
         the_army.hero.archetype = str(hero_archetype)
-
-        new_experience, bonus_level = game_basic.increase_level_for_new_heroes(settlement)
-        game_basic.hero_next_level(the_army.hero, new_experience)
-
-        for res in player.coffers:
-            depleted = False
-            if "Florins" == res[0]:
-                res[1] -= 2000 + (hero_pick[3] + bonus_level - 1) * 250
-                if res[1] == 0:
-                    depleted = True
-
-            if depleted:
-                for delete_res in player.coffers:
-                    if res[0] == delete_res[0]:
-                        player.coffers.remove(delete_res)
-
-        # Update visuals
-        update_gf_game_board.update_regiment_sprites()
+        print(str(the_army.hero.hero_class) + " " + the_army.hero.name)
 
 
 def buy_artifacts_settlements(player, economy, LUOS):

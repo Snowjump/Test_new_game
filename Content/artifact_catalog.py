@@ -1,4 +1,5 @@
-## Miracle battles
+## Among Myth and Wonder
+## artifact_catalog
 
 from Resources import artifact_classes
 

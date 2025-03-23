@@ -3,7 +3,7 @@
 
 
 class Hero_Ability:
-    def __init__(self, name, img, img_source, school, action, ai_tags, target, mana_cost, anim_effect):
+    def __init__(self, name, img, img_source, school, action, ai_tags, target, mana_cost, base_initiative, anim_effect):
         self.name = name
         self.img = img
         self.img_source = img_source
@@ -14,6 +14,7 @@ class Hero_Ability:
         # area_ally, area_enemy
         self.target = target
         self.mana_cost = mana_cost
+        self.base_initiative = base_initiative
         self.anim_effect = anim_effect
 
 
@@ -25,5 +26,3 @@ class Ability_Action:
         self.quality = quality
         self.ability_tags = ability_tags
         self.script = script  # Name of script from abilities catalog
-
-

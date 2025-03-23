@@ -74,7 +74,7 @@ def melee_hit(b, at_creature, unit, primary_target, target, acting_hero, enemy_h
     #       str(primary_target.crew[target].HP) + " HP by dealing " + str(dmg) + " damage")
     primary_target.crew[target].HP -= dmg
 
-    b.damage_msg_position = list(primary_target.position)
+    # b.damage_msg_position = list(primary_target.position)
 
     if primary_target.crew[target].HP <= 0:
         b.dealt_damage += (dmg + primary_target.crew[target].HP)
@@ -177,7 +177,7 @@ def ranged_hit(b, unit, primary_target, target, acting_hero, enemy_hero):
         dmg, excess_armour, excess_penetration = excess_armour_penetration(dmg, excess_armour, excess_penetration,
                                                                            used_penetration)
 
-        b.damage_msg_position = list(primary_target.position)
+        # b.damage_msg_position = list(primary_target.position)
 
         print(str(target) + ") "
               + "HP - " + str(primary_target.crew[target].HP) + ", damage - " + str(dmg)
