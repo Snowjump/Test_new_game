@@ -65,7 +65,7 @@ def manage_melee(b, acting_unit, own_army_id, enemy_army_id, own_melee, own_rang
 
             chosen_enemy = random.choice(enemy_nearby)
 
-            pos = direction_of_hit(chosen_enemy, old_position)
+            pos = game_battle.direction_of_hit(chosen_enemy, old_position)
 
             b.AI_ready = False
             game_battle.melee_attack_preparation(b, TileNum, pos, chosen_enemy[0], chosen_enemy[1])
@@ -103,7 +103,7 @@ def manage_melee(b, acting_unit, own_army_id, enemy_army_id, own_melee, own_rang
             approach_tile = choose_approach(chosen_enemy, b)
             print("approach_tile - " + str(approach_tile))
 
-            pos = direction_of_hit(chosen_enemy, approach_tile)
+            pos = game_battle.direction_of_hit(chosen_enemy, approach_tile)
             TileNum = (chosen_enemy[1] - 1) * game_stats.battle_width + chosen_enemy[0] - 1
 
             b.AI_ready = False
@@ -183,39 +183,6 @@ def manage_melee(b, acting_unit, own_army_id, enemy_army_id, own_melee, own_rang
                 else:
                     b.AI_ready = False
                     game_battle.action_order(b, "Defend", None)
-
-
-def direction_of_hit(chosen_enemy, old_position):
-
-    if chosen_enemy[0] - old_position[0] == 1:
-        if chosen_enemy[1] - old_position[1] == 1:
-            # NW from target
-            pos = [20, 20]
-        elif chosen_enemy[1] - old_position[1] == 0:
-            # W from target
-            pos = [20, 50]
-        elif chosen_enemy[1] - old_position[1] == -1:
-            # SW from target
-            pos = [20, 80]
-    elif chosen_enemy[0] - old_position[0] == 0:
-        if chosen_enemy[1] - old_position[1] == 1:
-            # N from target
-            pos = [50, 20]
-        elif chosen_enemy[1] - old_position[1] == -1:
-            # S from target
-            pos = [50, 80]
-    elif chosen_enemy[0] - old_position[0] == -1:
-        if chosen_enemy[1] - old_position[1] == 1:
-            # NE from target
-            pos = [80, 20]
-        elif chosen_enemy[1] - old_position[1] == 0:
-            # E from target
-            pos = [80, 50]
-        elif chosen_enemy[1] - old_position[1] == -1:
-            # SE from target
-            pos = [80, 80]
-
-    return pos
 
 
 def choose_approach(chosen_enemy, b):

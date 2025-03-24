@@ -1,5 +1,5 @@
 ## Among Myth and Wonder
-## battle_abilities_hero
+    ## battle_abilities_hero
 
 import math
 import random
@@ -16,12 +16,9 @@ from Resources.Abilities import game_ability
 def increase_morale(b, tile, acting_army, opponent_army, ability):
     unit = acting_army.units[tile.unit_index]
 
-    print("Before: " + unit.name + " unit.morale - " + str(unit.morale))
-    if unit.morale + 0.3 > unit.leadership:
-        unit.morale = float(unit.leadership)
-    else:
-        unit.morale = float(math.ceil((unit.morale + 0.3) * 100) / 100)
-    print("After: " + unit.name + " unit.morale - " + str(unit.morale))
+    print("increase_morale(): before " + unit.name + " unit.morale - " + str(unit.morale))
+    unit.simple_change_morale(0.3)
+    print("increase_morale(): after " + unit.name + " unit.morale - " + str(unit.morale))
 
 
 def advance_initiative(b, tile, acting_army, opponent_army, ability):
@@ -59,12 +56,9 @@ def advance_initiative(b, tile, acting_army, opponent_army, ability):
 def increase_army_morale(b, tile, acting_army, opponent_army, ability):
     unit = acting_army.units[tile.unit_index]
 
-    print("Before: " + unit.name + " unit.morale - " + str(unit.morale))
-    if unit.morale + 0.5 > unit.leadership:
-        unit.morale = float(unit.leadership)
-    else:
-        unit.morale = float(math.ceil((unit.morale + 0.5) * 100) / 100)
-    print("After: " + unit.name + " unit.morale - " + str(unit.morale))
+    print("increase_army_morale(): before " + unit.name + " unit.morale - " + str(unit.morale))
+    unit.simple_change_morale(0.5)
+    print("increase_army_morale(): after " + unit.name + " unit.morale - " + str(unit.morale))
     b.anim_message.append(game_classes.Battle_Message(["Rally",
                                                        "Morale + 0.5"],
                                                       "Regiment",
@@ -222,11 +216,7 @@ def inspiration_spell(b, tile, acting_army, opponent_army, ability):
     increase = morale_improvement
     if unit.morale + morale_improvement > unit.leadership:
         increase = float(unit.leadership) - unit.morale
-        unit.morale = float(unit.leadership)
-    else:
-        unit.morale += float(morale_improvement)
-
-    unit.morale = math.floor(unit.morale * 100) / 100
+    unit.simple_change_morale(morale_improvement)
 
     b.anim_message.append(game_classes.Battle_Message(["Inspiration", "Morale + " + str(increase)],
                                                       "Regiment",

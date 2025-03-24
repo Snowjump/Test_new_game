@@ -1,4 +1,5 @@
-## Miracle battles
+## Among Myth and Wonder
+## movement_catalog
 
 # List composition: [list of directions from where movement is wasted]
 waste_movement_dict = {"Earth rampart" : ["NW", "W", "SW"],

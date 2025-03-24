@@ -46,7 +46,22 @@ def bless_cond(b, own_units, enemy_units):
                 number_of_units_for_buffing += 1
 
     if number_of_units_for_buffing > 0:
-        return 10
+        return 8 + (number_of_units_for_buffing - 1)
+    return 0
+
+
+def haste_cond(b, own_units, enemy_units):
+    number_of_units_for_buffing = 0
+    for unit in own_units:
+        if not unit.deserted and unit.morale > 1.0:
+            if not AI_game_ability.effect_is_present(unit, "Haste"):
+                if "hybrid" in unit.reg_tags:
+                    number_of_units_for_buffing += 1
+                elif "melee" in unit.reg_tags:
+                    number_of_units_for_buffing += 2
+
+    if number_of_units_for_buffing > 0:
+        return 1 + number_of_units_for_buffing
     return 0
 
 
@@ -115,6 +130,7 @@ def hail_cond(b, own_units, enemy_units):
 cond_cat = {"Direct order" : direct_order_cond,
             "Rally" : rally_cond,
             "Bless" : bless_cond,
+            "Haste" : haste_cond,
             "Healing" : healing_cond,
             "Inspiration" : inspiration_cond,
             "Fire arrows" : fire_arrows_cond,

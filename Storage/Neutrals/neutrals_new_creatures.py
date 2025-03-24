@@ -1,54 +1,54 @@
 ## Among Myth and Wonder
 ## neutrals_new_creatures
-
+import Resources.Game_Regiment.regiment_classes
 from Resources import game_classes
 
 
 def create_simurg_anarchists():
-    new_unit = game_classes.Creature("Simurg's anarchists",
+    new_unit = Resources.Game_Regiment.regiment_classes.Creature("Simurg's anarchists",
                                      "simurg_anarchists",
                                      "neutrals", 23, 27,  # Img_source, img width, img height
-                                     7)  # HP
+                                                                 7)  # HP
     return new_unit
 
 
 def create_bandit_archers():
-    new_unit = game_classes.Creature("Bandit archers",
+    new_unit = Resources.Game_Regiment.regiment_classes.Creature("Bandit archers",
                                      "bandit_archers",
                                      "neutrals", 20, 27,  # Img_source, img width, img height
-                                     8)  # HP
+                                                                 8)  # HP
     return new_unit
 
 
 def create_highway_robbers():
-    new_unit = game_classes.Creature("Highway robbers",
+    new_unit = Resources.Game_Regiment.regiment_classes.Creature("Highway robbers",
                                      "highway_robbers",
                                      "neutrals", 23, 27,  # Img_source, img width, img height
-                                     8)  # HP
+                                                                 8)  # HP
     return new_unit
 
 
 def create_robber_knights():
-    new_unit = game_classes.Creature("Robber knights",
+    new_unit = Resources.Game_Regiment.regiment_classes.Creature("Robber knights",
                                      "robber_knights",
                                      "neutrals", 27, 39,  # Img_source, img width, img height
-                                     16)  # HP
+                                                                 16)  # HP
     return new_unit
 
 
 def create_grey_dragon():
-    new_unit = game_classes.Creature("Grey dragon",
+    new_unit = Resources.Game_Regiment.regiment_classes.Creature("Grey dragon",
                                      "grey_dragon",
                                      "neutrals", 60, 58,  # Img_source, img width, img height
-                                     145)  # HP
+                                                                 145)  # HP
     return new_unit
 
 
 def create_grey_drakes():
-    new_unit = game_classes.Creature("Grey drakes",
+    new_unit = Resources.Game_Regiment.regiment_classes.Creature("Grey drakes",
                                      "grey_drakes",
                                      "neutrals", 32, 40,  # Img_source, img width, img height
-                                     36)  # HP
+                                                                 36)  # HP
     return new_unit
 
 

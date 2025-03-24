@@ -1,102 +1,102 @@
 ## Among Myth and Wonder
 ## knight_lords_new_creatures
-
+import Resources.Game_Regiment.regiment_classes
 from Resources import game_classes
 
 
 def create_peasant_mob():
-    new_unit = game_classes.Creature("Peasant mob",
+    new_unit = Resources.Game_Regiment.regiment_classes.Creature("Peasant mob",
                                      "peasant_mob",
                                      "KL", 12, 30,  # Img_source, img width, img height
-                                     7)  # HP
+                                                                 7)  # HP
     return new_unit
 
 
 def create_peasant_bowmen():
-    new_unit = game_classes.Creature("Peasant bowmen",
+    new_unit = Resources.Game_Regiment.regiment_classes.Creature("Peasant bowmen",
                                      "peasant_bowmen",
                                      "KL", 16, 27,  # Img_source, img width, img height
-                                     7)  # HP
+                                                                 7)  # HP
     return new_unit
 
 
 def create_crossbowmen():
-    new_unit = game_classes.Creature("Crossbowmen",
+    new_unit = Resources.Game_Regiment.regiment_classes.Creature("Crossbowmen",
                                      "crossbowmen",
                                      "KL", 16, 29,  # Img_source, img width, img height
-                                     8)  # HP
+                                                                 8)  # HP
     return new_unit
 
 
 def create_spear_footmen():
-    new_unit = game_classes.Creature("Spear footmen",
+    new_unit = Resources.Game_Regiment.regiment_classes.Creature("Spear footmen",
                                      "spear_footmen",
                                      "KL", 16, 29,  # Img_source, img width, img height
-                                     8)  # HP
+                                                                 8)  # HP
     return new_unit
 
 
 def create_sword_footmen():
-    new_unit = game_classes.Creature("Sword footmen",
+    new_unit = Resources.Game_Regiment.regiment_classes.Creature("Sword footmen",
                                      "sword_footmen",
                                      "KL", 20, 28,  # Img_source, img width, img height
-                                     8)  # HP
+                                                                 8)  # HP
     return new_unit
 
 
 def create_squires():
-    new_unit = game_classes.Creature("Squires",
+    new_unit = Resources.Game_Regiment.regiment_classes.Creature("Squires",
                                      "squires",
                                      "KL", 19, 27,  # Img_source, img width, img height
-                                     8)  # HP
+                                                                 8)  # HP
     return new_unit
 
 
 def create_knights():
-    new_unit = game_classes.Creature("Knights",
+    new_unit = Resources.Game_Regiment.regiment_classes.Creature("Knights",
                                      "knights",
                                      "KL", 34, 39,  # Img_source, img width, img height
-                                     16)  # HP
+                                                                 16)  # HP
     return new_unit
 
 
 def create_priests_of_salvation():
-    new_unit = game_classes.Creature("Priests of Salvation",
+    new_unit = Resources.Game_Regiment.regiment_classes.Creature("Priests of Salvation",
                                      "priests_of_salvation",
                                      "KL", 11, 28,  # Img_source, img width, img height
-                                     8)  # HP
+                                                                 8)  # HP
     return new_unit
 
 
 def create_battle_monks():
-    new_unit = game_classes.Creature("Battle monks",
+    new_unit = Resources.Game_Regiment.regiment_classes.Creature("Battle monks",
                                      "battle_monks",
                                      "KL", 22, 28,  # Img_source, img width, img height
-                                     8)  # HP
+                                                                 8)  # HP
     return new_unit
 
 
 def create_griffons():
-    new_unit = game_classes.Creature("Griffons",
+    new_unit = Resources.Game_Regiment.regiment_classes.Creature("Griffons",
                                      "griffons",
                                      "KL", 44, 29,  # Img_source, img width, img height
-                                     20)  # HP
+                                                                 20)  # HP
     return new_unit
 
 
 def create_pegasus_knights():
-    new_unit = game_classes.Creature("Pegasus knights",
+    new_unit = Resources.Game_Regiment.regiment_classes.Creature("Pegasus knights",
                                      "pegasus_knights",
                                      "KL", 40, 37,  # Img_source, img width, img height
-                                     16)  # HP
+                                                                 16)  # HP
     return new_unit
 
 
 def create_field_ballistas():
-    new_unit = game_classes.Creature("Field ballistas",
+    new_unit = Resources.Game_Regiment.regiment_classes.Creature("Field ballistas",
                                      "field_ballistas",
                                      "KL", 42, 34,  # Img_source, img width, img height
-                                     25)  # HP
+                                                                 25)  # HP
     return new_unit
 
 

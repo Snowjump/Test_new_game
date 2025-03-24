@@ -20,6 +20,8 @@ from Resources import common_lists
 from Resources.Game_Battle import execute_order_funs
 from Resources.Game_Battle import hit_funs
 
+from Resources.Game_Regiment import regiment_classes
+
 from Content import movement_catalog
 from Content import siege_warfare_catalog
 
@@ -170,6 +172,7 @@ def advance_queue(b):  # b - stands for Battle
 
         # Reset engage status
         unit.engaged = False
+
         # Reset counterattack counter
         unit.counterattack = 1
         if army.hero:
@@ -178,13 +181,10 @@ def advance_queue(b):  # b - stands for Battle
                     if effect.application == "Bonus counterattack":
                         if effect.method == "addition":
                             unit.counterattack += effect.quantity
+
         # Restore some morale
-        if unit.morale + game_stats.battle_morale_base_restoration + morale_restoration_bonus > unit.leadership:
-            unit.morale = float(unit.leadership)
-        else:
-            unit.morale = float(math.ceil((unit.morale + game_stats.battle_morale_base_restoration
-                                           + morale_restoration_bonus) * 100)) / 100
-        # float(math.ceil(damage_fraction / game_stats.battle_base_morale_hit * angle_modifier[angle])) / 100
+        unit.simple_change_morale(game_stats.battle_morale_base_restoration + morale_restoration_bonus)
+
         # Check duration of effects
         num_list = []
         num = 0
@@ -513,7 +513,7 @@ def complete_melee_attack(b, unit, primary_target, angle, acting_hero, enemy_her
     battle_skills.charge_track(unit, primary_target, b.queue)
 
     # Reduce morale
-    reduce_morale(b, primary_target, before_HP, angle)
+    primary_target.reduce_morale(b, before_HP, angle)
 
     # Set initiative after performed action
     if b.primary != "Counterattack":
@@ -770,7 +770,7 @@ def complete_ranged_attack(b, unit, primary_target, acting_hero, enemy_hero):
         kill_unit(b, primary_target)
 
     # Reduce morale
-    reduce_morale(b, primary_target, before_HP, "Ranged")
+    primary_target.reduce_morale(b, before_HP, "Ranged")
 
     # Set initiative after performed action
     set_initiative(unit, acting_hero, "Ranged")
@@ -839,7 +839,7 @@ def melee_attack_preparation(b, TileNum, position, x2, y2):
     # x, y - coordinates of target
     x = (position[0] + 1) % 96
     y = (position[1] + 1) % 96
-    print("TileNum - " + str(TileNum) + ", position [x2, y2] - " + str([x2, y2]))
+    print("melee_attack_preparation: TileNum - " + str(TileNum) + ", position [x2, y2] - " + str([x2, y2]))
     print("x, y - " + str([x, y]))
 
     approach = []
@@ -1028,7 +1028,8 @@ def ranged_attack_preparation(b, TileNum, x2, y2):
         x_delta = int(x2 - b.queue[0].position[0])
         y_delta = int(y2 - b.queue[0].position[1])
         facing_angle = pygame.math.Vector2(x_delta, y_delta).angle_to((1, 0))
-        print("Angle - " + str(facing_angle))
+        print("Angle - " + str(facing_angle) + "; (x2, y2) - (" + str(x2) + ", " + str(y2) + "); position - " +
+              str(b.queue[0].position))
 
         new_direction = None
         if -22.5 <= facing_angle < 22.5:
@@ -1051,6 +1052,7 @@ def ranged_attack_preparation(b, TileNum, x2, y2):
         b.changed_direction = str(new_direction)
 
         TileNum2 = (y2 - 1) * game_stats.battle_width + x2 - 1
+        print("TileNum2 - " + str(TileNum2))
         army = common_selects.select_army_by_id(b.battle_map[TileNum2].army_id)
         b.enemy_army_id = army.army_id
 
@@ -1151,32 +1153,6 @@ def disengage(b, position):
                     army = common_selects.select_army_by_id(b.battle_map[TileNum].army_id)
                     if army.units[b.battle_map[TileNum].unit_index].direction == expected_direction:
                         army.units[b.battle_map[TileNum].unit_index].engaged = False
-
-
-def reduce_morale(b, primary_target, before_HP, angle):
-    angle_modifier = {"Front right": 100.0,
-                      "Right flank": 125.0,
-                      "Rear right": 150.0,
-                      "Rear": 150.0,
-                      "Rear left": 150.0,
-                      "Left flank": 125.0,
-                      "Front left": 100.0,
-                      "Front": 100.0,
-                      "Ranged": 100.0,
-                      "Spell": 100.0,
-                      "Above": 133.0}
-
-    total_HP = primary_target.rows * primary_target.number * primary_target.base_HP
-    print("before_HP - " + str(before_HP) + "; total_HP - " + str(total_HP) + "; b.dealt_damage - " + str(b.dealt_damage))
-    damage_fraction = (b.dealt_damage / 2) / before_HP + (b.dealt_damage / 2) / total_HP
-    morale_hit = float(math.ceil(damage_fraction / game_stats.battle_base_morale_hit * angle_modifier[angle])) / 100
-    # print("angle_modifier - " + str(angle_modifier[angle]) + " damage_fraction - " + str(damage_fraction) +
-    #       " morale_hit - " + str(morale_hit) + " b.dealt_damage - " + str(b.dealt_damage))
-    primary_target.morale -= morale_hit
-    primary_target.morale = float(int(primary_target.morale * 100)) / 100
-
-    # if primary_target.morale < 0.0:
-    #     primary_target.morale = 0.0
 
 
 def routing_path(b, routing_unit, acting_hero):
@@ -1834,3 +1810,35 @@ def choose_melee_attack_by_type(b, unit, primary_target):
     # print(str(b.attack_name))
     # print(str(b.attack_type_in_use))
     # print("")
+
+
+def direction_of_hit(chosen_enemy, old_position):
+    if chosen_enemy[0] - old_position[0] == 1:
+        if chosen_enemy[1] - old_position[1] == 1:
+            # NW from target
+            pos = [20, 20]
+        elif chosen_enemy[1] - old_position[1] == 0:
+            # W from target
+            pos = [20, 50]
+        elif chosen_enemy[1] - old_position[1] == -1:
+            # SW from target
+            pos = [20, 80]
+    elif chosen_enemy[0] - old_position[0] == 0:
+        if chosen_enemy[1] - old_position[1] == 1:
+            # N from target
+            pos = [50, 20]
+        elif chosen_enemy[1] - old_position[1] == -1:
+            # S from target
+            pos = [50, 80]
+    elif chosen_enemy[0] - old_position[0] == -1:
+        if chosen_enemy[1] - old_position[1] == 1:
+            # NE from target
+            pos = [80, 20]
+        elif chosen_enemy[1] - old_position[1] == 0:
+            # E from target
+            pos = [80, 50]
+        elif chosen_enemy[1] - old_position[1] == -1:
+            # SE from target
+            pos = [80, 80]
+
+    return pos

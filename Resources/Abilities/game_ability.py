@@ -179,7 +179,7 @@ def perished_creatures(b, unit, before_HP):
         game_battle.kill_unit(b, unit)
 
     # Reduce morale
-    game_battle.reduce_morale(b, unit, before_HP, "Spell")
+    unit.reduce_morale(b, before_HP, "Spell")
 
     game_battle.check_if_no_one_left_alive(b)
 
