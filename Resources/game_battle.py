@@ -836,7 +836,9 @@ def advance_battle_time(time_counted):
 
 
 def melee_attack_preparation(b, TileNum, position, x2, y2):
-    # x, y - coordinates of target
+    # position - exact screen coordinates of mouth click, required to know angle of attack
+    # x, y - coordinates of mouth click converted to 96x96 square
+    # TileNum and x2, y2 - location of target
     x = (position[0] + 1) % 96
     y = (position[1] + 1) % 96
     print("melee_attack_preparation: TileNum - " + str(TileNum) + ", position [x2, y2] - " + str([x2, y2]))

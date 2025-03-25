@@ -6,10 +6,11 @@ import random
 from Content.Abilities import ability_catalog
 from Content.Abilities.AI_behavior import reg_abilities_application, reg_abilities_probability
 
+from Battle_AI import common_search_funs
+from Battle_AI import common_battle_funs
+
 from Resources import game_stats
 from Resources import game_battle
-
-from Resources.Game_Battle import hit_funs
 
 from Resources.Abilities import battle_abilities_regiment
 
@@ -112,7 +113,7 @@ def manage_caster(b, acting_unit, own_army_id, enemy_army_id, own_melee, own_ran
                     del probability_to_use[ind]
 
     # Time to use ability if it possible
-    if len(abilities_list) > 0:
+    if abilities_list:
         # print("abilities_list - " + str(abilities_list))
         # print("probability_to_use - " + str(probability_to_use))
         ability_to_perform = random.choices(abilities_list, weights=probability_to_use)
@@ -124,67 +125,24 @@ def manage_caster(b, acting_unit, own_army_id, enemy_army_id, own_melee, own_ran
         ability_script_by_application[ability_application](ability_to_perform[0], b, acting_unit, own_army, enemy_army)
 
     else:
-        # Let's check if enemy stands nearby
-
-        old_position = acting_unit.position
-        enemy_nearby = []
-
         # Let's look at tiles surrounding this regiment, searching for enemies
-        for xy in [[0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1], [1, 0], [-1, 0]]:
-            if 0 < old_position[0] + xy[0] <= game_stats.battle_width:
-                if 0 < old_position[1] + xy[1] <= game_stats.battle_height:
-                    new_position = [old_position[0] + xy[0], old_position[1] + xy[1]]
-                    TileNum = (new_position[1] - 1) * game_stats.battle_width + new_position[0] - 1
+        old_position = acting_unit.position
+        enemy_nearby = common_search_funs.surrounding_enemies(b, enemy_army_id, old_position)
 
-                    if b.battle_map[TileNum].army_id == enemy_army_id:
-                        enemy_nearby.append(new_position)
-
-        if len(enemy_nearby) > 0:
+        if enemy_nearby:
             # Regiment has an enemy in nearby tile
             # Let's look for enemies without counterattack
 
-            target_without_counterattack = None
-            defence_strength = None
-            e_index = None
-            num = 0
+            targets_without_counterattack = []
 
             for e in enemy_units:
                 if e.position in enemy_nearby:
                     if e.counterattack == 0:
-                        target_without_counterattack = True
-                        if defence_strength is None:
-                            defence_strength = int(e.defence) + int(e.armour) + \
-                                               hit_funs.defence_effect(e, e.defence, enemy_hero)
-                            e_index = int(num)
-                        elif int(e.defence) + int(e.armour) + \
-                                hit_funs.defence_effect(e, e.defence, enemy_hero) < defence_strength:
-                            defence_strength = int(e.defence) + int(e.armour) + \
-                                               hit_funs.defence_effect(e, e.defence, enemy_hero)
-                            e_index = int(num)
-                        else:
-                            pass
-                num += 1
+                        targets_without_counterattack.append(e.position)
 
-            if target_without_counterattack:
+            if targets_without_counterattack:
                 print("Opportunity to hit an enemy without counterattack")
-
-                # And switch to melee attack
-                melee_attacks_list = []
-                num = 0
-                for s in acting_unit.attacks:
-                    if s.attack_type == "Melee":
-                        melee_attacks_list.append(num)
-                    num += 1
-
-                b.attack_type_index = random.choice(melee_attacks_list)
-                b.attack_type_in_use = acting_unit.attacks[b.attack_type_index].attack_type
-
-                chosen_enemy = enemy_nearby[e_index]
-
-                pos = game_battle.direction_of_hit(chosen_enemy, old_position)
-
-                b.AI_ready = False
-                game_battle.melee_attack_preparation(b, TileNum, pos, chosen_enemy[0], chosen_enemy[1])
+                common_battle_funs.set_melee_attack(b, acting_unit, targets_without_counterattack, old_position)
             else:
                 print("No opportunity to hit an enemy without counterattack, therefore regiment shall defend itself")
                 b.AI_ready = False

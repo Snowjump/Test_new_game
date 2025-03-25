@@ -67,6 +67,24 @@ def healing_select_target(b, units):
     return AI_ability_target_pool_class.AI_Target_Pool(priority_1, priority_2)
 
 
+def divine_protection_target(b, units):
+    priority_1 = []
+    priority_2 = []
+    priority_3 = []
+    for unit in units:
+        if not unit.deserted and unit.morale > 1.0:
+            print(unit.name + " " + str(unit.position) + " morale " + str(unit.morale))
+            if not AI_game_ability.effect_is_present(unit, "Divine protection"):
+                if "melee" in unit.reg_tags:
+                    priority_1.append((unit.position[0], unit.position[1]))
+                elif "hybrid" in unit.reg_tags:
+                    priority_2.append((unit.position[0], unit.position[1]))
+                else:
+                    priority_3.append((unit.position[0], unit.position[1]))
+
+    return AI_ability_target_pool_class.AI_Target_Pool(priority_1, priority_2, priority_3)
+
+
 def inspiration_target(b, units):
     priority_1 = []
     priority_2 = []
@@ -114,6 +132,7 @@ ability_cat = {"Direct order": direct_order_select_target,
                "Bless": bless_select_target,
                "Haste" : haste_target,
                "Healing": healing_select_target,
+               "Divine protection" : divine_protection_target,
                "Inspiration" : inspiration_target,
                "Fire arrows": fire_arrows_select_target,
                "Lightning bolts": lightning_bolts_select_target,

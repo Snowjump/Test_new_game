@@ -232,6 +232,9 @@ def execute_ability(b, ability):
         for target in b.ability_targets:
             TileNum = (target[1] - 1) * game_stats.battle_width + target[0] - 1
             tile = b.battle_map[TileNum]
+            print("Target " + str(TileNum) + " at " + str(target) + " with unit_index " + str(tile.unit_index))
+            unit = player_army.units[tile.unit_index]
+            print(unit.name + ": deserted - " + str(unit.deserted) + "; len(unit.crew) - " + str(len(unit.crew)))
             for action in ability.action:
                 if b.queue[0].obj_type == "Hero":
                     battle_abilities_hero.script_cat[action.script](b, tile, player_army, opponent_army, ability)
