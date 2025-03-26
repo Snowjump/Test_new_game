@@ -93,15 +93,17 @@ def unit_account(own_units, enemy_units):
     enemy_ranged = 0
 
     for i in own_units:
-        if "melee" in i.reg_tags:
-            own_melee += 1
-        elif "ranged" in i.reg_tags:
-            own_ranged += 1
+        if not i.deserted and i.crew:
+            if "melee" in i.reg_tags:
+                own_melee += 1
+            elif "ranged" in i.reg_tags:
+                own_ranged += 1
 
     for i in enemy_units:
-        if "melee" in i.reg_tags:
-            enemy_melee += 1
-        elif "ranged" in i.reg_tags:
-            enemy_ranged += 1
+        if not i.deserted and i.crew:
+            if "melee" in i.reg_tags:
+                enemy_melee += 1
+            elif "ranged" in i.reg_tags:
+                enemy_ranged += 1
 
     return own_melee, own_ranged, enemy_melee, enemy_ranged

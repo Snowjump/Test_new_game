@@ -135,7 +135,7 @@ def select_hero_ability(b, army):
     hero = army.hero
     ability = ability_catalog.ability_cat[b.selected_ability]
     MP_bonus, initiative, mana_bonus = game_ability.calculate_bonus(ability.name, ability.school, army.hero,
-                                                                                        [], [], [], 0, ability.base_initiative, 0)
+                                                                    [], [], [], 0, ability.base_initiative, 0)
     # print("mana_bonus - " + str(mana_bonus))
     b.ability_mana_cost = int(ability_catalog.ability_cat[b.selected_ability].mana_cost + mana_bonus)
     b.initiative_cost = initiative

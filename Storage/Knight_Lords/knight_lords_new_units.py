@@ -433,7 +433,7 @@ def create_field_ballistas():
                             Strike(
                                 "Shooting", "Ranged",
                                 ["Ranged", "Physical"],
-                                4, 9, 5,  # min_dmg, max_dmg, mastery
+                                5, 12, 9,  # min_dmg, max_dmg, mastery
                                 7, 13)],  # effective and limit range
                         3, 1, 4,  # Armour and defence and base leadership
                         # Skills

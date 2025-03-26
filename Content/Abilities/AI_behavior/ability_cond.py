@@ -95,6 +95,25 @@ def divine_protection_cond(b, own_units, enemy_units):
                     priority_3 += 1
 
     if priority_1 + priority_2 + priority_3 > 0:
+        return priority_1 + priority_2 + int(priority_3 / 2)
+    return 0
+
+
+def divine_strength_cond(b, own_units, enemy_units):
+    priority_1 = 0
+    priority_2 = 0
+    priority_3 = 0
+    for unit in own_units:
+        if not unit.deserted and unit.morale > 1.0:
+            if not AI_game_ability.effect_is_present(unit, "Divine strength"):
+                if "melee" in unit.reg_tags:
+                    priority_1 += 2
+                elif "hybrid" in unit.reg_tags:
+                    priority_2 += 1
+                else:
+                    priority_3 += 1
+
+    if priority_1 + priority_2 + priority_3 > 0:
         return 30 + priority_1 + priority_2 + int(priority_3 / 2)
     return 0
 
@@ -152,6 +171,7 @@ cond_cat = {"Direct order" : direct_order_cond,
             "Haste" : haste_cond,
             "Healing" : healing_cond,
             "Divine protection" : divine_protection_cond,
+            "Divine strength" : divine_strength_cond,
             "Inspiration" : inspiration_cond,
             "Fire arrows" : fire_arrows_cond,
             "Lightning bolts" : lightning_bolts_cond,
