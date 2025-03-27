@@ -95,6 +95,25 @@ def artifact_bonus(spell_name, school, hero, MP_addition_list, initiative_reduct
                             mana_cost_subtraction.append(effect.quantity * -1)
 
 
+def artifact_bonus_regiment(spell_name, school, hero, MP_addition_list, caster):
+    if hero:
+        if len(hero.inventory) > 0:
+            for artifact in hero.inventory:
+                for effect in artifact.effects:
+                    allowed = True
+                    if len(effect.other_tags) > 0:
+                        allowed = False
+                        for tag in caster.reg_tags:
+                            if tag in effect.other_tags:
+                                allowed = True
+
+                    # print("Allowed - " + str(allowed))
+                    if allowed:
+                        if effect.application == "Ability bonus Magic Power":
+                            if effect.method == "addition":
+                                MP_addition_list.append(int(effect.quantity))
+
+
 def magic_resistance(unit, final_MP, opponent_army):
     print("name - " + str(unit.name) + ", magic_power " + str(unit.magic_power))
     unit_MP = int(unit.magic_power)
@@ -144,12 +163,28 @@ def allocate_bonuses(MP_addition_list, MP_bonus, initiative_reduction, initiativ
     return MP_bonus, initiative, mana_bonus
 
 
-def calculate_bonus(spell_name, school, hero, MP_addition_list, initiative_reduction, mana_cost_subtraction, MP_bonus,
-                    initiative, mana_bonus):
+def calculate_bonus(spell_name, school, hero, initiative):
     print("calculate_bonus()")
     print("initiative - " + str(initiative))
+    MP_bonus = 0
+    MP_addition_list = []
+    initiative_reduction = []
+    mana_cost_subtraction = []
+    mana_bonus = 0
     skill_bonus(hero, MP_addition_list, initiative_reduction)
     artifact_bonus(spell_name, school, hero, MP_addition_list, initiative_reduction, mana_cost_subtraction)
+    return allocate_bonuses(MP_addition_list, MP_bonus, initiative_reduction, initiative, mana_cost_subtraction,
+                            mana_bonus)
+
+
+def calculate_bonus_regiment(spell_name, school, hero, unit, initiative):
+    print("calculate_bonus_regiment()")
+    MP_bonus = 0
+    MP_addition_list = []
+    initiative_reduction = []
+    mana_cost_subtraction = []
+    mana_bonus = 0
+    artifact_bonus_regiment(spell_name, school, hero, MP_addition_list, unit)
     return allocate_bonuses(MP_addition_list, MP_bonus, initiative_reduction, initiative, mana_cost_subtraction,
                             mana_bonus)
 
@@ -223,10 +258,15 @@ def execute_ability(b, ability):
     player_army = common_selects.select_army_by_id(player_army_id)
     opponent_army = common_selects.select_army_by_id(opponent_army_id)
 
-    player_army.hero.mana_reserve -= b.ability_mana_cost
-    print("hero.initiative - " + str(player_army.hero.initiative) + "; b.initiative_cost - " + str(b.initiative_cost))
-    player_army.hero.initiative = float(b.initiative_cost)
-    print("hero.initiative = " + str(player_army.hero.initiative))
+    if b.queue[0].obj_type == "Regiment":
+        caster = player_army.units[b.queue[0].number]
+        caster.mana_reserve -= b.ability_mana_cost
+        game_battle.set_initiative(caster, player_army.hero, "Ability")
+    else:
+        player_army.hero.mana_reserve -= b.ability_mana_cost
+        print("hero.initiative - " + str(player_army.hero.initiative) + "; b.initiative_cost - " + str(b.initiative_cost))
+        player_army.hero.initiative = float(b.initiative_cost)
+        print("hero.initiative = " + str(player_army.hero.initiative))
 
     if ability.target in ["single_ally", "single_enemy", "all_allies"]:
         for target in b.ability_targets:
@@ -235,9 +275,15 @@ def execute_ability(b, ability):
             print("Target " + str(TileNum) + " at " + str(target) + " with unit_index " + str(tile.unit_index))
             unit = player_army.units[tile.unit_index]
             print(unit.name + ": deserted - " + str(unit.deserted) + "; len(unit.crew) - " + str(len(unit.crew)))
+            magic_power = 0
+            if b.queue[0].obj_type == "Hero":
+                magic_power = player_army.hero.magic_power
+            else:
+                regiment_strength = len(caster.crew) / (caster.number * caster.rows)
+                magic_power = int(regiment_strength * caster.magic_power + 0.5)
             for action in ability.action:
-                if b.queue[0].obj_type == "Hero":
-                    battle_abilities_hero.script_cat[action.script](b, tile, player_army, opponent_army, ability)
+                battle_abilities_hero.script_cat[action.script](b, tile, player_army, opponent_army, ability,
+                                                                magic_power)
 
         graphics_basic.remove_specific_objects(["Selected targets counter panel"], graphics_obj.battle_objects)
 

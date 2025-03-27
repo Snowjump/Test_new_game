@@ -4,6 +4,8 @@
 from Resources.Abilities import game_ability
 from Resources.Abilities import AI_game_ability
 
+from Battle_AI import battle_logic
+
 
 def direct_order_cond(b, own_units, enemy_units):
     need_to_improve_morale = False
@@ -114,7 +116,7 @@ def divine_strength_cond(b, own_units, enemy_units):
                     priority_3 += 1
 
     if priority_1 + priority_2 + priority_3 > 0:
-        return 30 + priority_1 + priority_2 + int(priority_3 / 2)
+        return priority_1 + priority_2 + int(priority_3 / 2)
     return 0
 
 
@@ -128,6 +130,15 @@ def inspiration_cond(b, own_units, enemy_units):
                 priority += 1
 
     if priority > 0:
+        return 5 + (priority - 1)
+    return 0
+
+
+def missile_shielding_cond(b, own_units, enemy_units):
+    priority = 0
+    own_melee, own_ranged, enemy_melee, enemy_ranged = battle_logic.unit_account(own_units, enemy_units)
+    priority += enemy_ranged
+    if priority:
         return 35 + (priority - 1)
     return 0
 
@@ -173,6 +184,7 @@ cond_cat = {"Direct order" : direct_order_cond,
             "Divine protection" : divine_protection_cond,
             "Divine strength" : divine_strength_cond,
             "Inspiration" : inspiration_cond,
+            "Missile shielding" : missile_shielding_cond,
             "Fire arrows" : fire_arrows_cond,
             "Lightning bolts" : lightning_bolts_cond,
             "Hail" : hail_cond}

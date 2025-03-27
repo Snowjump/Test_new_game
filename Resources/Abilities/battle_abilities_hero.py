@@ -1,5 +1,5 @@
 ## Among Myth and Wonder
-    ## battle_abilities_hero
+## battle_abilities_hero
 
 import math
 import random
@@ -13,7 +13,7 @@ from Resources.Abilities import game_ability
 
 
 # Scripts
-def increase_morale(b, tile, acting_army, opponent_army, ability):
+def increase_morale(b, tile, acting_army, opponent_army, ability, magic_power):
     unit = acting_army.units[tile.unit_index]
 
     print("increase_morale(): before " + unit.name + " unit.morale - " + str(unit.morale))
@@ -21,7 +21,7 @@ def increase_morale(b, tile, acting_army, opponent_army, ability):
     print("increase_morale(): after " + unit.name + " unit.morale - " + str(unit.morale))
 
 
-def advance_initiative(b, tile, acting_army, opponent_army, ability):
+def advance_initiative(b, tile, acting_army, opponent_army, ability, magic_power):
     unit = acting_army.units[tile.unit_index]
     info_card = game_ability.find_queue_card(b, unit)
 
@@ -53,7 +53,7 @@ def advance_initiative(b, tile, acting_army, opponent_army, ability):
                                                       (unit.position[0], unit.position[1])))
 
 
-def increase_army_morale(b, tile, acting_army, opponent_army, ability):
+def increase_army_morale(b, tile, acting_army, opponent_army, ability, magic_power):
     unit = acting_army.units[tile.unit_index]
 
     print("increase_army_morale(): before " + unit.name + " unit.morale - " + str(unit.morale))
@@ -65,10 +65,10 @@ def increase_army_morale(b, tile, acting_army, opponent_army, ability):
                                                       (unit.position[0], unit.position[1])))
 
 
-def bless_spell(b, tile, acting_army, opponent_army, ability):
+def bless_spell(b, tile, acting_army, opponent_army, ability, magic_power):
     unit = acting_army.units[tile.unit_index]
 
-    final_MP = int(acting_army.hero.magic_power + b.bonus_magic_power)
+    final_MP = int(magic_power + b.bonus_magic_power)
 
     duration = float(1.0 + final_MP)
     info_card = game_ability.find_queue_card(b, unit)
@@ -92,10 +92,10 @@ def bless_spell(b, tile, acting_army, opponent_army, ability):
                                                       (unit.position[0], unit.position[1])))
 
 
-def haste_spell(b, tile, acting_army, opponent_army, ability):
+def haste_spell(b, tile, acting_army, opponent_army, ability, magic_power):
     unit = acting_army.units[tile.unit_index]
 
-    final_MP = int(acting_army.hero.magic_power + b.bonus_magic_power)
+    final_MP = int(magic_power + b.bonus_magic_power)
 
     duration = float(1.0 + final_MP)
     increase = 2 + math.floor(final_MP / 2)
@@ -119,9 +119,9 @@ def haste_spell(b, tile, acting_army, opponent_army, ability):
                                                       (unit.position[0], unit.position[1])))
 
 
-def healing_spell(b, tile, acting_army, opponent_army, ability):
+def healing_spell(b, tile, acting_army, opponent_army, ability, magic_power):
     unit = acting_army.units[tile.unit_index]
-    final_MP = int(acting_army.hero.magic_power + b.bonus_magic_power)
+    final_MP = int(magic_power + b.bonus_magic_power)
 
     charges = 4 + math.floor(final_MP / 3)
     heal_HP = 5 + math.floor(final_MP / 2)
@@ -154,9 +154,9 @@ def healing_spell(b, tile, acting_army, opponent_army, ability):
                                                       (unit.position[0], unit.position[1])))
 
 
-def divine_protection_spell(b, tile, acting_army, opponent_army, ability):
+def divine_protection_spell(b, tile, acting_army, opponent_army, ability, magic_power):
     unit = acting_army.units[tile.unit_index]
-    final_MP = int(acting_army.hero.magic_power + b.bonus_magic_power)
+    final_MP = int(magic_power + b.bonus_magic_power)
 
     duration = float(1.0 + final_MP)
     increase = 2 + math.ceil(final_MP * 2 / 3)
@@ -181,9 +181,9 @@ def divine_protection_spell(b, tile, acting_army, opponent_army, ability):
                                                       (unit.position[0], unit.position[1])))
 
 
-def divine_strength_spell(b, tile, acting_army, opponent_army, ability):
+def divine_strength_spell(b, tile, acting_army, opponent_army, ability, magic_power):
     unit = acting_army.units[tile.unit_index]
-    final_MP = int(acting_army.hero.magic_power + b.bonus_magic_power)
+    final_MP = int(magic_power + b.bonus_magic_power)
 
     duration = float(1.0 + final_MP)
     increase = 2 + math.ceil(final_MP * 2 / 3)
@@ -208,9 +208,9 @@ def divine_strength_spell(b, tile, acting_army, opponent_army, ability):
                                                       (unit.position[0], unit.position[1])))
 
 
-def inspiration_spell(b, tile, acting_army, opponent_army, ability):
+def inspiration_spell(b, tile, acting_army, opponent_army, ability, magic_power):
     unit = acting_army.units[tile.unit_index]
-    final_MP = int(acting_army.hero.magic_power + b.bonus_magic_power)
+    final_MP = int(magic_power + b.bonus_magic_power)
 
     morale_improvement = 1.0 + final_MP * 0.2
     increase = morale_improvement
@@ -223,9 +223,9 @@ def inspiration_spell(b, tile, acting_army, opponent_army, ability):
                                                       (unit.position[0], unit.position[1])))
 
 
-def missile_shielding_spell(b, tile, acting_army, opponent_army, ability):
+def missile_shielding_spell(b, tile, acting_army, opponent_army, ability, magic_power):
     unit = acting_army.units[tile.unit_index]
-    final_MP = int(acting_army.hero.magic_power + b.bonus_magic_power)
+    final_MP = int(magic_power + b.bonus_magic_power)
 
     duration = float(1.0 + final_MP)
     increase = 2 + math.ceil(final_MP * 2 / 3)
@@ -250,9 +250,9 @@ def missile_shielding_spell(b, tile, acting_army, opponent_army, ability):
                                                       (unit.position[0], unit.position[1])))
 
 
-def fire_arrows_spell(b, tile, acting_army, opponent_army, ability):
+def fire_arrows_spell(b, tile, acting_army, opponent_army, ability, magic_power):
     unit = opponent_army.units[tile.unit_index]
-    final_MP = int(acting_army.hero.magic_power + b.bonus_magic_power)
+    final_MP = int(magic_power + b.bonus_magic_power)
     final_MP = game_ability.magic_resistance(unit, final_MP, opponent_army)
     print("hero.magic_power - " + str(acting_army.hero.magic_power) + ", final_MP - " + str(final_MP))
     b.dealt_damage = 0
@@ -304,9 +304,9 @@ def fire_arrows_spell(b, tile, acting_army, opponent_army, ability):
                                                       (unit.position[0], unit.position[1])))
 
 
-def lightning_bolts_spell(b, tile, acting_army, opponent_army, ability):
+def lightning_bolts_spell(b, tile, acting_army, opponent_army, ability, magic_power):
     unit = opponent_army.units[tile.unit_index]
-    final_MP = int(acting_army.hero.magic_power + b.bonus_magic_power)
+    final_MP = int(magic_power + b.bonus_magic_power)
     final_MP = game_ability.magic_resistance(unit, final_MP, opponent_army)
     b.dealt_damage = 0
     before_HP = 0
@@ -358,9 +358,9 @@ def lightning_bolts_spell(b, tile, acting_army, opponent_army, ability):
                                                       (unit.position[0], unit.position[1])))
 
 
-def hail_spell(b, tile, acting_army, opponent_army, ability):
+def hail_spell(b, tile, acting_army, opponent_army, ability, magic_power):
     unit = opponent_army.units[tile.unit_index]
-    final_MP = int(acting_army.hero.magic_power + b.bonus_magic_power)
+    final_MP = int(magic_power + b.bonus_magic_power)
     final_MP = game_ability.magic_resistance(unit, final_MP, opponent_army)
     b.dealt_damage = 0
     before_HP = 0

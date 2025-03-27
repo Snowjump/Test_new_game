@@ -413,7 +413,7 @@ def ranged_defence_effect(primary_target, enemy_hero):
         for addition in addition_bonus_list:
             final_defence += int(addition)
 
-    print("final_defence against ranged attack - " + str(final_defence))
+    print("bonus from final_defence against ranged attack - " + str(final_defence))
     return final_defence
 
 

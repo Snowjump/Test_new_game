@@ -4,127 +4,26 @@
 import random
 
 from Content.Abilities import ability_catalog
-from Content.Abilities.AI_behavior import reg_abilities_application, reg_abilities_probability
+from Content.Abilities import ability_targets
+
+from Content.Abilities.AI_behavior import ability_cond
 
 from Battle_AI import common_search_funs
 from Battle_AI import common_battle_funs
 
-from Resources import game_stats
 from Resources import game_battle
 
-from Resources.Abilities import battle_abilities_regiment
+from Resources.Abilities import game_ability
+from Resources.Abilities import AI_game_ability
+
+from Surfaces.Sf_Battle import ability_menu_funs
 
 
 def manage_caster(b, acting_unit, own_army_id, enemy_army_id, own_melee, own_ranged, enemy_melee,
                   enemy_ranged, enemy_units, own_army, enemy_army, enemy_hero):
-    # At beginning asses available abilities
-    abilities_list = []
-    application_type = []
-    probability_to_use = []
+    performed_ability = use_abilities(b, acting_unit, own_army, enemy_army)
 
-    print("acting_unit.abilities - " + str(acting_unit.abilities))
-    for ability in acting_unit.abilities:
-        # print("ability - " + str(ability))
-        if ability_catalog.ability_cat[ability].mana_cost <= acting_unit.mana_reserve:
-            abilities_list.append(str(ability))
-            application_type.append(str(reg_abilities_application.ability_role[ability]))
-            probability_to_use.append(int(reg_abilities_probability.ability_value[ability]))
-
-    ## Let's go through every ability tag, to determine which is possible to use
-    if len(abilities_list) > 0:
-        # Are there sufficiently enough hurt regiments to restore HP?
-        if "Restore HP" in application_type:
-            ignore_HP_restoration = True
-            for unit in own_army.units:
-                if unit.morale > 0.0:
-                    HP_pool = 0
-                    for creature in unit.crew:
-                        HP_pool += int(creature.HP)
-
-                    if len(unit.crew) * unit.max_HP - HP_pool >= 20:
-                        ignore_HP_restoration = False
-                        break
-
-            # No application for HP restoration
-            if ignore_HP_restoration:
-                indexes = []
-                num = 0
-                for application in application_type:
-                    if application == "Restore HP":
-                        indexes.append(int(num))
-                    num += 1
-
-                indexes.reverse()
-
-                for ind in indexes:
-                    del abilities_list[ind]
-                    del application_type[ind]
-                    del probability_to_use[ind]
-
-        if "Single ally buff" in application_type:
-            # print("Ability tag - Single ally buff")
-            ignore_buff = True
-            alive_regiments = 0  # Regiments formidable enough to be worth to be buffed
-            for unit in own_army.units:
-                if unit.morale > 0.0 and len(unit.crew) > (unit.number * unit.rows) / 5:
-                    # print(unit.name + " with morale - " + str(unit.morale) + ", crew size - " + str(len(unit.crew)))
-                    alive_regiments += 1
-            if alive_regiments > 1:
-                # Remove those buffs, that can't be applied, due to presence of same buff
-                remove_list = []
-                num = 0
-                for application in application_type:
-                    if application == "Single ally buff":
-                        print("Check ability - " + str(abilities_list[num]))
-                        count = int(alive_regiments)
-                        for unit in own_army.units:
-                            if unit.morale > 0.0 and len(unit.crew) > (unit.number * unit.rows) / 5:
-                                if present_effect(unit, abilities_list[num]):
-                                    count -= 1
-
-                        print("Counted regiments for buffing - " + str(count))
-                        if count <= 1:
-                            remove_list.append(num)
-
-                    num += 1
-                if len(remove_list) > 0:
-                    remove_list.reverse()
-                    for ind in remove_list:
-                        del abilities_list[ind]
-                        del application_type[ind]
-                        del probability_to_use[ind]
-
-                ignore_buff = False
-
-            # No regiments to be buffed
-            if ignore_buff:
-                indexes = []
-                num = 0
-                for application in application_type:
-                    if application == "Single ally buff":
-                        indexes.append(int(num))
-                    num += 1
-
-                indexes.reverse()
-
-                for ind in indexes:
-                    del abilities_list[ind]
-                    del application_type[ind]
-                    del probability_to_use[ind]
-
-    # Time to use ability if it possible
-    if abilities_list:
-        # print("abilities_list - " + str(abilities_list))
-        # print("probability_to_use - " + str(probability_to_use))
-        ability_to_perform = random.choices(abilities_list, weights=probability_to_use)
-        print(str(acting_unit.name) + " will use ability - " + str(ability_to_perform[0]))
-        position = abilities_list.index(ability_to_perform[0])
-        ability_application = application_type[position]
-        b.selected_ability = str(ability_to_perform[0])
-        b.AI_ready = False
-        ability_script_by_application[ability_application](ability_to_perform[0], b, acting_unit, own_army, enemy_army)
-
-    else:
+    if not performed_ability:
         # Let's look at tiles surrounding this regiment, searching for enemies
         old_position = acting_unit.position
         enemy_nearby = common_search_funs.surrounding_enemies(b, enemy_army_id, old_position)
@@ -158,66 +57,68 @@ def manage_caster(b, acting_unit, own_army_id, enemy_army_id, own_melee, own_ran
             game_battle.action_order(b, "Wait", None)
 
 
-def present_effect(unit, effect_name):
-    present = False
-    if len(unit.effects) > 0:
-        for effect in unit.effects:
-            if effect.name == effect_name:
-                present = True
+def use_abilities(b, caster, acting_army, enemy_army):
+    b.attack_name = "Abilities"
+    ability_menu_funs.open_regiment_ability_menu_but(b)
+    # Close it immediately
+    b.battle_window = None
 
-    return present
+    # 1) Select abilities that could be afforded with available mana
+    available_ability_list = []
+    for ability_name in b.list_of_abilities:
+        if ability_catalog.ability_cat[ability_name].mana_cost <= caster.mana_reserve:
+            available_ability_list.append(ability_name)
+    print("available_ability_list: " + str(available_ability_list))
 
+    # 2) Check if abilities fulfill conditions to be used in battle
+    approved_ability_list = []
+    weight_list = []
+    for ability_name in available_ability_list:
+        if ability_name in ability_cond.cond_cat:
+            weight = ability_cond.cond_cat[ability_name](b, acting_army.units, enemy_army.units)
+            if weight:
+                approved_ability_list.append(ability_catalog.ability_cat[ability_name])
+                # 2.1) Assign weights
+                weight_list.append(weight)
+                print("With weight " + str(weight) + " added ability - " + str(ability_name))
 
-def restore_HP_script(ability, b, acting_unit, own_army, enemy_army):
-    regiment_index = []
-    num = 0
+    print("approved_ability_list: " + str(len(approved_ability_list)))
+    print("weight_list: " + str(weight_list))
 
-    for unit in own_army.units:
-        if unit.morale > 0.0:
-            HP_pool = 0
-            for creature in unit.crew:
-                HP_pool += int(creature.HP)
+    selected_ability = None
+    if approved_ability_list:
+        # 3) Select ability for use
+        selected_ability = random.choices(approved_ability_list, weights=weight_list)[0]
+    if selected_ability:
+        print("selected_ability - " + str(selected_ability.name))
+        MP_bonus, initiative, mana_bonus = game_ability.calculate_bonus_regiment(selected_ability.name,
+                                                                                 selected_ability.school,
+                                                                                 acting_army.hero,
+                                                                                 caster,
+                                                                                 selected_ability.base_initiative)
+        b.ability_mana_cost = int(selected_ability.mana_cost + mana_bonus)
+        b.initiative_cost = initiative
+        b.bonus_magic_power = int(MP_bonus)
 
-                if len(unit.crew) * unit.max_HP - HP_pool >= 20:
-                    regiment_index.append(num)
+        # 4) Get targets for ability
+        # print("4) Get targets for ability")
+        # print("b.total_targets - " + str(b.total_targets))
+        b.ability_targets = []
+        if selected_ability.target == "all_allies":
+            game_ability.select_all_targets(b, acting_army)
+        else:
+            # print("magic_power - " + str(acting_army.hero.magic_power) +
+            #       "; bonus_magic_power - " + str(b.bonus_magic_power))
+            b.total_targets = ability_targets.ability_cat[selected_ability.name](acting_army.hero.magic_power +
+                                                                                 b.bonus_magic_power)
+            AI_game_ability.AI_manage_ability_seperate_targets(b, selected_ability, acting_army, enemy_army)
 
-        num += 1
-
-    selected_index = random.choice(regiment_index)
-
-    TileNum = None
-    x2 = int(own_army.units[selected_index].position[0])
-    y2 = int(own_army.units[selected_index].position[1])
-    TileNum = (y2 - 1) * game_stats.battle_width + x2 - 1
-
-    for action in ability_catalog.ability_cat[ability].action:
-        battle_abilities_regiment.script_cat[action.script](b, TileNum, own_army.hero, acting_unit)
-
-    game_battle.action_order(b, "Pass", None)
-
-
-def single_ally_buff_script(ability, b, acting_unit, own_army, enemy_army):
-    regiment_index = []
-    num = 0
-
-    for unit in own_army.units:
-        if unit.morale > 0.0 and len(unit.crew) > (unit.number * unit.rows) / 5:
-            regiment_index.append(num)
-
-        num += 1
-
-    selected_index = random.choice(regiment_index)
-    TileNum = None
-    x2 = int(own_army.units[selected_index].position[0])
-    y2 = int(own_army.units[selected_index].position[1])
-    TileNum = (y2 - 1) * game_stats.battle_width + x2 - 1
-    print("single_ally_buff_script, TileNum - " + str(TileNum))
-
-    for action in ability_catalog.ability_cat[ability].action:
-        battle_abilities_regiment.script_cat[action.script](b, TileNum, own_army.hero, acting_unit)
-
-    game_battle.action_order(b, "Pass", None)
-
-
-ability_script_by_application = {"Restore HP" : restore_HP_script,
-                                 "Single ally buff" : single_ally_buff_script}
+    if selected_ability:
+        # 5) Execute ability
+        # Ability is performed
+        game_ability.execute_ability(b, selected_ability)
+        b.AI_ready = False
+        game_battle.action_order(b, "Pass", None)
+        return True
+    else:
+        return False

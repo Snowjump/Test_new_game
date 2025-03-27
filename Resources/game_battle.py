@@ -1381,7 +1381,7 @@ def remove_aura_effects(unit_position, b):
 def set_initiative(unit, acting_hero, action_type):
     initiative = 1.0
     reduction_list = []
-    if acting_hero is not None:
+    if acting_hero:
         for skill in acting_hero.skills:
             for effect in skill.effects:
                 if effect.application == "Initiative time reduction":
@@ -1398,23 +1398,22 @@ def set_initiative(unit, acting_hero, action_type):
                             if appropriate_unit:
                                 reduction_list.append(float(effect.quantity))
 
-        if len(acting_hero.inventory) > 0:
-            for artifact in acting_hero.inventory:
-                for effect in artifact.effects:
-                    if effect.application == "Initiative time reduction":
-                        if effect.method == "subtraction":
-                            if action_type in effect.application_tags:
-                                appropriate_unit = False
-                                if len(effect.other_tags) > 0:
-                                    for unit_tag in unit.reg_tags:
-                                        if unit_tag in effect.other_tags:
-                                            appropriate_unit = True
-                                else:
-                                    appropriate_unit = True
+        for artifact in acting_hero.inventory:
+            for effect in artifact.effects:
+                if effect.application == "Initiative time reduction":
+                    if effect.method == "subtraction":
+                        if action_type in effect.application_tags:
+                            appropriate_unit = False
+                            if len(effect.other_tags) > 0:
+                                for unit_tag in unit.reg_tags:
+                                    if unit_tag in effect.other_tags:
+                                        appropriate_unit = True
+                            else:
+                                appropriate_unit = True
 
-                                if appropriate_unit:
-                                    reduction_list.append(float(effect.quantity))
-    if len(reduction_list) > 0:
+                            if appropriate_unit:
+                                reduction_list.append(float(effect.quantity))
+    if reduction_list:
         for item in reduction_list:
             initiative = initiative * (1 - item)
 

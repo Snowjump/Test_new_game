@@ -10,11 +10,9 @@ from Resources import graphics_basic
 from Resources import graphics_obj
 
 from Resources.Abilities import game_ability
-from Resources.Abilities import battle_abilities_regiment
 
 from Content.Abilities import ability_catalog
 from Content.Abilities import ability_desc_cat_hero
-from Content.Abilities import ability_desc_cat_regiment
 from Content.Abilities import ability_targets
 
 
@@ -58,21 +56,20 @@ def open_hero_ability_menu_but(b):
         update_gf_battle.add_ability_misc_sprites(ability)
 
     # Abilities from artifacts
-    if len(army.hero.inventory) > 0:
-        for artifact in army.hero.inventory:
-            for effect in artifact.effects:
-                if effect.application == "Cast spells":
-                    for ability in effect.application_tags:
-                        b.list_of_abilities.append(str(ability))
+    for artifact in army.hero.inventory:
+        for effect in artifact.effects:
+            if effect.application == "Cast spells":
+                for ability in effect.application_tags:
+                    b.list_of_abilities.append(str(ability))
 
-                        school = ability_catalog.ability_cat[ability].school
+                    school = ability_catalog.ability_cat[ability].school
 
-                        if school not in b.list_of_schools:
-                            b.list_of_schools.append(str(school))
+                    if school not in b.list_of_schools:
+                        b.list_of_schools.append(str(school))
 
-                        # Update visuals
-                        update_gf_battle.add_school_misc_sprites(school)
-                        update_gf_battle.add_ability_misc_sprites(ability)
+                    # Update visuals
+                    update_gf_battle.add_school_misc_sprites(school)
+                    update_gf_battle.add_ability_misc_sprites(ability)
 
     b.selected_ability = str(army.hero.abilities[0])
     select_hero_ability(b, army)
@@ -111,7 +108,7 @@ def open_regiment_ability_menu_but(b):
             update_gf_battle.add_ability_misc_sprites(ability)
 
         b.selected_ability = str(the_unit.abilities[0])
-        b.ability_description = ability_desc_cat_regiment.script_cat[b.selected_ability](the_unit)
+        select_regiment_ability(b, army)
 
 
 def prepare_selecting_ability(b, position):
@@ -132,21 +129,28 @@ def prepare_selecting_ability(b, position):
 
 def select_hero_ability(b, army):
     print("select_hero_ability")
-    hero = army.hero
     ability = ability_catalog.ability_cat[b.selected_ability]
     MP_bonus, initiative, mana_bonus = game_ability.calculate_bonus(ability.name, ability.school, army.hero,
-                                                                    [], [], [], 0, ability.base_initiative, 0)
+                                                                    ability.base_initiative)
     # print("mana_bonus - " + str(mana_bonus))
     b.ability_mana_cost = int(ability_catalog.ability_cat[b.selected_ability].mana_cost + mana_bonus)
     b.initiative_cost = initiative
     print("b.initiative_cost - " + str(b.initiative_cost))
     b.bonus_magic_power = int(MP_bonus)
-    b.ability_description = ability_desc_cat_hero.script_cat[b.selected_ability](b, hero, MP_bonus)
+    b.ability_description = ability_desc_cat_hero.script_cat[b.selected_ability](b, army.hero.magic_power, MP_bonus)
 
 
 def select_regiment_ability(b, army):
     unit = army.units[b.queue[0].number]
-    b.ability_description = ability_desc_cat_regiment.script_cat[b.selected_ability](unit)
+    ability = ability_catalog.ability_cat[b.selected_ability]
+    MP_bonus, initiative, mana_bonus = game_ability.calculate_bonus_regiment(ability.name, ability.school, army.hero,
+                                                                             unit, ability.base_initiative)
+    b.ability_mana_cost = int(ability_catalog.ability_cat[b.selected_ability].mana_cost + mana_bonus)
+    b.initiative_cost = initiative
+    b.bonus_magic_power = int(MP_bonus)
+    regiment_strength = len(unit.crew)/(unit.number * unit.rows)
+    magic_power = int(regiment_strength * unit.magic_power + 0.5)
+    b.ability_description = ability_desc_cat_hero.script_cat[b.selected_ability](b, magic_power, MP_bonus)
 
 
 def prepare_selecting_ability_school(b, position):
@@ -242,10 +246,17 @@ def execute_ability_but():
         else:
             # Player has to select suitable regiment as a target for ability
             b.cursor_function = "Execute ability"
-            print("bless_targets(): magic_power - " + str(player_army.hero.magic_power + b.bonus_magic_power) +
-                  "; hero.magic_power - " + str(player_army.hero.magic_power) +
-                  "; b.bonus_magic_power - " + str(b.bonus_magic_power))
-            b.total_targets = ability_targets.ability_cat[b.selected_ability](player_army.hero.magic_power +
+            magic_power = 0
+            if b.queue[0].obj_type == "Regiment":
+                unit = player_army.units[b.queue[0].number]
+                regiment_strength = len(unit.crew) / (unit.number * unit.rows)
+                magic_power = int(regiment_strength * unit.magic_power + 0.5)
+            else:
+                print("bless_targets(): magic_power - " + str(player_army.hero.magic_power + b.bonus_magic_power) +
+                      "; hero.magic_power - " + str(player_army.hero.magic_power) +
+                      "; b.bonus_magic_power - " + str(b.bonus_magic_power))
+                magic_power = player_army.hero.magic_power
+            b.total_targets = ability_targets.ability_cat[b.selected_ability](magic_power +
                                                                               b.bonus_magic_power)
             b.battle_window = None
             graphics_basic.prepare_selected_targets_counter()
@@ -257,16 +268,7 @@ def confirm_ability_targets(b, TileNum, player_army, opponent_army):
     correct_target = False
     ability = ability_catalog.ability_cat[b.selected_ability]
     for action in ability.action:
-        if b.queue[0].obj_type == "Regiment":
-            the_unit = player_army.units[b.queue[0].number]
-            correct_target = battle_abilities_regiment.script_cat[action.script](b, TileNum,
-                                                                                 player_army.hero,
-                                                                                 the_unit)
-        elif b.queue[0].obj_type == "Hero":
-            correct_target = game_ability.confirm_target(b, TileNum, player_army, opponent_army, ability)
-            # correct_target = battle_abilities_hero.script_cat[action.script](b, TileNum,
-            #                                                                  player_army,
-            #                                                                  opponent_army, ability)
+        correct_target = game_ability.confirm_target(b, TileNum, player_army, opponent_army, ability)
         if not correct_target:
             break  # Selected wrong regiment for ability
 

@@ -188,7 +188,7 @@ artifact_data = {"Champion's lance": ["Champion's lance", 'img/Artifacts/champio
                                                                    [])]],
                  "Forgotten mask": ["Forgotten mask", 'img/Artifacts/forgotten_mask.png',
                                     3000, [],
-                                    [artifact_classes.Artifact_Effect("Bonus Magic Power",
+                                    [artifact_classes.Artifact_Effect("Ability bonus Magic Power",
                                                                       2,
                                                                       "addition",
                                                                       None,
