@@ -22,6 +22,13 @@ from Screens.Sc_Battle_Windows import panel_waiting_list, panel_battle_queue, pa
 from Screens.Game_Board_Windows import info_panel_army
 from Screens.Game_Board_Windows import info_panel_settlement
 from Screens.Game_Board_Windows import info_panel_tile_obj
+from Screens.Sc_Menus_Windows import panel_entrance_menu_buttons
+
+
+def init_entrance_menu_graphics():
+    # print("init_entrance_menu_graphics()")
+    graphics_obj.menus_objects = []
+    prepare_entrance_menu_buttons()
 
 
 def init_game_board_graphics():
@@ -76,6 +83,12 @@ def remove_selected_objects(location):
                      "Info panel settlement",
                      "Info panel tile object"]
     remove_specific_objects(list_of_names, location)
+
+
+def prepare_entrance_menu_buttons():
+    # print("prepare_entrance_menu_buttons()")
+    new_object = panel_entrance_menu_buttons.Entrance_Menu_Buttons_Panel("Entrance menu")
+    refresh_graphics_object(new_object, graphics_obj.menus_objects)
 
 
 def prepare_exit_to_menu():

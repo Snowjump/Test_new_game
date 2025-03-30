@@ -6,13 +6,14 @@
 resource_ribbon = []
 
 
-# Temporary
 # Contains Panel object
-# resource_ribbon_panel = None
 game_board_objects = []
 
-#
+# Contains Panel object
 level_editor_objects = []
 
-#
+# Contains Panel object
 battle_objects = []
+
+# Contains Panel object
+menus_objects = []

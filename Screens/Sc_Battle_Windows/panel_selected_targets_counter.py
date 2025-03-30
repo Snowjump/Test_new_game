@@ -43,9 +43,9 @@ class Selected_Targets_Counter_Panel(graphics_classes.Panel):
 
     def add_confirmation_button(self):
         yVar = game_stats.game_window_height - 800
-        new_button = graphics_classes.Text_Button("Confirm target selection button", confirm_target_selection,
-                                                  "Confirm targets", "tnr_font20", "TitleText", "FieldColor",
-                                                  "LineMainMenuColor1", 550, 700 + yVar, 150, 30, 10, 5, 3)
+        new_button = graphics_classes.Battle_Text_Button("Confirm target selection button", confirm_target_selection,
+                                                         "Confirm targets", "tnr_font20", "TitleText", "FieldColor",
+                                                         "LineMainMenuColor1", 550, 700 + yVar, 150, 30, 10, 5, 3)
         self.buttons.append(new_button)
 
 

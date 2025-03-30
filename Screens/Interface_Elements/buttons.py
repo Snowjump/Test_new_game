@@ -4,13 +4,15 @@
 from Screens.colors_catalog import *
 from Screens.fonts_catalog import *
 
-font_dic = {"tnr_font20" : tnr_font20,
+font_dic = {"tnr_font26" : tnr_font26,
+            "tnr_font20" : tnr_font20,
             "tnr_font18" : tnr_font18,
             "tnr_font16" : tnr_font16,
             "arial_font16" : arial_font16,
             "arial_font14" : arial_font14}
 
 color_dic = {"LineMainMenuColor1" : LineMainMenuColor1,
+             "BorderMainMenuColor" : BorderMainMenuColor,
              "TitleText" : TitleText,
              "DarkText" : DarkText,
              "FillButton" : FillButton,

@@ -44,7 +44,12 @@ class Text_Button:
     def press_text_button(self, position):
         if self.x < position[0] < self.x + self.x_p and self.y < position[1] < self.y + self.y_p:
             self.function()
+
+
+class Battle_Text_Button(Text_Button):
+    def press_text_button(self, position):
+        if self.x < position[0] < self.x + self.x_p and self.y < position[1] < self.y + self.y_p:
+            self.function()
             b = game_stats.present_battle
             b.button_pressed = True
             print("b.button_pressed is " + str(b.button_pressed))
-

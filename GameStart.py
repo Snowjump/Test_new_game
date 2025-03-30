@@ -10,6 +10,7 @@ import math
 from Resources import display_graphics
 from Resources import game_stats
 from Resources import update_gf_menus
+from Resources import graphics_basic
 from Resources.Game_Start import game_controls
 from Resources.Game_Start import game_time
 
@@ -33,6 +34,8 @@ def init_window():
 
     screen = pygame.display.set_mode((game_stats.game_window_width, game_stats.game_window_height))
     pygame.display.set_caption('Among Myth and Wonder videogame')
+
+    graphics_basic.init_entrance_menu_graphics()
 
     # print("End of init_window()")
     # print(screen)
