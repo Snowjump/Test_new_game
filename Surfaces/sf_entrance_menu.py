@@ -12,7 +12,7 @@ def entrance_menu_surface_m1(position):
     print("entrance_menu_surface_m1")
     for obj in graphics_obj.menus_objects:
         for button in obj.buttons:
-            button.press_text_button(position)
+            button.press_button(position)
 
 
 def entrance_menu_surface_m3(position):

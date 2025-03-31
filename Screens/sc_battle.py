@@ -685,7 +685,7 @@ def battle_screen(screen):
     for obj in graphics_obj.battle_objects:
         obj.draw_panel(screen)
         for button in obj.buttons:
-            button.draw_text_button(screen)
+            button.draw_button(screen)
         # print(obj.name)
 
     if b.stage == "Formation":

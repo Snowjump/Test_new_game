@@ -38,36 +38,7 @@ def main_menu_screen(screen):
     ## Buttons
     for obj in graphics_obj.menus_objects:
         for button in obj.buttons:
-            button.draw_text_button(screen)
-    # # New Game
-    # text_MainMenu2 = tnr_font26.render("Skirmish", True, TitleText)
-    # screen.blit(text_MainMenu2, [371, 215])
-    #
-    # pygame.draw.polygon(screen, BorderMainMenuColor, [[270, 213], [570, 213], [570, 245], [270, 245]], 3)
-    #
-    # # Create level
-    # text_MainMenu2 = tnr_font26.render("Create level", True, TitleText)
-    # screen.blit(text_MainMenu2, [353, 265])
-    #
-    # pygame.draw.polygon(screen, BorderMainMenuColor, [[270, 263], [570, 263], [570, 295], [270, 295]], 3)
-    #
-    # # Settings
-    # text_MainMenu4 = tnr_font26.render("Settings", True, TitleText)
-    # screen.blit(text_MainMenu4, [373, 315])
-    #
-    # pygame.draw.polygon(screen, BorderMainMenuColor, [[270, 313], [570, 313], [570, 345], [270, 345]], 3)
-    #
-    # # Credits
-    # text_MainMenu4 = tnr_font26.render("Credits", True, TitleText)
-    # screen.blit(text_MainMenu4, [376, 365])
-    #
-    # pygame.draw.polygon(screen, BorderMainMenuColor, [[270, 363], [570, 363], [570, 395], [270, 395]], 3)
-
-    # # Exit
-    # text_MainMenu3 = tnr_font26.render("Exit", True, TitleText)
-    # screen.blit(text_MainMenu3, [395, 415])
-    #
-    # pygame.draw.polygon(screen, BorderMainMenuColor, [[270, 413], [570, 413], [570, 445], [270, 445]], 3)
+            button.draw_button(screen)
 
     # Art picture
     picture_img = game_stats.gf_menus_art["Arts/sinister_figure_in_the_woods"]
