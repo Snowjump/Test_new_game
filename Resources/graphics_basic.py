@@ -24,6 +24,7 @@ from Screens.Game_Board_Windows import info_panel_settlement
 from Screens.Game_Board_Windows import info_panel_tile_obj
 from Screens.Sc_Menus_Windows import panel_entrance_menu_buttons
 from Screens.Sc_Menus_Windows import panel_skirmish_menu_interface
+from Screens.Sc_Menus_Windows import panel_game_board_pause_menu_interface
 
 
 def init_entrance_menu_graphics():
@@ -46,6 +47,11 @@ def init_game_board_graphics():
     prepare_resource_ribbon()
     prepare_left_ribbon_menu()
     prepare_vision_mode_buttons()
+
+
+def init_game_board_pause_menu_graphics():
+    graphics_obj.menus_objects = []
+    prepare_game_board_pause_menu_interface()
 
 
 def init_level_editor_graphics():
@@ -245,6 +251,11 @@ def prepare_vision_mode_buttons():
 def prepare_waiting_list():
     new_object = panel_waiting_list.Waiting_List_Panel("Waiting list panel")
     refresh_graphics_object(new_object, graphics_obj.battle_objects)
+
+
+def prepare_game_board_pause_menu_interface():
+    new_object = panel_game_board_pause_menu_interface.Game_Board_Pause_Menu_Interface_Panel("Game board pause menu")
+    refresh_graphics_object(new_object, graphics_obj.menus_objects)
 
 
 def prepare_battle_queue():

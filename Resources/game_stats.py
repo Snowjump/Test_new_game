@@ -4,7 +4,7 @@
 # Software versioning
 version_major = 0
 version_minor = 3
-version_micro = 6
+version_micro = 7
 
 time_counted = 0
 fps = 0.0
@@ -132,10 +132,11 @@ picked_leader_trait = ""
 # available_traits_list = []
 
 # Game stats
-game_type = "singleplayer"  # Very important, if human player begin battle, then on global map game pause and wait until
+game_type = "singleplayer"  # Very important, if human player begin battle, when on global map game pause and wait until
 # battle is concluded
 strategy_mode = True  # Very important, when on - all events work on global map
 pause_status = True
+pause_last_status = True
 day = 0
 hours = 0
 minutes = 0

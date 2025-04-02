@@ -7,11 +7,10 @@ import pygame
 import math
 # from pygame.locals import *
 
-from Resources import display_graphics
 from Resources import game_stats
 from Resources import update_gf_menus
 from Resources import graphics_basic
-from Resources.Game_Start import game_controls
+from Resources.Game_Start import game_controls, display_graphics
 from Resources.Game_Start import game_time
 
 

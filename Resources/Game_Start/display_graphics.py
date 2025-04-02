@@ -8,6 +8,7 @@ import pygame.font
 from Screens.sc_create_level import *
 from Screens.sc_entrance_menu import *
 from Screens.sc_game_board import *
+from Screens.sc_game_board_pause_menu import *
 from Screens.sc_level_editor import *
 from Screens.sc_skirmish_menu import *
 from Screens.sc_settings import *
@@ -23,6 +24,7 @@ from Screens.sc_load_level_into_editor import *
 screen_funs = {"main_menu_screen" : main_menu_screen,
                "skirmish_menu_screen" : skirmish_menu_screen,
                "game_board_screen" : game_board_screen,
+               "game_board_pause_menu_screen" : game_board_pause_menu_screen,
                "create_level_screen" : create_level_screen,
                "level_editor_screen" : level_editor_screen,
                "settings_screen" : settings_screen,
@@ -35,8 +37,6 @@ OldLace = [0xFD, 0xF5, 0xE6]
 
 
 def drawing(screen, screen_to_draw):
-##    global screen
-    global font15, font16, font20, font26
 ##    print("Attempt to process screen")
 ##    print(screen)
     screen.fill(OldLace)  # background

@@ -2,7 +2,7 @@
 ## fonts_catalog
 
 import pygame.font
-
+pygame.init()
 
 tnr_font26 = pygame.font.SysFont('timesnewroman', 26)
 tnr_font20 = pygame.font.SysFont('timesnewroman', 20)

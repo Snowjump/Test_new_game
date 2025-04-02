@@ -940,15 +940,20 @@ def game_board_surface_m3(position):
 
 
 def exit_but():
-    game_stats.current_screen = "Entrance Menu"
-    print(game_stats.current_screen)
-    game_stats.screen_to_draw = "main_menu_screen"
-    game_stats.right_window = ""
-    game_stats.edit_instrument = ""
-    game_stats.selected_tile = []
-    game_stats.level_editor_panel = ""
-
-    update_gf_menus.update_menus_art()
+    game_stats.current_screen = "Game Board Pause Menu"
+    game_stats.screen_to_draw = "game_board_pause_menu_screen"
+    game_stats.pause_last_status = bool(game_stats.pause_status)
+    game_stats.pause_status = True
+    game_stats.strategy_mode = False
+    graphics_basic.init_game_board_pause_menu_graphics()
+    # game_stats.current_screen = "Entrance Menu"
+    # print(game_stats.current_screen)
+    # game_stats.screen_to_draw = "main_menu_screen"
+    # game_stats.right_window = ""
+    # game_stats.selected_tile = []
+    # graphics_basic.init_entrance_menu_graphics()
+    #
+    # update_gf_menus.update_menus_art()
 
 
 def save_but():

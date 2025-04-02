@@ -8,6 +8,7 @@ from pygame.locals import *
 from Surfaces.sf_create_level import *
 from Surfaces.sf_entrance_menu import *
 from Surfaces.sf_game_board import *
+from Surfaces.sf_game_board_pause_menu import *
 from Surfaces.sf_level_editor import *
 from Surfaces.sf_skirmish_menu import *
 from Surfaces.sf_settings import *
@@ -20,6 +21,7 @@ from Resources import game_stats
 m1_button_action_list = {"Entrance Menu": entrance_menu_surface_m1,
                          "Skirmish": skirmish_menu_surface_m1,
                          "Game Board": game_board_surface_m1,
+                         "Game Board Pause Menu": game_board_pause_menu_m1,
                          "Create Level": create_level_surface_m1,
                          "Level Editor": level_editor_surface_m1,
                          "Settings": settings_surface_m1,
@@ -30,6 +32,7 @@ m1_button_action_list = {"Entrance Menu": entrance_menu_surface_m1,
 m3_button_action_list = {"Entrance Menu": entrance_menu_surface_m3,
                          "Skirmish": skirmish_menu_surface_m3,
                          "Game Board": game_board_surface_m3,
+                         "Game Board Pause Menu": game_board_pause_menu_m3,
                          "Create Level": create_level_surface_m3,
                          "Level Editor": level_editor_surface_m3,
                          "Settings": settings_surface_m3,
@@ -40,6 +43,7 @@ m3_button_action_list = {"Entrance Menu": entrance_menu_surface_m3,
 key_action_list = {"Entrance Menu": entrance_menu_keys,
                    "Skirmish": skirmish_menu_keys,
                    "Game Board": game_board_keys,
+                   "Game Board Pause Menu": game_board_pause_menu_keys,
                    "Create Level": create_level_keys,
                    "Level Editor": level_editor_keys,
                    "Settings": settings_keys,

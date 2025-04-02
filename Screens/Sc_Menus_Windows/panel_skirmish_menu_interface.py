@@ -9,6 +9,7 @@ from Screens.fonts_catalog import *
 from Resources import graphics_classes
 from Resources import game_stats
 from Resources import graphics_basic
+from Resources import graphics_obj
 from Resources import start_new_level
 
 
@@ -135,6 +136,7 @@ def start_new_game():
     game_stats.screen_to_draw = "game_board_screen"
     game_stats.start_level_selected_realm = None
     graphics_basic.init_game_board_graphics()
+    graphics_obj.menus_objects = []
 
     click_sound = pygame.mixer.Sound("Sound/Interface/Abstract1.ogg")
     click_sound.play()
