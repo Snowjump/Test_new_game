@@ -19,7 +19,7 @@ from Content import enlist_regiment_prices
 from Resources import game_classes
 from Resources import game_obj
 from Resources import game_stats
-from Resources import graphics_basic
+from Resources.Game_Graphics import graphics_basic
 from Resources import game_diplomacy
 from Resources import algo_circle_range
 from Resources import economy

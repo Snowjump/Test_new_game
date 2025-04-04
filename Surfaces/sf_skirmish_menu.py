@@ -1,7 +1,8 @@
 ## Among Myth and Wonder
 ## sf_skirmish_menu
 
-from Resources import graphics_obj
+from Resources.Game_Graphics import graphics_obj
+from Resources.Game_Graphics import graphics_funs
 
 
 def skirmish_menu_keys(key_action):
@@ -10,11 +11,7 @@ def skirmish_menu_keys(key_action):
 
 def skirmish_menu_surface_m1(position):
     # print("skirmish_menu_surface_m1")
-    for obj in graphics_obj.menus_objects:
-        for button in obj.buttons:
-            button.press_button(position)
-        for obj_list in obj.lists:
-            obj_list.select_element(position)
+    graphics_funs.m1_single_click(graphics_obj.menus_objects, position)
 
 
 def skirmish_menu_surface_m3(position):

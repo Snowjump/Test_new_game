@@ -1,9 +1,7 @@
 ## Among Myth and Wonder
 ## panel_exit_to_menu
 
-import pygame.draw
-
-from Resources import graphics_classes
+from Resources.Game_Graphics import graphics_classes
 from Resources import game_stats
 
 

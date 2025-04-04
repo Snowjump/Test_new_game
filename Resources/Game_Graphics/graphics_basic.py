@@ -5,9 +5,8 @@ from Content.production_catalog import *
 
 from Resources import game_stats
 from Resources import game_obj
-from Resources import graphics_obj
 from Resources import common_selects
-from Resources import graphics_classes
+from Resources.Game_Graphics import graphics_classes, graphics_obj
 
 from Content import production_methods
 
@@ -255,6 +254,11 @@ def prepare_waiting_list():
 
 def prepare_game_board_pause_menu_interface():
     new_object = panel_game_board_pause_menu_interface.Game_Board_Pause_Menu_Interface_Panel("Game board pause menu")
+    refresh_graphics_object(new_object, graphics_obj.menus_objects)
+
+
+def prepare_save_game_submenu_interface():
+    new_object = panel_game_board_pause_menu_interface.Save_Game_Interface_Panel("Save game submenu")
     refresh_graphics_object(new_object, graphics_obj.menus_objects)
 
 

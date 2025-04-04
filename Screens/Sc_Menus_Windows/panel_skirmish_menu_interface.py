@@ -6,10 +6,8 @@ import math
 from Screens.colors_catalog import *
 from Screens.fonts_catalog import *
 
-from Resources import graphics_classes
+from Resources.Game_Graphics import graphics_classes, graphics_basic, graphics_obj
 from Resources import game_stats
-from Resources import graphics_basic
-from Resources import graphics_obj
 from Resources import start_new_level
 
 

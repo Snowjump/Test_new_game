@@ -2,7 +2,7 @@
 ## common_transactions
 
 from Resources import game_stats
-from Resources import graphics_basic
+from Resources.Game_Graphics import graphics_basic
 
 
 def payment(resources, realm):

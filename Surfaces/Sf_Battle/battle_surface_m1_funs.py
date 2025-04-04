@@ -1,7 +1,7 @@
 ## Among Myth and Wonder
 ## battle_surface_m1_funs
 
-from Resources import graphics_obj
+from Resources.Game_Graphics import graphics_obj
 
 
 def manage_clicks(position, b):

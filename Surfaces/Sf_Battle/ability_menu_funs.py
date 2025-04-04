@@ -6,8 +6,7 @@ import math
 from Resources import game_stats
 from Resources import common_selects
 from Resources import update_gf_battle
-from Resources import graphics_basic
-from Resources import graphics_obj
+from Resources.Game_Graphics import graphics_basic, graphics_obj
 
 from Resources.Abilities import game_ability
 

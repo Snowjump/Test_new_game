@@ -4,20 +4,15 @@
 import math
 import pygame
 import random
-import sys
-import copy
 
 from Resources import game_basic
-from Resources import graphics_basic
+from Resources.Game_Graphics import graphics_basic, graphics_obj
 from Resources import game_classes
 from Resources import game_obj
-from Resources import graphics_obj
 from Resources import game_pathfinding
 from Resources import game_stats
 from Resources import algo_building
-from Resources import skill_classes
 from Resources import update_gf_game_board
-from Resources import update_gf_menus
 from Resources import algo_path_arrows
 from Resources import game_diplomacy
 from Resources import game_autobattle
@@ -31,7 +26,6 @@ from Resources.Game_Hero import common_hero_funs
 from Storage import create_unit
 
 from Content import new_heroes_catalog
-from Content import hero_names
 from Content import starting_skills
 from Content import hero_skill_catalog
 from Content import rw_click_scripts

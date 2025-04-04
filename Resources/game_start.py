@@ -1,12 +1,12 @@
 ## Among Myth and Wonder
 ## game_start
 
-import random, pygame, math, shelve
+import math, shelve
 from pathlib import Path
 
 from Resources import game_stats
 from Resources import game_classes
-from Resources import graphics_basic
+from Resources.Game_Graphics import graphics_basic
 from Resources import algo_borders
 from Content import terrain_catalog
 

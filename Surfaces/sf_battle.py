@@ -10,8 +10,7 @@ from Resources import game_stats
 from Resources import game_battle
 from Resources import game_classes
 from Resources import game_basic
-from Resources import graphics_basic
-from Resources import graphics_obj
+from Resources.Game_Graphics import graphics_basic, graphics_obj
 from Resources import algo_movement_range
 from Resources import update_gf_game_board
 from Resources import game_pathfinding

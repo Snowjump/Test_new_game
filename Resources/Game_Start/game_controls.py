@@ -57,7 +57,8 @@ def control_input():
     # global mouse_button1_pressed, mouse_button3_pressed, Pause, key_pressed, time_counted
     for event in pygame.event.get():
         # Game exit
-        if (event.type == QUIT) or (event.type == KEYDOWN and event.key == K_ESCAPE):
+        # if (event.type == QUIT) or (event.type == KEYDOWN and event.key == K_ESCAPE):
+        if event.type == QUIT:
             pygame.quit()
             sys.exit()
 
@@ -68,7 +69,7 @@ def control_input():
             # print(game_stats.input_text)
             # print("unicode: " + event.unicode + "; record_text: " + str(game_stats.record_text))
             if game_stats.record_text:
-                game_stats.input_text += event.unicode
+                game_stats.input_text = event.unicode
 
             # if not key_pressed or event.key in [304]:
             if not game_stats.key_pressed:

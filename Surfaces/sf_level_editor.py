@@ -1,13 +1,12 @@
 ## Among Myth and Wonder
 ## sf_level_editor
 
-import copy
-import sys, pygame, math, random
+import pygame, math, random
 
 from Resources import game_stats
 from Resources import game_classes
 from Resources import faction_classes
-from Resources import level_save
+from Resources.Save_Load import level_save
 from Resources import update_gf_level_editor
 from Resources import update_gf_menus
 from Resources import algo_building

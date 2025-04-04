@@ -9,7 +9,7 @@ import math
 
 from Resources import game_stats
 from Resources import update_gf_menus
-from Resources import graphics_basic
+from Resources.Game_Graphics import graphics_basic
 from Resources.Game_Start import game_controls, display_graphics
 from Resources.Game_Start import game_time
 

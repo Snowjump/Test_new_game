@@ -10,7 +10,7 @@ from Screens.fonts_catalog import *
 from Screens.Interface_Elements import buttons
 from Screens.Interface_Elements import flags
 
-from Resources import graphics_classes
+from Resources.Game_Graphics import graphics_classes
 from Resources import game_stats
 from Resources import common_selects
 

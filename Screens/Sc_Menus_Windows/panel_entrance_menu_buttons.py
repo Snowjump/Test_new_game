@@ -6,10 +6,9 @@ import glob
 
 from Screens.fonts_catalog import *
 
-from Resources import graphics_classes
+from Resources.Game_Graphics import graphics_classes, graphics_basic
 from Resources import game_stats
 from Resources import start_new_level
-from Resources import graphics_basic
 
 
 class Entrance_Menu_Buttons_Panel(graphics_classes.Panel):

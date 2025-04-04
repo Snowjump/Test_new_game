@@ -8,7 +8,7 @@ from Screens.colors_catalog import *
 from Screens.fonts_catalog import *
 from Screens.Interface_Elements import buttons
 
-from Resources import graphics_classes
+from Resources.Game_Graphics import graphics_classes
 from Resources import game_stats
 from Resources import game_obj
 from Resources import common_selects

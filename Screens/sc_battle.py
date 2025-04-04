@@ -16,7 +16,7 @@ from Content import siege_warfare_catalog
 from Resources import game_obj
 from Resources import game_stats
 from Resources import common_selects
-from Resources import graphics_obj
+from Resources.Game_Graphics import graphics_obj
 
 from Screens.Sc_Battle import anim_battle_effects
 from Screens.Sc_Battle import anim_battle_unit_action

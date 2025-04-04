@@ -1,11 +1,12 @@
 ## Among Myth and Wonder
 ## sc_skirmish_menu
 
-import pygame.draw, pygame.font
+import pygame.font
 
 from Screens.colors_catalog import *
 
-from Resources import graphics_obj
+from Resources.Game_Graphics import graphics_obj
+from Resources.Game_Graphics import graphics_funs
 
 pygame.init()
 
@@ -20,9 +21,4 @@ def skirmish_menu_screen(screen):
     text_NewGame1 = font26.render("SKIRMISH", True, TitleText)
     screen.blit(text_NewGame1, [335, 40])
 
-    for obj in graphics_obj.menus_objects:
-        obj.draw_panel(screen)
-        for button in obj.buttons:
-            button.draw_button(screen)
-        for obj_list in obj.lists:
-            obj_list.draw_list(screen)
+    graphics_funs.draw_panel_objects(screen, graphics_obj.menus_objects)

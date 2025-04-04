@@ -3,13 +3,11 @@
 
 from Screens.colors_catalog import *
 
-from Resources import graphics_obj
+from Resources.Game_Graphics import graphics_obj
+from Resources.Game_Graphics import graphics_funs
 
 
 def game_board_pause_menu_screen(screen):
     screen.fill(NewGameColor)  # background
 
-    for obj in graphics_obj.menus_objects:
-        obj.draw_panel(screen)
-        for button in obj.buttons:
-            button.draw_button(screen)
+    graphics_funs.draw_panel_objects(screen, graphics_obj.menus_objects)

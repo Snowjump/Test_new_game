@@ -1,14 +1,11 @@
 ## Among Myth and Wonder
 ## panel_resource_ribbon
 
-import pygame.draw
-
 from Screens.colors_catalog import *
 from Screens.fonts_catalog import *
 from Screens.resource_icons_catalog import *
 
-from Resources import graphics_classes
-from Resources import graphics_obj
+from Resources.Game_Graphics import graphics_classes, graphics_obj
 from Resources import game_stats
 
 

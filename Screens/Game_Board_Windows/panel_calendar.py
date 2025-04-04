@@ -1,12 +1,10 @@
 ## Among Myth and Wonder
 ## panel_calendar
 
-import pygame.draw
-
 from Screens.colors_catalog import *
 from Screens.fonts_catalog import *
 
-from Resources import graphics_classes
+from Resources.Game_Graphics import graphics_classes
 from Resources import game_stats
 
 

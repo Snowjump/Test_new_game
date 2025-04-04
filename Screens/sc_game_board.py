@@ -12,7 +12,7 @@ from Screens.draw_alpha_funs import *
 
 from Resources import game_obj
 from Resources import game_stats
-from Resources import graphics_obj
+from Resources.Game_Graphics import graphics_obj
 from Resources import common_selects
 
 from Screens.Game_Board_Windows import det_settlement_buildings

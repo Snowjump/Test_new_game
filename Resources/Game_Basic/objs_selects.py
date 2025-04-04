@@ -2,10 +2,9 @@
 ## objs_selects
 
 from Resources import game_stats
-from Resources import graphics_basic
+from Resources.Game_Graphics import graphics_basic, graphics_obj
 from Resources import algo_building
 from Resources import update_gf_game_board
-from Resources import graphics_obj
 
 
 def deselect_army():

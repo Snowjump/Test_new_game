@@ -20,6 +20,7 @@ class Panel:
         self.name = name
         self.buttons = []  # List of interactable buttons objects
         self.lists = []  # List of interactable list objects
+        self.text_boxes = []  # List of interactable text boxes
 
 
 class Text_Button:
@@ -129,3 +130,38 @@ class Text_List:
     def select_element(self, position):
         if self.square[0] < position[0] < self.square[2] and self.square[1] < position[1] < self.square[3]:
             self.function(position)
+
+
+class Text_Box:
+    def __init__(self, name, text_font, text_color, field_color, border_color, x, y, x_p, y_p,
+                 x_w, y_w, border_thickness):
+        self.name = name
+        self.text = ""
+        self.text_font = text_font
+        self.text_color = text_color
+        self.field_color = field_color
+        self.border_color = border_color
+        self.x = x
+        self.y = y
+        self.x_p = x_p
+        self.y_p = y_p
+        self.x_w = x_w
+        self.y_w = y_w
+        self.border_thickness = border_thickness
+        self.type_text = False
+        self.original_border_color = border_color
+
+    def draw_box(self, screen):
+        buttons.element_button(screen, self.text, self.text_font, self.text_color, self.field_color, self.border_color,
+                               self.x, self.y, self.x_p, self.y_p, self.x_w, self.y_w, self.border_thickness)
+
+    def press_box(self, position):
+        if self.x < position[0] < self.x + self.x_p and self.y < position[1] < self.y + self.y_p:
+            self.type_text = True
+            self.border_color = "HighlightOption"
+            game_stats.record_text = True
+
+    def deselect_box(self):
+        self.type_text = False
+        self.border_color = self.original_border_color
+        game_stats.record_text = False

@@ -8,7 +8,7 @@ from Resources import game_obj
 from Resources import artifact_classes
 from Resources import update_gf_game_board
 from Resources import common_selects
-from Resources import graphics_basic
+from Resources.Game_Graphics import graphics_basic
 from Resources import common_transactions
 
 from Content import rw_click_scripts

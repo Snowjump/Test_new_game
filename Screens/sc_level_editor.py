@@ -9,7 +9,7 @@ from Screens.draw_alpha_funs import *
 
 from Resources import game_stats
 from Resources import faction_classes
-from Resources import graphics_obj
+from Resources.Game_Graphics import graphics_obj
 from Resources import common_selects
 
 from Content import terrain_catalog

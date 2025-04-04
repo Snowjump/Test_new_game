@@ -1,7 +1,8 @@
 ## Among Myth and Wonder
 ## game_ability
 
-from Resources import game_battle, game_stats, common_selects, graphics_basic, graphics_obj
+from Resources import game_battle, game_stats, common_selects
+from Resources.Game_Graphics import graphics_basic, graphics_obj
 from Resources.Abilities import battle_abilities_hero
 
 

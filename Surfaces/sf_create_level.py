@@ -28,7 +28,7 @@ def create_level_keys(key_action):
     print("key_action")
     print("input_text: " + str(game_stats.input_text))
 
-    if len(game_stats.input_text) > 0:
+    if game_stats.input_text:
         # Check if input is a number
         if game_stats.active_width_field or game_stats.active_height_field or game_stats.active_starting_month_field:
             print("Is it a number?  " + str(game_stats.input_text[-1]))

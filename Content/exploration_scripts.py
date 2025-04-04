@@ -12,7 +12,7 @@ from Resources import game_obj
 from Resources import game_basic
 from Resources import common_selects
 from Resources import common_transactions
-from Resources import graphics_basic
+from Resources.Game_Graphics import graphics_basic
 
 from Content import artifact_imgs_cat
 from Content import artifact_catalog

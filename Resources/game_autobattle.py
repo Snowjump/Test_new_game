@@ -11,7 +11,7 @@ from Resources import game_obj
 from Resources import algo_movement_range
 from Resources import game_pathfinding
 from Resources import common_selects
-from Resources import graphics_basic
+from Resources.Game_Graphics import graphics_basic
 
 from Content import exploration_catalog
 from Content import reward_catalog
