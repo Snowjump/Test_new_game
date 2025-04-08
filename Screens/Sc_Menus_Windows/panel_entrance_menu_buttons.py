@@ -65,7 +65,7 @@ def open_new_game_skirmish():
     print(game_stats.current_screen)
     game_stats.screen_to_draw = "skirmish_menu_screen"
 
-    game_stats.level_index = 0
+    game_stats.level_index = None
     game_stats.levels_list = glob.glob("Levels/Skirmish/*.dat")
     # print("1 level_list: " + str(game_stats.levels_list))
     # for line in game_stats.levels_list:
@@ -78,7 +78,7 @@ def open_new_game_skirmish():
     # for line in game_stats.levels_list:
     # print(str(line))
 
-    start_new_level.gather_level_information("Skirmish", game_stats.levels_list[game_stats.level_index])
+    # start_new_level.gather_level_information("Skirmish", game_stats.levels_list[game_stats.level_index])
     graphics_basic.init_skirmish_menu_graphics()
 
     click_sound = pygame.mixer.Sound("Sound/Interface/Abstract1.ogg")

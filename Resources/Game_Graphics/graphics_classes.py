@@ -105,6 +105,7 @@ class Text_List:
         self.x_p = x_p
         self.y_p = y_p
         self.line_indent = line_indent
+        self.item_index = None
 
     def draw_list(self, screen):
         x = self.x
@@ -122,14 +123,18 @@ class Text_List:
             underline_number += 1
             y += self.y_p
 
-        pygame.draw.lines(screen, self.accent_color, False,
-                          [(self.x, self.y + game_stats.level_index * self.y_p + self.line_indent),
-                           (self.x + self.x_p, self.y + game_stats.level_index * self.y_p + self.line_indent)],
-                          self.underline_thickness)
+        if self.item_index is not None:
+            pygame.draw.lines(screen, self.accent_color, False,
+                              [(self.x, self.y + self.item_index * self.y_p + self.line_indent),
+                               (self.x + self.x_p, self.y + self.item_index * self.y_p + self.line_indent)],
+                              self.underline_thickness)
 
     def select_element(self, position):
         if self.square[0] < position[0] < self.square[2] and self.square[1] < position[1] < self.square[3]:
-            self.function(position)
+            self.function(self, position)
+
+    def update_objects(self, new_objects_list):
+        self.obj_list = new_objects_list
 
 
 class Text_Box:

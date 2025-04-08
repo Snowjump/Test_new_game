@@ -7,6 +7,7 @@ from Screens.colors_catalog import *
 from Screens.fonts_catalog import *
 
 from Resources.Game_Graphics import graphics_classes, graphics_basic, graphics_obj
+from Resources.Game_Graphics import graphics_funs
 from Resources import game_stats
 from Resources import start_new_level
 
@@ -20,11 +21,6 @@ class Skirmish_Menu_Interface_Panel(graphics_classes.Panel):
         self.add_start_new_game_button(x, y)
         y += 70
         self.add_return_to_main_menu_button(x, y)
-        x = 800
-        y = 109
-        self.add_previous_realm_button(x, y)
-        x += 21
-        self.add_next_realm_button(x, y)
 
         # Create new object list
         x = 80
@@ -50,7 +46,7 @@ class Skirmish_Menu_Interface_Panel(graphics_classes.Panel):
         self.buttons.append(new_button)
 
     def add_next_realm_button(self, x, y):
-        new_button = graphics_classes.Arrow_Button("Switch to previous realm", switch_to_previous_realm,
+        new_button = graphics_classes.Arrow_Button("Switch to next realm", switch_to_previous_realm,
                                                    "Right", "RockTunel", "LineMainMenuColor1", "LineMainMenuColor1",
                                                    x, y, 19, 19, 1, 2)
         self.buttons.append(new_button)
@@ -68,57 +64,59 @@ class Skirmish_Menu_Interface_Panel(graphics_classes.Panel):
         self.draw_levels_list_background(screen)
 
     def draw_details(self, screen):
-        x = 400
-        y = 85
-        text_NewGame2 = tnr_font20.render(game_stats.levels_list[game_stats.level_index], True, TitleText)
-        screen.blit(text_NewGame2, [x, y])
+        if game_stats.level_index is not None:
+            x = 400
+            y = 85
+            text_NewGame2 = tnr_font20.render(game_stats.levels_list[game_stats.level_index], True, TitleText)
+            screen.blit(text_NewGame2, [x, y])
 
-        y += 24
-        text_NewGame2 = tnr_font18.render("Objectives:", True, TitleText)
-        screen.blit(text_NewGame2, [x, y])
+            y += 24
+            text_NewGame2 = tnr_font18.render("Objectives:", True, TitleText)
+            screen.blit(text_NewGame2, [x, y])
 
-        y += 22
-        text_NewGame2 = tnr_font18.render("Neither lords, nor their servants", True, TitleText)
-        screen.blit(text_NewGame2, [x, y])
+            y += 22
+            text_NewGame2 = tnr_font18.render("Neither lords, nor their servants", True, TitleText)
+            screen.blit(text_NewGame2, [x, y])
 
-        y += 22
-        text_NewGame2 = tnr_font18.render("shall know your mercy", True, TitleText)
-        screen.blit(text_NewGame2, [x, y])
+            y += 22
+            text_NewGame2 = tnr_font18.render("shall know your mercy", True, TitleText)
+            screen.blit(text_NewGame2, [x, y])
 
-        y += 22
-        text_NewGame2 = tnr_font18.render("Conquer all other realms", True, TitleText)
-        screen.blit(text_NewGame2, [x, y])
+            y += 22
+            text_NewGame2 = tnr_font18.render("Conquer all other realms", True, TitleText)
+            screen.blit(text_NewGame2, [x, y])
 
     def draw_realm_selection(self, screen):
-        x = 800
-        y = 85
-        text_skirmish = str(game_stats.start_level_playable_realms) + " playable realms out of " + \
-            str(game_stats.start_level_total_realms) + " realms total"
+        if game_stats.level_index is not None:
+            x = 800
+            y = 85
+            text_skirmish = str(game_stats.start_level_playable_realms) + " playable realms out of " + \
+                str(game_stats.start_level_total_realms) + " realms total"
 
-        text_NewGame2 = tnr_font18.render(text_skirmish, True, TitleText)
-        screen.blit(text_NewGame2, [x, y])
+            text_NewGame2 = tnr_font18.render(text_skirmish, True, TitleText)
+            screen.blit(text_NewGame2, [x, y])
 
-        # Flag
-        x += 46
-        y += 24
-        pygame.draw.polygon(screen, FlagColors[game_stats.start_level_selected_realm.f_color],
-                            [[x, y], [x + 22, y],
-                             [x + 22, y + 8], [x, y + 8]])
-        pygame.draw.polygon(screen, FlagColors[game_stats.start_level_selected_realm.s_color],
-                            [[x, y + 9], [x + 22, y + 9],
-                             [x + 22, y + 16], [x, y + 16]])
+            # Flag
+            x += 46
+            y += 24
+            pygame.draw.polygon(screen, FlagColors[game_stats.start_level_selected_realm.f_color],
+                                [[x, y], [x + 22, y],
+                                 [x + 22, y + 8], [x, y + 8]])
+            pygame.draw.polygon(screen, FlagColors[game_stats.start_level_selected_realm.s_color],
+                                [[x, y + 9], [x + 22, y + 9],
+                                 [x + 22, y + 16], [x, y + 16]])
 
-        x += 27
-        y -= 1
-        text_skirmish = game_stats.start_level_selected_realm.name
-        text_NewGame2 = tnr_font18.render(text_skirmish, True, TitleText)
-        screen.blit(text_NewGame2, [x, y])
+            x += 27
+            y -= 1
+            text_skirmish = game_stats.start_level_selected_realm.name
+            text_NewGame2 = tnr_font18.render(text_skirmish, True, TitleText)
+            screen.blit(text_NewGame2, [x, y])
 
-        x -= 27
-        y += 22
-        text_skirmish = game_stats.start_level_selected_realm.alignment
-        text_NewGame2 = tnr_font18.render(text_skirmish, True, TitleText)
-        screen.blit(text_NewGame2, [x, y])
+            x -= 27
+            y += 22
+            text_skirmish = game_stats.start_level_selected_realm.alignment
+            text_NewGame2 = tnr_font18.render(text_skirmish, True, TitleText)
+            screen.blit(text_NewGame2, [x, y])
 
     def draw_levels_list_background(self, screen):
         x = 78
@@ -154,26 +152,40 @@ def return_to_main_menu():
 
 
 def switch_to_previous_realm():
-    start_new_level.skirmish_previous_realm()
+    if game_stats.level_index is not None:
+        start_new_level.skirmish_previous_realm()
 
-    click_sound = pygame.mixer.Sound("Sound/Interface/Abstract1.ogg")
-    click_sound.play()
+        click_sound = pygame.mixer.Sound("Sound/Interface/Abstract1.ogg")
+        click_sound.play()
 
 
 def switch_to_next_realm():
-    start_new_level.skirmish_next_realm()
+    if game_stats.level_index is not None:
+        start_new_level.skirmish_next_realm()
 
-    click_sound = pygame.mixer.Sound("Sound/Interface/Abstract1.ogg")
-    click_sound.play()
+        click_sound = pygame.mixer.Sound("Sound/Interface/Abstract1.ogg")
+        click_sound.play()
 
 
-def select_level(position):
+def select_level(self, position):
     y_axis = position[1]
     y_axis -= 82
     # print(str(y_axis))
     y_axis = math.ceil(y_axis / 24)
     # print(str(y_axis))
     # print("len(game_stats.levels_list) - " + str(len(game_stats.levels_list)))
-    if y_axis - 1 != game_stats.level_index and y_axis <= len(game_stats.levels_list):
-        game_stats.level_index = int(y_axis - 1)
-        start_new_level.gather_level_information("Skirmish", game_stats.levels_list[game_stats.level_index])
+    if y_axis - 1 != self.item_index and y_axis <= len(self.obj_list):
+        self.item_index = int(y_axis - 1)
+        start_new_level.gather_level_information("Skirmish", self.obj_list[self.item_index])
+        game_stats.level_index = self.item_index
+        # print("item_index - " + str(self.item_index))
+
+    if self.item_index is not None:
+        panel = graphics_funs.find_graphics_object("Skirmish menu", graphics_obj.menus_objects)
+        button = graphics_funs.find_graphics_object("Switch to previous realm", panel.buttons)
+        if not button:
+            x = 800
+            y = 109
+            panel.add_previous_realm_button(x, y)
+            x += 21
+            panel.add_next_realm_button(x, y)

@@ -31,6 +31,8 @@ def key_action_panel(graphics_objects_list, key_action):
                 elif key_action == 8:  # Backspace
                     if text_box.text:  # Remove last character from text line
                         text_box.text = text_box.text[:-1]
+                elif key_action == 13:  # Enter
+                    text_box.deselect_box()
                 else:  # Add a character to text line
                     if game_stats.input_text.isalnum() or game_stats.input_text.isspace():
                         print(str(game_stats.input_text))

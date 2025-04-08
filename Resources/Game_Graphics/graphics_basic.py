@@ -262,6 +262,11 @@ def prepare_save_game_submenu_interface():
     refresh_graphics_object(new_object, graphics_obj.menus_objects)
 
 
+def prepare_load_game_submenu_interface():
+    new_object = panel_game_board_pause_menu_interface.Load_Game_Interface_Panel("Load game submenu")
+    refresh_graphics_object(new_object, graphics_obj.menus_objects)
+
+
 def prepare_battle_queue():
     new_object = panel_battle_queue.Battle_Queue_Panel("Battle queue panel")
     refresh_graphics_object(new_object, graphics_obj.battle_objects)

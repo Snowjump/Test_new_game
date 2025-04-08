@@ -86,6 +86,7 @@ def begin_new_level(folder, level_to_load):
     prepare_level.prepare_AI_army_roles()
     prepare_level.prepare_population_reserves()
 
+    game_stats.level_type = level_type
     game_stats.strategy_mode = True
     game_stats.pause_status = True
     game_stats.day = 0

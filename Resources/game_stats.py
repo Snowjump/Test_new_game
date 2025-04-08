@@ -4,7 +4,7 @@
 # Software versioning
 version_major = 0
 version_minor = 3
-version_micro = 8
+version_micro = 9
 
 time_counted = 0
 fps = 0.0
@@ -50,11 +50,13 @@ input_text = ""
 record_text = False  # Either True or False, to copy keys into input_text
 create_level_input_text = ""
 
+# Levels selection
 levels_list = []  # List of level files in folder
-level_index = 0  # Index of selected level from levels_list
+level_index = None  # int: Index of selected level from levels_list
 start_level_total_realms = 0  # Total number of realms in level
 start_level_playable_realms = 0  # Number of playable realms in level
 start_level_selected_realm = None  # Selected playable realm
+level_info = None  # Contains an object with an information about save file
 
 # Create level
 new_level_width = 9
@@ -134,6 +136,7 @@ picked_leader_trait = ""
 # Game stats
 game_type = "singleplayer"  # Very important, if human player begin battle, when on global map game pause and wait until
 # battle is concluded
+level_type = None  # str: "Skirmish"
 strategy_mode = True  # Very important, when on - all events work on global map
 pause_status = True
 pause_last_status = True
