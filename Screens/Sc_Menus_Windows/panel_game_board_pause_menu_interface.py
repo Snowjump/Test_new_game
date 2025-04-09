@@ -1,7 +1,6 @@
 ## Among Myth and Wonder
-    ## panel_game_board_pause_menu_interface
+## panel_game_board_pause_menu_interface
 
-import glob
 import math
 
 from Screens.colors_catalog import *
@@ -81,7 +80,7 @@ def save_game_submenu():
     graphics_basic.remove_specific_objects(["Load game submenu"], graphics_obj.menus_objects)
 
     game_stats.level_index = 0
-    game_stats.levels_list = glob.glob("*.svfl")
+    save_game.prepare_save_files_list()
     game_stats.level_info = None
     graphics_basic.prepare_save_game_submenu_interface()
 
@@ -96,7 +95,8 @@ def load_game_submenu():
     graphics_basic.remove_specific_objects(["Save game submenu"], graphics_obj.menus_objects)
 
     game_stats.level_index = 0
-    game_stats.levels_list = glob.glob("*.svfl")
+    save_game.prepare_save_files_list()
+    print("levels_list: " + str(game_stats.levels_list))
     game_stats.level_info = None
     graphics_basic.prepare_load_game_submenu_interface()
 
@@ -212,12 +212,15 @@ def select_save_file(self, position):
 def confirm_saving():
     panel = graphics_funs.find_graphics_object("Save game submenu", graphics_obj.menus_objects)
     filename_text_box = graphics_funs.find_graphics_object("Save filename text box", panel.text_boxes)
-    save_game.save_current_game(filename_text_box.text)
-    filename_text_box.text = ""
-    # Update save files list
-    game_stats.levels_list = glob.glob("*.svfl")
-    save_files_list = graphics_funs.find_graphics_object("Save files list", panel.lists)
-    save_files_list.update_objects(game_stats.levels_list)
+    if filename_text_box.text:
+        save_game.save_current_game(filename_text_box.text)
+        filename_text_box.text = ""
+        # Update save files list
+        save_game.prepare_save_files_list()
+        save_files_list = graphics_funs.find_graphics_object("Save files list", panel.lists)
+        save_files_list.update_objects(game_stats.levels_list)
+    else:
+        print("Save filename is empty")
 
 
 class Load_Game_Interface_Panel(graphics_classes.Panel):

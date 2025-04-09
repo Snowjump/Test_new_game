@@ -2,6 +2,13 @@
 ## save_game
 
 import pickle
+import site
+import os
+import glob
+
+from pathlib import Path
+
+from platformdirs import PlatformDirs
 
 from Resources.Save_Load import save_classes
 
@@ -11,16 +18,43 @@ from Resources import game_start
 from Resources import common_selects
 
 
+def prepare_save_files_list():
+    # print("levels_list: " + str(game_stats.levels_list))
+    dirs = PlatformDirs(game_stats.app_name, game_stats.author)
+    folder_path = str(dirs.user_data_dir) + '\\saves\\' + game_stats.level_type
+    # print("folder_path: " + folder_path)
+    # print("Directory exist - " + str(os.path.isdir(folder_path)))
+    if os.path.isdir(folder_path):
+        game_stats.levels_list = glob.glob(folder_path + "\\*.svfl")
+        for i, s in enumerate(game_stats.levels_list):
+            pos = s.find(game_stats.level_type)
+            game_stats.levels_list[i] = s[pos + len(game_stats.level_type) + 1:]
+    else:
+        game_stats.levels_list = []
+    # print("levels_list: " + str(game_stats.levels_list))
+
+
 def save_current_game(filename):
     print("save_current_game() " + str(filename))
     data = save_classes.Save_File()
     data.fill_in_the_information()
-    with open(filename + '.svfl', 'wb') as file:  # Savefile = svfl
+    dirs = PlatformDirs(game_stats.app_name, game_stats.author)
+    print(str(dirs.user_data_dir) + "; type - " + str(type(dirs.user_data_dir)))
+    folder_path = str(dirs.user_data_dir) + '\\saves\\' + game_stats.level_type
+    check_dir(folder_path)
+    path = folder_path + '\\' + filename + '.svfl'
+    print(path)
+    with open(path, 'wb') as file:  # Savefile = svfl
         pickle.dump(data, file, protocol=pickle.HIGHEST_PROTOCOL)
 
 
 def get_save_info(filename):
-    with open(filename, 'rb') as file:
+    # print(site.getsitepackages())
+    # print(dir(pygame))
+    dirs = PlatformDirs(game_stats.app_name, game_stats.author)
+    folder_path = str(dirs.user_data_dir) + '\\saves\\' + game_stats.level_type
+    path = folder_path + '\\' + filename
+    with open(path, 'rb') as file:
         game_stats.level_info = pickle.load(file)
 
 
@@ -60,3 +94,8 @@ def load_game(file):
     game_stats.strategy_mode = True
 
 
+def check_dir(folder_path):
+    folder_exist = os.path.isdir(folder_path)
+    print("Directory exist - " + str(folder_exist))
+    if not folder_exist:
+        Path(folder_path).mkdir(parents=True, exist_ok=True)
