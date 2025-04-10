@@ -34,7 +34,7 @@ class Skirmish_Menu_Interface_Panel(graphics_classes.Panel):
         self.buttons.append(new_button)
 
     def add_return_to_main_menu_button(self, x, y):
-        new_button = graphics_classes.Text_Button("Return to Main Menu", return_to_main_menu,
+        new_button = graphics_classes.Text_Button("Return to Main Menu", graphics_funs.return_to_main_menu,
                                                   "Return to Main Menu", "tnr_font26", "TitleText", None,
                                                   "BorderMainMenuColor", x, y, 300, 32, 40, 2, 3)
         self.buttons.append(new_button)
@@ -138,17 +138,6 @@ def start_new_game():
     click_sound.play()
 
     game_stats.gf_menus_art = {}
-
-
-def return_to_main_menu():
-    game_stats.current_screen = "Entrance Menu"
-    print(game_stats.current_screen)
-    game_stats.screen_to_draw = "main_menu_screen"
-    game_stats.levels_list = []
-    graphics_basic.init_entrance_menu_graphics()
-
-    click_sound = pygame.mixer.Sound("Sound/Interface/Abstract1.ogg")
-    click_sound.play()
 
 
 def switch_to_previous_realm():

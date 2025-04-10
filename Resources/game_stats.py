@@ -4,7 +4,7 @@
 # Software versioning
 version_major = 0
 version_minor = 3
-version_micro = 10
+version_micro = 11
 
 # Essential information
 author = "Snowjump"

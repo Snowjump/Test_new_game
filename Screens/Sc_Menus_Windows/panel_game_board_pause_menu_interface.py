@@ -13,7 +13,6 @@ from Resources.Save_Load import save_game
 
 from Resources import game_stats
 from Resources import update_gf_menus
-from Resources import update_gf_game_board
 
 
 class Game_Board_Pause_Menu_Interface_Panel(graphics_classes.Panel):
@@ -234,14 +233,14 @@ class Load_Game_Interface_Panel(graphics_classes.Panel):
         self.add_load_button(x, y)
 
     def add_load_files_list(self, x, y):
-        new_list = graphics_classes.Text_List("Load files list", select_load_file, game_stats.levels_list,
+        new_list = graphics_classes.Text_List("Load files list", graphics_funs.select_load_file, game_stats.levels_list,
                                               [x, y, x + 400, y + 319],
                                               tnr_font20, TitleText, NewGameColor, 1, WhiteBorder,
                                               game_stats.level_index, x + 2, y, 396, 24, 22)
         self.lists.append(new_list)
 
     def add_load_button(self, x, y):
-        new_button = graphics_classes.Text_Button("Load", confirm_loading,
+        new_button = graphics_classes.Text_Button("Load", graphics_funs.confirm_loading,
                                                   "Load Game", "tnr_font20", "TitleText", None,
                                                   "BorderMainMenuColor", x, y, 200, 28, 51, 3, 3)
         self.buttons.append(new_button)
@@ -293,35 +292,3 @@ class Load_Game_Interface_Panel(graphics_classes.Panel):
                    str(game_stats.level_info.game_version_minor) + "." + str(game_stats.level_info.game_version_micro)
             text_line = tnr_font20.render(text, True, DarkText)
             screen.blit(text_line, [x, y])
-
-
-def select_load_file(self, position):
-    y_axis = position[1]
-    y_axis -= 295
-    # print(str(y_axis))
-    y_axis = math.ceil(y_axis / 24)
-    # print(str(y_axis))
-    # print("len(game_stats.levels_list) - " + str(len(game_stats.levels_list)))
-    # print("game_stats.level_index - " + str(game_stats.level_index))
-    if (y_axis - 1 != self.item_index and y_axis <= len(self.obj_list)) \
-            or (y_axis - 1 == 0 and len(self.obj_list) == 1):
-        self.item_index = int(y_axis - 1)
-        game_stats.level_index = self.item_index
-        # print("game_stats.level_index = " + str(game_stats.level_index))
-        save_file = str(self.obj_list[self.item_index])
-        save_game.get_save_info(save_file)
-
-
-def confirm_loading():
-    if game_stats.level_info:
-        save_game.load_game(game_stats.level_info)
-
-        game_stats.current_screen = "Game Board"
-        game_stats.screen_to_draw = "game_board_screen"
-        game_stats.level_info = None
-        game_stats.strategy_mode = True
-        graphics_obj.menus_objects = []
-
-        # Update visuals
-        update_gf_game_board.update_misc_sprites()
-        update_gf_game_board.update_sprites()

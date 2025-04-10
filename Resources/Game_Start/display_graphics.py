@@ -7,6 +7,7 @@ import pygame.font
 # screens
 from Screens.sc_create_level import *
 from Screens.sc_entrance_menu import *
+from Screens.sc_load_game_menu import *
 from Screens.sc_game_board import *
 from Screens.sc_game_board_pause_menu import *
 from Screens.sc_level_editor import *
@@ -23,6 +24,7 @@ from Screens.sc_load_level_into_editor import *
 # screen functions
 screen_funs = {"main_menu_screen" : main_menu_screen,
                "skirmish_menu_screen" : skirmish_menu_screen,
+               "load_game_menu_screen" : load_game_menu_screen,
                "game_board_screen" : game_board_screen,
                "game_board_pause_menu_screen" : game_board_pause_menu_screen,
                "create_level_screen" : create_level_screen,

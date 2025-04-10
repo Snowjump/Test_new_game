@@ -6,7 +6,7 @@ from Resources.Game_Graphics import graphics_funs
 
 
 def skirmish_menu_keys(key_action):
-    pass
+    print("skirmish_menu_keys")
 
 
 def skirmish_menu_surface_m1(position):

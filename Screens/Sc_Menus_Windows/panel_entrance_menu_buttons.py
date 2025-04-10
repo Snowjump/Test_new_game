@@ -10,6 +10,8 @@ from Resources.Game_Graphics import graphics_classes, graphics_basic
 from Resources import game_stats
 from Resources import start_new_level
 
+from Resources.Save_Load import save_game
+
 
 class Entrance_Menu_Buttons_Panel(graphics_classes.Panel):
     def __init__(self, name):
@@ -18,6 +20,8 @@ class Entrance_Menu_Buttons_Panel(graphics_classes.Panel):
         x = 270
         y = 213
         self.add_skirmish_menu_button(x, y)
+        y += 50
+        self.add_load_game_menu_button(x, y)
         y += 50
         self.add_create_level_button(x, y)
         y += 50
@@ -31,6 +35,12 @@ class Entrance_Menu_Buttons_Panel(graphics_classes.Panel):
         new_button = graphics_classes.Text_Button("Skirmish button", open_new_game_skirmish,
                                                   "Skirmish", "tnr_font26", "TitleText", None,
                                                   "BorderMainMenuColor", x, y, 300, 32, 101, 2, 3)
+        self.buttons.append(new_button)
+
+    def add_load_game_menu_button(self, x, y):
+        new_button = graphics_classes.Text_Button("Load game button", open_load_game,
+                                                  "Load game menu", "tnr_font26", "TitleText", None,
+                                                  "BorderMainMenuColor", x, y, 300, 32, 60, 2, 3)
         self.buttons.append(new_button)
 
     def add_create_level_button(self, x, y):
@@ -80,6 +90,22 @@ def open_new_game_skirmish():
 
     # start_new_level.gather_level_information("Skirmish", game_stats.levels_list[game_stats.level_index])
     graphics_basic.init_skirmish_menu_graphics()
+
+    click_sound = pygame.mixer.Sound("Sound/Interface/Abstract1.ogg")
+    click_sound.play()
+
+
+def open_load_game():
+    game_stats.selected_character = None
+    game_stats.current_screen = "Load Game Menu"
+    print(game_stats.current_screen)
+    game_stats.screen_to_draw = "load_game_menu_screen"
+
+    game_stats.level_index = None
+    game_stats.level_type = "Skirmish"  # Temporary solution
+    save_game.prepare_save_files_list()
+    game_stats.level_info = None
+    graphics_basic.init_load_game_menu_graphics()
 
     click_sound = pygame.mixer.Sound("Sound/Interface/Abstract1.ogg")
     click_sound.play()

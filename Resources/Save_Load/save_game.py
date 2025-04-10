@@ -90,6 +90,7 @@ def load_game(file):
 
     game_stats.turn_hourglass = False
     player_realm = common_selects.select_realm_by_name(game_stats.player_power)
+    player_realm.turn_completed = False
     game_stats.map_to_display = player_realm.known_map
     game_stats.strategy_mode = True
 
@@ -99,3 +100,30 @@ def check_dir(folder_path):
     print("Directory exist - " + str(folder_exist))
     if not folder_exist:
         Path(folder_path).mkdir(parents=True, exist_ok=True)
+
+
+def autosave_current_game():
+    print("autosave_current_game()")
+    prepare_save_files_list()
+    print("levels_list: " + str(game_stats.levels_list))
+    if game_stats.levels_list:
+        dirs = PlatformDirs(game_stats.app_name, game_stats.author)
+        folder_path = str(dirs.user_data_dir) + '\\saves\\' + game_stats.level_type
+        for i in reversed(range(1, 5)):
+            old_save = 'autosave_' + str(i) + '.svfl'
+            print("old_save - " + str(old_save))
+
+            if old_save in game_stats.levels_list:
+                print("Replace autosave_" + str(i + 1) + '.svfl')
+                if i == 4:
+                    print("Delete last autosave: autosave_" + str(i + 1) + '.svfl')
+                    if 'autosave_' + str(i + 1) + '.svfl' in game_stats.levels_list:
+                        file_to_rem = Path(folder_path + '\\' + 'autosave_' + str(i + 1) + '.svfl')
+                        print(str(file_to_rem) + "; type - " + str(type(file_to_rem)))
+                        file_to_rem.unlink()
+
+                old_filename = folder_path + '\\' + 'autosave_' + str(i) + '.svfl'
+                new_filename = folder_path + '\\' + 'autosave_' + str(i + 1) + '.svfl'
+                os.rename(old_filename, new_filename)
+
+    save_current_game('autosave_1')

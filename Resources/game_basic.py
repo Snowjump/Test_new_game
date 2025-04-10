@@ -19,7 +19,6 @@ from Content import enlist_regiment_prices
 from Resources import game_classes
 from Resources import game_obj
 from Resources import game_stats
-from Resources.Game_Graphics import graphics_basic
 from Resources import game_diplomacy
 from Resources import algo_circle_range
 from Resources import economy
@@ -32,6 +31,10 @@ from Resources import common_selects
 from Resources import algo_borders
 
 from Resources.Game_Basic import objs_selects
+
+from Resources.Game_Graphics import graphics_basic
+
+from Resources.Save_Load import save_game
 
 from Content.Quests import knight_lords_cond
 from Content.Quests import knight_lords_quest_result_scripts
@@ -182,7 +185,10 @@ def turn_end():
 
     # Every player has ended his turn
     if everyone_is_ready:
-        if len(game_obj.game_armies) > 0:
+        # Autosave
+        save_game.autosave_current_game()
+
+        if game_obj.game_armies:
             for army in game_obj.game_armies:
                 additional_points = 0
                 if army.hero:

@@ -24,6 +24,7 @@ from Screens.Game_Board_Windows import info_panel_tile_obj
 from Screens.Sc_Menus_Windows import panel_entrance_menu_buttons
 from Screens.Sc_Menus_Windows import panel_skirmish_menu_interface
 from Screens.Sc_Menus_Windows import panel_game_board_pause_menu_interface
+from Screens.Sc_Menus_Windows import panel_load_game_menu_interface
 
 
 def init_entrance_menu_graphics():
@@ -36,6 +37,12 @@ def init_skirmish_menu_graphics():
     # print("init_skirmish_menu_graphics()")
     graphics_obj.menus_objects = []
     prepare_skirmish_menu_interface()
+
+
+def init_load_game_menu_graphics():
+    # print("init_skirmish_menu_graphics()")
+    graphics_obj.menus_objects = []
+    prepare_load_game_menu_interface()
 
 
 def init_game_board_graphics():
@@ -105,6 +112,11 @@ def prepare_entrance_menu_buttons():
 
 def prepare_skirmish_menu_interface():
     new_object = panel_skirmish_menu_interface.Skirmish_Menu_Interface_Panel("Skirmish menu")
+    refresh_graphics_object(new_object, graphics_obj.menus_objects)
+
+
+def prepare_load_game_menu_interface():
+    new_object = panel_load_game_menu_interface.Load_Game_Menu_Interface_Panel("Load game menu")
     refresh_graphics_object(new_object, graphics_obj.menus_objects)
 
 
